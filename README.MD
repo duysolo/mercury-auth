@@ -6,8 +6,9 @@
 ## Install
 
 ```shell
-npm install --save @mercury-labs/auth
+npm install --save @mercury-labs/hashing @mercury-labs/auth
 ```
+Learn more about the package `@mercury-labs/hashing` [@mercury-labs/hashing](https://www.npmjs.com/package/@mercury-labs/hashing)
 
 ## Define a database repository to get user info
 
@@ -63,41 +64,56 @@ export class CmsAuthRepository implements AuthRepository {
 ```typescript
 import { AuthModule, AuthTransferTokenMethod } from '@mercury-labs/auth'
 import { ConfigService } from '@nestjs/config'
+import { Module } from '@nestjs/common'
+import { HashingModule } from '@mercury-labs/hashing'
 
-AuthModule.forRootAsync({
-    definitions: {
-        useFactory: (config: ConfigService) => {
-            return {
-                basicAuth: {
-                    username: config.get('BASIC_AUTH_USER') || '',
-                    password: config.get('BASIC_AUTH_PASSWORD') || '',
+@Module({
+    imports: [
+        HashingModule.forRootAsync({
+            useFactory: (config: ConfigService) => {
+                return {
+                    secretKey: config.get('HASHING_SECRET_KEY') || '',
+                }
+            },
+            inject: [ConfigService],
+        }),
+        AuthModule.forRootAsync({
+            definitions: {
+                useFactory: (config: ConfigService) => {
+                    return {
+                        basicAuth: {
+                            username: config.get('BASIC_AUTH_USER') || '',
+                            password: config.get('BASIC_AUTH_PASSWORD') || '',
+                        },
+                        impersonate: {
+                            isEnabled: config.get('AUTH_IMPERSONATE_ENABLED') === 'true',
+                            cipher: config.get('AUTH_IMPERSONATE_CIPHER') || '',
+                            password: config.get('AUTH_IMPERSONATE_PASSWORD') || '',
+                        },
+                        jwt: {
+                            secret: config.get('AUTH_JWT_SECRET'),
+                            expiresIn: config.get('AUTH_JWT_EXPIRES') || '',
+                        },
+                        transferTokenMethod: config.get<AuthTransferTokenMethod>(
+                                'AUTH_TRANSFER_TOKEN_METHOD'
+                        ),
+                        redactedFields: ['password'],
+                        usernameField: 'username',
+                        passwordField: 'password',
+                    }
                 },
-                impersonate: {
-                    isEnabled: config.get('AUTH_IMPERSONATE_ENABLED') === 'true',
-                    cipher: config.get('AUTH_IMPERSONATE_CIPHER') || '',
-                    password: config.get('AUTH_IMPERSONATE_PASSWORD') || '',
+                inject: [ConfigService],
+            },
+            providers: [
+                {
+                    provide: AuthRepository,
+                    useClass: CmsAuthRepository,
                 },
-                jwt: {
-                    secret: config.get('AUTH_JWT_SECRET'),
-                    expiresIn: config.get('AUTH_JWT_EXPIRES') || '',
-                },
-                transferTokenMethod: config.get<AuthTransferTokenMethod>(
-                        'AUTH_TRANSFER_TOKEN_METHOD'
-                ),
-                redactedFields: ['password'],
-                usernameField: 'username',
-                passwordField: 'password',
-            }
-        },
-        inject: [ConfigService],
-    },
-    providers: [
-        {
-            provide: AuthRepository,
-            useClass: CmsAuthRepository,
-        },
-    ],
+            ],
+        }),
+    ]
 })
+export class AppModule {}
 ```
 
 #### Notes:
