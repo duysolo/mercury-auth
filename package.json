@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/duysolo/mercury-auth"
   },
-  "keywords": ["mercury-labs", "string encode", "string decode", "nestjs encode/decode string"],
+  "keywords": ["mercury-labs", "basic auth", "jwt auth", "nestjs auth using basic auth, jwt auth"],
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "private": false,
