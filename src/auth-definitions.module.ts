@@ -5,7 +5,7 @@ import {
   Provider,
   Type,
 } from '@nestjs/common'
-import { AuthTransferTokenMethod } from '../domain/definitions'
+import { AuthTransferTokenMethod } from './domain'
 
 export interface IAuthDefinitions {
   basicAuth: {
@@ -35,7 +35,7 @@ export interface IAuthDefinitions {
   httpAdaptorType: 'fastify' | 'express'
 }
 
-export type IAuhDefinitionsModuleOptions = Pick<ModuleMetadata, 'imports'> & {
+export type IAuthDefinitionsModuleOptions = Pick<ModuleMetadata, 'imports'> & {
   useFactory: (...args: any[]) => Promise<IAuthDefinitions> | IAuthDefinitions
   inject?: Type[]
 }
@@ -47,7 +47,7 @@ export const AUTH_DEFINITIONS_MODULE_OPTIONS: symbol = Symbol(
 @Module({})
 export class AuthDefinitionsModule {
   public static forRootAsync(
-    options: IAuhDefinitionsModuleOptions
+    options: IAuthDefinitionsModuleOptions
   ): DynamicModule {
     const authModuleProvider: Provider = {
       provide: AUTH_DEFINITIONS_MODULE_OPTIONS,

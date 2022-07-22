@@ -18,7 +18,7 @@ import {
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   IAuthDefinitions,
-} from '../../infrastructure'
+} from '../../auth-definitions.module'
 
 const transferFromResponseToCookie: (
   response: IHttpResponse,

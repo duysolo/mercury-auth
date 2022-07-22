@@ -12,7 +12,7 @@ import {
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   IAuthDefinitions,
-} from '../../infrastructure'
+} from '../../auth-definitions.module'
 
 export interface IJwtTokenResponse {
   accessToken: string

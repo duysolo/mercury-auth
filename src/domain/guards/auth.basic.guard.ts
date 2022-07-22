@@ -7,7 +7,7 @@ import {
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   IAuthDefinitions,
-} from '../../infrastructure'
+} from '../../auth-definitions.module'
 import { getRequestFromContext, getRequestHeader } from '../helpers'
 
 export interface IBasicAuthCredentials {

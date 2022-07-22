@@ -10,6 +10,12 @@ import {
 import { APP_GUARD } from '@nestjs/core'
 import { JwtModule } from '@nestjs/jwt'
 import {
+  AUTH_DEFINITIONS_MODULE_OPTIONS,
+  AuthDefinitionsModule,
+  IAuthDefinitions,
+  IAuthDefinitionsModuleOptions,
+} from './auth-definitions.module'
+import {
   AuthBasicGuard,
   AuthenticationService,
   AuthGlobalGuard,
@@ -22,14 +28,7 @@ import {
   PasswordHasherService,
   RefreshTokenStrategy,
 } from './domain'
-import {
-  AUTH_DEFINITIONS_MODULE_OPTIONS,
-  AuthDefinitionsModule,
-  BasicAuthMiddleware,
-  IAuhDefinitionsModuleOptions,
-  IAuthDefinitions,
-  LocalAuthRepository,
-} from './infrastructure'
+import { BasicAuthMiddleware, LocalAuthRepository } from './infrastructure'
 import {
   ClearAuthCookieInterceptor,
   CookieAuthInterceptor,
@@ -41,7 +40,7 @@ import { LogoutController } from './presentation/controllers/logout.controller'
 
 export interface IAuthModuleOptions
   extends Pick<ModuleMetadata, 'imports' | 'providers'> {
-  definitions: IAuhDefinitionsModuleOptions
+  definitions: IAuthDefinitionsModuleOptions
 }
 
 @Module({})

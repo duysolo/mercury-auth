@@ -5,7 +5,7 @@ import { lastValueFrom, map, mergeMap, of } from 'rxjs'
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   IAuthDefinitions,
-} from '../../infrastructure'
+} from '../../auth-definitions.module'
 import { IAuthUserEntityForResponse } from '../definitions'
 import { IJwtPayload, JwtPayload } from '../entities'
 import {

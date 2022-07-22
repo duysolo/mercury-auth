@@ -14,7 +14,7 @@ import {
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   IAuthDefinitions,
-} from '../../infrastructure'
+} from '../../auth-definitions.module'
 import { AuthRepository } from '../repositories'
 import { AuthenticationService } from '../services'
 

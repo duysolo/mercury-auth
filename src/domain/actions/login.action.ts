@@ -1,8 +1,25 @@
-import { Inject, Injectable, Logger, LoggerService, ValidationPipe, } from '@nestjs/common'
-import { asyncScheduler, map, mergeMap, Observable, of, scheduled, tap, } from 'rxjs'
+import {
+  Inject,
+  Injectable,
+  Logger,
+  LoggerService,
+  ValidationPipe,
+} from '@nestjs/common'
+import {
+  asyncScheduler,
+  map,
+  mergeMap,
+  Observable,
+  of,
+  scheduled,
+  tap,
+} from 'rxjs'
 import { IAuthUserEntity, IAuthUserEntityForResponse } from '..'
 import { PasswordHasherService } from '../services'
-import { AUTH_DEFINITIONS_MODULE_OPTIONS, IAuthDefinitions, } from '../../infrastructure'
+import {
+  AUTH_DEFINITIONS_MODULE_OPTIONS,
+  IAuthDefinitions,
+} from '../../auth-definitions.module'
 import { AuthDto } from '../dtos'
 import { AuthRepository } from '../repositories'
 
@@ -20,9 +37,8 @@ export class LoginAction {
     @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
     protected readonly options: IAuthDefinitions,
     protected readonly authRepository: AuthRepository,
-    protected readonly passwordHasherService: PasswordHasherService,
-  ) {
-  }
+    protected readonly passwordHasherService: PasswordHasherService
+  ) {}
 
   public handle(
     dto: AuthDto
@@ -31,23 +47,23 @@ export class LoginAction {
       new ValidationPipe({
         transform: true,
         whitelist: true,
-      }).transform(dto, {type: 'body', metatype: AuthDto}),
+      }).transform(dto, { type: 'body', metatype: AuthDto }),
       asyncScheduler
     ).pipe(
       map((validatedDto: AuthDto) => this.verifyImpersonate(validatedDto)),
-      tap(({username, impersonated}) => {
+      tap(({ username, impersonated }) => {
         if (impersonated) {
           this.loggerService.warn(
             `The user "${username}" is impersonated. Action with care!`
           )
         }
       }),
-      mergeMap(({username, password, impersonated}) =>
+      mergeMap(({ username, password, impersonated }) =>
         this.authRepository
           .getAuthUserByUsername(username)
-          .pipe(map((user) => ({user, impersonated})))
+          .pipe(map((user) => ({ user, impersonated })))
       ),
-      mergeMap(({user, impersonated}) =>
+      mergeMap(({ user, impersonated }) =>
         user ? this.doLogin(dto, user, impersonated) : of(undefined)
       )
     )
@@ -86,8 +102,8 @@ export class LoginAction {
       impersonated,
       username: impersonated
         ? username.substring(
-          (this.options?.impersonate?.cipher as string).length
-        )
+            (this.options?.impersonate?.cipher as string).length
+          )
         : username,
       password,
     }
