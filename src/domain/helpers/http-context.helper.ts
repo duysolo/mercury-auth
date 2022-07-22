@@ -18,13 +18,23 @@ export interface IHttpRequest {
   cookies?: Record<string, any>
 }
 
-export interface IHttpResponse {
-  setCookie?: (
-    key: string,
-    value: string,
-    options: CookieSerializeOptions
-  ) => void
-}
+export type IHttpResponse =
+  | {
+      httpAdaptorType: 'fastify'
+      setCookie?: (
+        key: string,
+        value: string,
+        options: CookieSerializeOptions
+      ) => void
+    }
+  | {
+      httpAdaptorType: 'express'
+      cookie?: (
+        key: string,
+        value: string,
+        options: CookieSerializeOptions
+      ) => void
+    }
 
 export function getRequestFromContext(context: ExecutionContext): IHttpRequest {
   return context.switchToHttp().getRequest()

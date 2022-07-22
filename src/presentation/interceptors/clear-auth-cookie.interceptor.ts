@@ -1,6 +1,7 @@
 import {
   CallHandler,
   ExecutionContext,
+  Inject,
   Injectable,
   NestInterceptor,
 } from '@nestjs/common'
@@ -11,14 +12,25 @@ import {
   getResponseFromContext,
   IHttpResponse,
 } from '../../domain'
+import {
+  AUTH_DEFINITIONS_MODULE_OPTIONS,
+  IAuthDefinitions,
+} from '../../infrastructure'
 
 @Injectable()
 export class ClearAuthCookieInterceptor implements NestInterceptor {
+  constructor(
+    @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
+    protected readonly definitions: IAuthDefinitions
+  ) {}
+
   public intercept(
     context: ExecutionContext,
     next: CallHandler
   ): Observable<any> {
     const res: IHttpResponse = getResponseFromContext(context)
+
+    res.httpAdaptorType = this.definitions.httpAdaptorType
 
     return next.handle().pipe(
       tap(() => {
@@ -28,7 +40,10 @@ export class ClearAuthCookieInterceptor implements NestInterceptor {
   }
 
   public clearAuthCookies(res: IHttpResponse): void {
-    if (!res.setCookie) {
+    if (
+      (res.httpAdaptorType === 'fastify' && !res.setCookie) ||
+      (res.httpAdaptorType === 'express' && !res.cookie)
+    ) {
       return
     }
 
@@ -41,8 +56,14 @@ export class ClearAuthCookieInterceptor implements NestInterceptor {
       secure: process.env.NODE_ENV !== 'local',
     }
 
-    res.setCookie('AccessToken', '', cookieOptions)
+    if (res.httpAdaptorType === 'fastify' && res.setCookie) {
+      res.setCookie('AccessToken', '', cookieOptions)
+      res.setCookie('RefreshToken', '', cookieOptions)
+    }
 
-    res.setCookie('RefreshToken', '', cookieOptions)
+    if (res.httpAdaptorType === 'express' && res.cookie) {
+      res.cookie('AccessToken', '', cookieOptions)
+      res.cookie('RefreshToken', '', cookieOptions)
+    }
   }
 }

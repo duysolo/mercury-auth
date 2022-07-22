@@ -31,6 +31,8 @@ export interface IAuthDefinitions {
 
   usernameField?: string
   passwordField?: string
+
+  httpAdaptorType: 'fastify' | 'express'
 }
 
 export type IAuhDefinitionsModuleOptions = Pick<ModuleMetadata, 'imports'> & {

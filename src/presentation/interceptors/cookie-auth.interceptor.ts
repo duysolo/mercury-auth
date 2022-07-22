@@ -10,6 +10,8 @@ import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import {
   AuthTransferTokenMethod,
+  CookieSerializeOptions,
+  getResponseFromContext,
   IHttpResponse,
   IJwtTokenResponse,
 } from '../../domain'
@@ -20,19 +22,20 @@ import {
 
 const transferFromResponseToCookie: (
   response: IHttpResponse,
-  authPrefer: AuthTransferTokenMethod
+  definitions: IAuthDefinitions
 ) => (
   token: IJwtTokenResponse,
   mapKeys: {
     [responseKey: string]: string
   }
-) => Record<string, any> = (response, authPrefer) => (token, mapKeys) => {
+) => Record<string, any> = (response, definitions) => (token, mapKeys) => {
   if (
-    !response.setCookie ||
+    (response.httpAdaptorType === 'fastify' && !response.setCookie) ||
+    (response.httpAdaptorType === 'express' && !response.cookie) ||
     ![
       AuthTransferTokenMethod.COOKIE_ONLY,
       AuthTransferTokenMethod.BOTH,
-    ].includes(authPrefer)
+    ].includes(definitions.transferTokenMethod)
   ) {
     return token
   }
@@ -40,16 +43,29 @@ const transferFromResponseToCookie: (
   // eslint-disable-next-line guard-for-in
   for (const responseKey in mapKeys) {
     if (token[responseKey]) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      response.setCookie(mapKeys[responseKey], token[responseKey], {
+      const cookieOptions: CookieSerializeOptions = {
         httpOnly: true,
         expires: moment(token.expiryDate).toDate(),
         path: '/',
         sameSite: 'none',
         secure: process.env.NODE_ENV !== 'local',
-      })
+      }
 
-      if (authPrefer === AuthTransferTokenMethod.COOKIE_ONLY) {
+      if (response.httpAdaptorType === 'fastify' && response.setCookie) {
+        response.setCookie(
+          mapKeys[responseKey],
+          token[responseKey],
+          cookieOptions
+        )
+      }
+
+      if (response.httpAdaptorType === 'express' && response.cookie) {
+        response.cookie(mapKeys[responseKey], token[responseKey], cookieOptions)
+      }
+
+      if (
+        definitions.transferTokenMethod === AuthTransferTokenMethod.COOKIE_ONLY
+      ) {
         delete token[responseKey]
       }
     }
@@ -69,12 +85,15 @@ export class CookieAuthInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler
   ): Observable<any> {
-    const res = context.switchToHttp().getResponse()
+    const res = getResponseFromContext(context)
+
+    res.httpAdaptorType = this.definitions.httpAdaptorType
 
     return next.handle().pipe(
       map((tokenResponse: IJwtTokenResponse) => {
         if (
-          !res.setCookie ||
+          (res.httpAdaptorType === 'fastify' && !res.setCookie) ||
+          (res.httpAdaptorType === 'express' && !res.cookie) ||
           this.definitions.transferTokenMethod ===
             AuthTransferTokenMethod.BEARER_ONLY ||
           !tokenResponse.accessToken
@@ -84,7 +103,7 @@ export class CookieAuthInterceptor implements NestInterceptor {
 
         const transferFunction = transferFromResponseToCookie(
           res,
-          this.definitions.transferTokenMethod
+          this.definitions
         )
 
         return transferFunction(tokenResponse, {

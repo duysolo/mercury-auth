@@ -1,6 +1,6 @@
 {
   "name": "@mercury-labs/auth",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Mercury framework auth library",
   "author": "duysolo <duypt.dev@gmail.com>",
   "repository": {

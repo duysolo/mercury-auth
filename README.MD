@@ -100,6 +100,7 @@ import { HashingModule } from '@mercury-labs/hashing'
                         redactedFields: ['password'],
                         usernameField: 'username',
                         passwordField: 'password',
+                        httpAdaptorType: 'fastfify'
                     }
                 },
                 inject: [ConfigService],
@@ -189,7 +190,9 @@ interface IAuthDefinitions {
      * Password field when login
      * Eg: password, pass...
      */
-    passwordField?: string
+    passwordField?: string,
+
+    httpAdaptorType: 'fastify' | 'express'
 }
 ```
 
