@@ -1,13 +1,16 @@
-import type { CookieSerializeOptions } from '@fastify/cookie'
 import {
   CallHandler,
   ExecutionContext,
   Injectable,
   NestInterceptor,
 } from '@nestjs/common'
-import type { FastifyReply } from 'fastify'
 import moment from 'moment'
 import { Observable, tap } from 'rxjs'
+import {
+  CookieSerializeOptions,
+  getResponseFromContext,
+  IHttpResponse,
+} from '../../domain'
 
 @Injectable()
 export class ClearAuthCookieInterceptor implements NestInterceptor {
@@ -15,7 +18,7 @@ export class ClearAuthCookieInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler
   ): Observable<any> {
-    const res: FastifyReply = context.switchToHttp().getResponse()
+    const res: IHttpResponse = getResponseFromContext(context)
 
     return next.handle().pipe(
       tap(() => {
@@ -24,7 +27,7 @@ export class ClearAuthCookieInterceptor implements NestInterceptor {
     )
   }
 
-  public clearAuthCookies(res: FastifyReply): void {
+  public clearAuthCookies(res: IHttpResponse): void {
     if (!res.setCookie) {
       return
     }
@@ -38,10 +41,8 @@ export class ClearAuthCookieInterceptor implements NestInterceptor {
       secure: process.env.NODE_ENV !== 'local',
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     res.setCookie('AccessToken', '', cookieOptions)
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     res.setCookie('RefreshToken', '', cookieOptions)
   }
 }

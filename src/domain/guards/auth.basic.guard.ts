@@ -4,11 +4,11 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common'
-import { FastifyRequest } from 'fastify'
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   IAuthDefinitions,
 } from '../../infrastructure'
+import { getRequestFromContext, getRequestHeader } from '../helpers'
 
 export interface IBasicAuthCredentials {
   username: string
@@ -27,9 +27,10 @@ export class AuthBasicGuard implements CanActivate {
   }
 
   public canActivate(context: ExecutionContext): boolean {
-    const request: FastifyRequest = context.switchToHttp().getRequest()
+    const request = getRequestFromContext(context)
 
-    const authenticationHeader = request.headers.authorization
+    const authenticationHeader = getRequestHeader(request, 'authorization')
+
     const [, token] = authenticationHeader?.split(' ') || []
 
     return !!authenticationHeader && !!token && this.validateToken(token)

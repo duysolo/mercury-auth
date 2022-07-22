@@ -39,7 +39,8 @@ import {
 } from './presentation'
 import { LogoutController } from './presentation/controllers/logout.controller'
 
-export interface IAuthModuleOptions extends Pick<ModuleMetadata, 'imports' | 'providers'> {
+export interface IAuthModuleOptions
+  extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   definitions: IAuhDefinitionsModuleOptions
 }
 
@@ -102,13 +103,26 @@ export class AuthModule implements NestModule {
         LogoutController,
         ProfileController,
       ],
-      exports: [AuthenticationService, PasswordHasherService],
+      exports: [
+        AuthRepository,
+
+        AuthenticationService,
+        PasswordHasherService,
+        PasswordHasherService,
+
+        ClearAuthCookieInterceptor,
+        CookieAuthInterceptor,
+
+        LocalStrategy,
+        JwtStrategy,
+        RefreshTokenStrategy,
+      ],
     }
   }
 
   public configure(consumer: MiddlewareConsumer): void {
     consumer
       .apply(BasicAuthMiddleware)
-      .forRoutes({path: '*', method: RequestMethod.ALL})
+      .forRoutes({ path: '*', method: RequestMethod.ALL })
   }
 }

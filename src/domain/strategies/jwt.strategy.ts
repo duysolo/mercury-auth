@@ -1,6 +1,5 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
-import { FastifyRequest } from 'fastify'
 import { ExtractJwt, JwtFromRequestFunction, Strategy } from 'passport-jwt'
 import { lastValueFrom, map, mergeMap, of } from 'rxjs'
 import {
@@ -9,22 +8,28 @@ import {
 } from '../../infrastructure'
 import { IAuthUserEntityForResponse } from '../definitions'
 import { IJwtPayload, JwtPayload } from '../entities'
-import { hideRedactedFields, validateEntity } from '../helpers'
+import {
+  getRequestCookie,
+  getRequestHeader,
+  hideRedactedFields,
+  IHttpRequest,
+  validateEntity,
+} from '../helpers'
 import { AuthRepository } from '../repositories'
 import { AuthenticationService } from '../services'
 
 export const JWT_STRATEGY_NAME: string = 'jwt'
 
 const cookieExtractor: JwtFromRequestFunction = (
-  request: FastifyRequest | any
-): string | undefined | any => {
-  return request?.cookies?.AccessToken || null
+  request: IHttpRequest
+): string | null => {
+  return (getRequestCookie(request, 'AccessToken') as unknown as string) || null
 }
 
 const accessTokenHeaderExtractor: JwtFromRequestFunction = (
-  request: FastifyRequest | any
+  request: IHttpRequest
 ): string | undefined | any => {
-  const authHeader = request.headers.authorization
+  const authHeader = getRequestHeader(request, 'authorization')
 
   if (!authHeader || typeof authHeader !== 'string') {
     return undefined

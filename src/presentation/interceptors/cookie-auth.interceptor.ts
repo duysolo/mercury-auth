@@ -5,18 +5,21 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common'
-import type { FastifyReply } from 'fastify'
 import moment from 'moment'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { AuthTransferTokenMethod, IJwtTokenResponse } from '../../domain'
+import {
+  AuthTransferTokenMethod,
+  IHttpResponse,
+  IJwtTokenResponse,
+} from '../../domain'
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   IAuthDefinitions,
 } from '../../infrastructure'
 
 const transferFromResponseToCookie: (
-  response: FastifyReply,
+  response: IHttpResponse,
   authPrefer: AuthTransferTokenMethod
 ) => (
   token: IJwtTokenResponse,

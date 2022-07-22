@@ -1,10 +1,16 @@
 import { HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
-import { FastifyRequest } from 'fastify'
 import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
 import { Strategy } from 'passport-strategy'
 import { lastValueFrom, map } from 'rxjs'
-import { hideRedactedFields, IAuthUserEntityForResponse, IJwtPayload } from '..'
+import {
+  getRequestCookie,
+  getRequestHeader,
+  hideRedactedFields,
+  IAuthUserEntityForResponse,
+  IHttpRequest,
+  IJwtPayload,
+} from '..'
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   IAuthDefinitions,
@@ -15,15 +21,19 @@ import { AuthenticationService } from '../services'
 export const REFRESH_TOKEN_STRATEGY_NAME: string = 'mercury-refresh-token'
 
 const cookieExtractor: JwtFromRequestFunction = (
-  request: FastifyRequest | any
-): string | undefined | any => {
-  return request?.cookies?.RefreshToken
+  request: IHttpRequest
+): string | null => {
+  return (
+    (getRequestCookie(request, 'RefreshToken') as unknown as string) || null
+  )
 }
 
 const refreshTokenHeaderExtractor: JwtFromRequestFunction = (
-  request: FastifyRequest | any
-): string | undefined | any => {
-  return request.headers['refresh-token'] as unknown as string
+  request: IHttpRequest
+): string | null => {
+  return (
+    (getRequestHeader(request, 'refresh-token') as unknown as string) || null
+  )
 }
 
 @Injectable()
