@@ -19,7 +19,7 @@ export class LoginAction {
     @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
     protected readonly options: IAuthDefinitions,
     protected readonly authRepository: AuthRepository,
-    protected readonly passwordHasherService: PasswordHasherService<string>,
+    protected readonly passwordHasherService: PasswordHasherService,
   ) {
   }
 

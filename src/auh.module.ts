@@ -108,7 +108,6 @@ export class AuthModule implements NestModule {
 
         AuthenticationService,
         PasswordHasherService,
-        PasswordHasherService,
 
         ClearAuthCookieInterceptor,
         CookieAuthInterceptor,
