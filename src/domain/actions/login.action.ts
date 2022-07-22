@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger, LoggerService, ValidationPipe, } from '@nestjs/common'
 import { asyncScheduler, map, mergeMap, Observable, of, scheduled, tap, } from 'rxjs'
-import { IAuthUserEntity, IAuthUserEntityForResponse, PasswordHasherService } from '..'
+import { IAuthUserEntity, IAuthUserEntityForResponse } from '..'
+import { PasswordHasherService } from '../services'
 import { AUTH_DEFINITIONS_MODULE_OPTIONS, IAuthDefinitions, } from '../../infrastructure'
 import { AuthDto } from '../dtos'
 import { AuthRepository } from '../repositories'
