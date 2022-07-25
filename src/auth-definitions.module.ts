@@ -1,10 +1,6 @@
-import {
-  DynamicModule,
-  Module,
-  ModuleMetadata,
-  Provider,
-  Type,
-} from '@nestjs/common'
+import { DynamicModule, Module, ModuleMetadata, Provider } from '@nestjs/common'
+import { InjectionToken } from '@nestjs/common/interfaces/modules/injection-token.interface'
+import { OptionalFactoryDependency } from '@nestjs/common/interfaces/modules/optional-factory-dependency.interface'
 import { AuthTransferTokenMethod } from './domain'
 
 export interface IAuthDefinitions {
@@ -37,7 +33,7 @@ export interface IAuthDefinitions {
 
 export type IAuthDefinitionsModuleOptions = Pick<ModuleMetadata, 'imports'> & {
   useFactory: (...args: any[]) => Promise<IAuthDefinitions> | IAuthDefinitions
-  inject?: Type[]
+  inject?: Array<InjectionToken | OptionalFactoryDependency>
 }
 
 export const AUTH_DEFINITIONS_MODULE_OPTIONS: symbol = Symbol(

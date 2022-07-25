@@ -6,8 +6,9 @@ import {
   ModuleMetadata,
   NestModule,
   RequestMethod,
-  Type,
 } from '@nestjs/common'
+import { InjectionToken } from '@nestjs/common/interfaces/modules/injection-token.interface'
+import { OptionalFactoryDependency } from '@nestjs/common/interfaces/modules/optional-factory-dependency.interface'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtModule } from '@nestjs/jwt'
 import {
@@ -44,13 +45,13 @@ export interface IAuthModuleOptions extends Pick<ModuleMetadata, 'imports'> {
   definitions: IAuthDefinitionsModuleOptions
   authRepository: {
     useFactory: (...args: any[]) => Promise<AuthRepository> | AuthRepository
-    inject?: Type[]
+    inject?: Array<InjectionToken | OptionalFactoryDependency>
   }
   passwordHasher?: {
     useFactory: (
       ...args: any[]
     ) => Promise<PasswordHasherService> | PasswordHasherService
-    inject?: Type[]
+    inject?: Array<InjectionToken | OptionalFactoryDependency>
   }
 }
 

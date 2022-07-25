@@ -1,6 +1,6 @@
 {
   "name": "@mercury-labs/auth",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Mercury framework auth library",
   "author": "duysolo <duypt.dev@gmail.com>",
   "repository": {
@@ -20,7 +20,6 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "rm -rf ./dist && nest build",
-    "publish": "rm -rf ./dist && nest build && npm publish",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
