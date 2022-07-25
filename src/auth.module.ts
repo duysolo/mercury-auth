@@ -39,15 +39,16 @@ import {
 } from './presentation'
 import { LogoutController } from './presentation/controllers/logout.controller'
 
-export interface IAuthModuleOptions
-  extends Pick<ModuleMetadata, 'imports'> {
+export interface IAuthModuleOptions extends Pick<ModuleMetadata, 'imports'> {
   definitions: IAuthDefinitionsModuleOptions
   authRepository: {
     useFactory: (...args: any[]) => Promise<AuthRepository> | AuthRepository
     inject?: Type[]
   }
   passwordHasher?: {
-    useFactory: (...args: any[]) => Promise<AuthRepository> | AuthRepository
+    useFactory: (
+      ...args: any[]
+    ) => Promise<PasswordHasherService> | PasswordHasherService
     inject?: Type[]
   }
 }
@@ -59,18 +60,19 @@ export class AuthModule implements NestModule {
       module: AuthModule,
       providers: [
         {
-          provide: AuthRepository,
-          useFactory:
-            options.authRepository.useFactory ||
-            (() => new LocalAuthRepository()),
-          inject: options.authRepository.inject,
-        },
-        {
           provide: PasswordHasherService,
           useFactory:
             options.passwordHasher?.useFactory ||
             (() => new BcryptPasswordHasherService()),
           inject: options.passwordHasher?.inject,
+        },
+
+        {
+          provide: AuthRepository,
+          useFactory:
+            options.authRepository.useFactory ||
+            (() => new LocalAuthRepository()),
+          inject: options.authRepository.inject,
         },
 
         {
