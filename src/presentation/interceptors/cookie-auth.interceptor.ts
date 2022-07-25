@@ -6,8 +6,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common'
 import moment from 'moment'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, Observable } from 'rxjs'
 import {
   AuthTransferTokenMethod,
   CookieSerializeOptions,

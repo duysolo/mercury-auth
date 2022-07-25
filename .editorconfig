@@ -679,6 +679,8 @@ ij_html_uniform_ident = false
 ij_visual_guides = none
 
 [{*.markdown,*.md}]
+indent_size = 2
+indent_style = space
 ij_visual_guides = none
 ij_markdown_force_one_space_after_blockquote_symbol = true
 ij_markdown_force_one_space_after_header_symbol = true

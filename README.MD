@@ -105,12 +105,12 @@ import { HashingModule } from '@mercury-labs/hashing'
                 },
                 inject: [ConfigService],
             },
-            providers: [
-                {
-                    provide: AuthRepository,
-                    useClass: CmsAuthRepository,
-                },
-            ],
+            authRepository: {
+              useFactory: (hasher: PasswordHasherService) => {
+                return new CmsAuthRepository()
+              },
+              inject: [PasswordHasherService]
+            }
         }),
     ]
 })
@@ -248,13 +248,11 @@ export class Pbkdf2PasswordHasherService implements PasswordHasherService<IPbkdf
 ```typescript
 AuthModule.forRootAsync({
     ...,
-    providers: [
-        ...,
-        {
-            provide: PasswordHasherService,
-            useClass: Pbkdf2PasswordHasherService,
+    passwordHasher: {
+        useFactory: () => {
+            return new Pbkdf2PasswordHasherService()
         },
-    ],
+    }
 })
 ```
 

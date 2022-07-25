@@ -6,6 +6,7 @@ import {
   ModuleMetadata,
   NestModule,
   RequestMethod,
+  Type,
 } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtModule } from '@nestjs/jwt'
@@ -39,8 +40,16 @@ import {
 import { LogoutController } from './presentation/controllers/logout.controller'
 
 export interface IAuthModuleOptions
-  extends Pick<ModuleMetadata, 'imports' | 'providers'> {
+  extends Pick<ModuleMetadata, 'imports'> {
   definitions: IAuthDefinitionsModuleOptions
+  authRepository: {
+    useFactory: (...args: any[]) => Promise<AuthRepository> | AuthRepository
+    inject?: Type[]
+  }
+  passwordHasher?: {
+    useFactory: (...args: any[]) => Promise<AuthRepository> | AuthRepository
+    inject?: Type[]
+  }
 }
 
 @Module({})
@@ -51,11 +60,17 @@ export class AuthModule implements NestModule {
       providers: [
         {
           provide: AuthRepository,
-          useClass: LocalAuthRepository,
+          useFactory:
+            options.authRepository.useFactory ||
+            (() => new LocalAuthRepository()),
+          inject: options.authRepository.inject,
         },
         {
           provide: PasswordHasherService,
-          useClass: BcryptPasswordHasherService,
+          useFactory:
+            options.passwordHasher?.useFactory ||
+            (() => new BcryptPasswordHasherService()),
+          inject: options.passwordHasher?.inject,
         },
 
         {
@@ -76,8 +91,6 @@ export class AuthModule implements NestModule {
 
         ClearAuthCookieInterceptor,
         CookieAuthInterceptor,
-
-        ...(options.providers || []),
       ],
       imports: [
         ...(options.imports || []),
@@ -105,7 +118,6 @@ export class AuthModule implements NestModule {
       exports: [
         AuthRepository,
 
-        AuthenticationService,
         PasswordHasherService,
 
         ClearAuthCookieInterceptor,
