@@ -14,14 +14,14 @@ import {
   scheduled,
   tap,
 } from 'rxjs'
-import { IAuthUserEntity, IAuthUserEntityForResponse } from '..'
-import { PasswordHasherService } from '../services'
+import { AUTH_PASSWORD_HASHER, PasswordHasherService } from '../services'
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   IAuthDefinitions,
 } from '../../auth-definitions.module'
 import { AuthDto } from '../dtos'
 import { AuthRepository } from '../repositories'
+import type { IAuthUserEntity, IAuthUserEntityForResponse } from '..'
 
 export interface IImpersonatedLoginRequest {
   impersonated: boolean
@@ -37,6 +37,7 @@ export class LoginAction {
     @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
     protected readonly options: IAuthDefinitions,
     protected readonly authRepository: AuthRepository,
+    @Inject(AUTH_PASSWORD_HASHER)
     protected readonly passwordHasherService: PasswordHasherService
   ) {}
 

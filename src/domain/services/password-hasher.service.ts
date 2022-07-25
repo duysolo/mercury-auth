@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import bcrypt from 'bcrypt'
 
-@Injectable()
+export const AUTH_PASSWORD_HASHER: symbol = Symbol('AUTH_PASSWORD_HASHER')
+
 export abstract class PasswordHasherService<T = any> {
   public abstract hash(password: string): Promise<T>
 

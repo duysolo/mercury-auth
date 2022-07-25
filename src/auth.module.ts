@@ -17,6 +17,7 @@ import {
   IAuthDefinitionsModuleOptions,
 } from './auth-definitions.module'
 import {
+  AUTH_PASSWORD_HASHER,
   AuthBasicGuard,
   AuthenticationService,
   AuthGlobalGuard,
@@ -60,7 +61,7 @@ export class AuthModule implements NestModule {
       module: AuthModule,
       providers: [
         {
-          provide: PasswordHasherService,
+          provide: AUTH_PASSWORD_HASHER,
           useFactory:
             options.passwordHasher?.useFactory ||
             (() => new BcryptPasswordHasherService()),
@@ -71,8 +72,9 @@ export class AuthModule implements NestModule {
           provide: AuthRepository,
           useFactory:
             options.authRepository.useFactory ||
-            (() => new LocalAuthRepository()),
-          inject: options.authRepository.inject,
+            ((hasher: PasswordHasherService) =>
+              new LocalAuthRepository(hasher)),
+          inject: options.authRepository.inject || [AUTH_PASSWORD_HASHER],
         },
 
         {
@@ -120,7 +122,7 @@ export class AuthModule implements NestModule {
       exports: [
         AuthRepository,
 
-        PasswordHasherService,
+        AUTH_PASSWORD_HASHER,
 
         ClearAuthCookieInterceptor,
         CookieAuthInterceptor,
