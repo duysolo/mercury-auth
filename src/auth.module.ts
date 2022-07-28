@@ -1,14 +1,14 @@
 import { HashingModule } from '@mercury-labs/hashing'
 import {
   DynamicModule,
+  InjectionToken,
   MiddlewareConsumer,
   Module,
   ModuleMetadata,
   NestModule,
+  OptionalFactoryDependency,
   RequestMethod,
 } from '@nestjs/common'
-import { InjectionToken } from '@nestjs/common/interfaces/modules/injection-token.interface'
-import { OptionalFactoryDependency } from '@nestjs/common/interfaces/modules/optional-factory-dependency.interface'
 import { APP_GUARD } from '@nestjs/core'
 import { JwtModule } from '@nestjs/jwt'
 import {
@@ -41,7 +41,8 @@ import {
 } from './presentation'
 import { LogoutController } from './presentation/controllers/logout.controller'
 
-export interface IAuthModuleOptions extends Pick<ModuleMetadata, 'imports'> {
+export interface IAuthModuleOptions
+  extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   definitions: IAuthDefinitionsModuleOptions
   authRepository: {
     useFactory: (...args: any[]) => Promise<AuthRepository> | AuthRepository
@@ -89,13 +90,29 @@ export class AuthModule implements NestModule {
         JwtStrategy,
         RefreshTokenStrategy,
 
-        LoginAction,
+        {
+          provide: LoginAction,
+          useFactory: (
+            definitions: IAuthDefinitions,
+            authRepository: AuthRepository,
+            passwordHasher: PasswordHasherService
+          ) => {
+            return new LoginAction(definitions, authRepository, passwordHasher)
+          },
+          inject: [
+            AUTH_DEFINITIONS_MODULE_OPTIONS,
+            AuthRepository,
+            AUTH_PASSWORD_HASHER,
+          ],
+        },
 
         AuthBasicGuard,
         AuthRefreshTokenGuard,
 
         ClearAuthCookieInterceptor,
         CookieAuthInterceptor,
+
+        ...(options.providers || []),
       ],
       imports: [
         ...(options.imports || []),
@@ -122,6 +139,8 @@ export class AuthModule implements NestModule {
       ],
       exports: [
         AuthRepository,
+
+        AuthenticationService,
 
         AUTH_PASSWORD_HASHER,
 

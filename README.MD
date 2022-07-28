@@ -14,6 +14,7 @@ Learn more about the package `@mercury-labs/hashing` [@mercury-labs/hashing](htt
 
 ```typescript
 import {
+    AUTH_PASSWORD_HASHER,
     AuthRepository,
     IAuthUserEntity,
     PasswordHasherService
@@ -24,11 +25,14 @@ import { map, Observable, scheduled } from 'rxjs'
 
 @Injectable()
 export class CmsAuthRepository implements AuthRepository {
-    public constructor(protected readonly hasher: PasswordHasherService) {
+    public constructor(
+        @Inject(AUTH_PASSWORD_HASHER)
+        protected readonly hasher: PasswordHasherService
+    ) {
     }
 
     public getAuthUserByUsername(
-            username: string
+        username: string
     ): Observable<IAuthUserEntity | undefined> {
         return scheduled(this.hasher.hash('some-password-phrase'))
             .pipe(
@@ -44,7 +48,7 @@ export class CmsAuthRepository implements AuthRepository {
                 })),
                 map((user) => {
                     if (
-                            user.email !== username
+                        user.email !== username
                     ) {
                         return undefined
                     }
@@ -107,9 +111,9 @@ import { HashingModule } from '@mercury-labs/hashing'
             },
             authRepository: {
               useFactory: (hasher: PasswordHasherService) => {
-                return new CmsAuthRepository()
+                return new CmsAuthRepository(hasher)
               },
-              inject: [PasswordHasherService]
+              inject: [AUTH_PASSWORD_HASHER]
             }
         }),
     ]

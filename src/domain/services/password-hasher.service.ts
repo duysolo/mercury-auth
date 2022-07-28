@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import bcrypt from 'bcrypt'
+import { compare, hash } from 'bcrypt'
 
 export const AUTH_PASSWORD_HASHER: symbol = Symbol('AUTH_PASSWORD_HASHER')
 
@@ -13,11 +13,14 @@ export abstract class PasswordHasherService<T = any> {
 export class BcryptPasswordHasherService
   implements PasswordHasherService<string>
 {
-  public hash(password: string): Promise<string> {
-    return bcrypt.hash(password, 32)
+  public async hash(password: string): Promise<string> {
+    return hash(password, 10)
   }
 
-  public compare(password: string, hashedPassword: string): Promise<boolean> {
-    return bcrypt.compare(password, hashedPassword || '')
+  public async compare(
+    password: string,
+    hashedPassword: string
+  ): Promise<boolean> {
+    return compare(password, hashedPassword || '')
   }
 }
