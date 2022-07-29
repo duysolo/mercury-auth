@@ -77,17 +77,17 @@ import { Module } from '@nestjs/common'
                 useFactory: (config: ConfigService) => {
                     return {
                         basicAuth: {
-                            username: config.get('BASIC_AUTH_USER') || '',
-                            password: config.get('BASIC_AUTH_PASSWORD') || '',
+                            username: config.get('BASIC_AUTH_USER'),
+                            password: config.get('BASIC_AUTH_PASSWORD'),
                         },
                         impersonate: {
                             isEnabled: config.get('AUTH_IMPERSONATE_ENABLED') === 'true',
-                            cipher: config.get('AUTH_IMPERSONATE_CIPHER') || '',
-                            password: config.get('AUTH_IMPERSONATE_PASSWORD') || '',
+                            cipher: config.get('AUTH_IMPERSONATE_CIPHER'),
+                            password: config.get('AUTH_IMPERSONATE_PASSWORD'),
                         },
                         jwt: {
                             secret: config.get('AUTH_JWT_SECRET'),
-                            expiresIn: config.get('AUTH_JWT_EXPIRES') || '',
+                            expiresIn: config.get('AUTH_JWT_EXPIRES') || '1d',
                         },
                         transferTokenMethod: config.get<AuthTransferTokenMethod>(
                                 'AUTH_TRANSFER_TOKEN_METHOD'
@@ -103,7 +103,8 @@ import { Module } from '@nestjs/common'
             hashing: {
                 useFactory: (config: ConfigService) => {
                     return {
-                        secretKey: config.get('HASHING_SECRET_KEY') || '',
+                        // 32 characters string
+                        secretKey: config.get('HASHING_SECRET_KEY'),
                     }
                 },
                 inject: [ConfigService],
