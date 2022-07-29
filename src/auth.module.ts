@@ -1,4 +1,8 @@
-import { HashingModule } from '@mercury-labs/hashing'
+import {
+  HashingModule,
+  HashingModuleOptionsAsync,
+  HashTextService,
+} from '@mercury-labs/hashing'
 import {
   DynamicModule,
   InjectionToken,
@@ -10,7 +14,7 @@ import {
   RequestMethod,
 } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'
-import { JwtModule } from '@nestjs/jwt'
+import { JwtModule, JwtService } from '@nestjs/jwt'
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   AuthDefinitionsModule,
@@ -44,6 +48,7 @@ import { LogoutController } from './presentation/controllers/logout.controller'
 export interface IAuthModuleOptions
   extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   definitions: IAuthDefinitionsModuleOptions
+  hashing: Omit<HashingModuleOptionsAsync, 'global'>
   authRepository: {
     useFactory: (...args: any[]) => Promise<AuthRepository> | AuthRepository
     inject?: Array<InjectionToken | OptionalFactoryDependency>
@@ -61,6 +66,23 @@ export class AuthModule implements NestModule {
   public static forRootAsync(options: IAuthModuleOptions): DynamicModule {
     return {
       module: AuthModule,
+      imports: [
+        ...(options.imports || []),
+        HashingModule.forRootAsync(options.hashing),
+        AuthDefinitionsModule.forRootAsync(options.definitions),
+        JwtModule.registerAsync({
+          useFactory: (definitions: IAuthDefinitions) => {
+            return {
+              secret: definitions.jwt.secret,
+              signOptions: {
+                expiresIn: definitions.jwt.expiresIn,
+              },
+            }
+          },
+          inject: [AUTH_DEFINITIONS_MODULE_OPTIONS],
+          imports: [AuthDefinitionsModule],
+        }),
+      ],
       providers: [
         {
           provide: AUTH_PASSWORD_HASHER,
@@ -84,7 +106,25 @@ export class AuthModule implements NestModule {
           useClass: AuthGlobalGuard,
         },
 
-        AuthenticationService,
+        {
+          provide: AuthenticationService,
+          useFactory: (
+            jwtService: JwtService,
+            hashTextService: HashTextService,
+            authDefinitions: IAuthDefinitions
+          ) => {
+            return new AuthenticationService(
+              jwtService,
+              hashTextService,
+              authDefinitions
+            )
+          },
+          inject: [
+            JwtService,
+            HashTextService,
+            AUTH_DEFINITIONS_MODULE_OPTIONS,
+          ],
+        },
 
         LocalStrategy,
         JwtStrategy,
@@ -114,23 +154,6 @@ export class AuthModule implements NestModule {
 
         ...(options.providers || []),
       ],
-      imports: [
-        ...(options.imports || []),
-        HashingModule,
-        AuthDefinitionsModule.forRootAsync(options.definitions),
-        JwtModule.registerAsync({
-          useFactory: (definitions: IAuthDefinitions) => {
-            return {
-              secret: definitions.jwt.secret,
-              signOptions: {
-                expiresIn: definitions.jwt.expiresIn,
-              },
-            }
-          },
-          inject: [AUTH_DEFINITIONS_MODULE_OPTIONS],
-          imports: [AuthDefinitionsModule],
-        }),
-      ],
       controllers: [
         LoginController,
         RefreshTokenController,
@@ -139,17 +162,16 @@ export class AuthModule implements NestModule {
       ],
       exports: [
         AuthRepository,
-
         AuthenticationService,
-
         AUTH_PASSWORD_HASHER,
 
         ClearAuthCookieInterceptor,
         CookieAuthInterceptor,
-
         LocalStrategy,
         JwtStrategy,
         RefreshTokenStrategy,
+
+        HashingModule,
       ],
     }
   }

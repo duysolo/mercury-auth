@@ -69,18 +69,9 @@ export class CmsAuthRepository implements AuthRepository {
 import { AuthModule, AuthTransferTokenMethod } from '@mercury-labs/auth'
 import { ConfigService } from '@nestjs/config'
 import { Module } from '@nestjs/common'
-import { HashingModule } from '@mercury-labs/hashing'
 
 @Module({
     imports: [
-        HashingModule.forRootAsync({
-            useFactory: (config: ConfigService) => {
-                return {
-                    secretKey: config.get('HASHING_SECRET_KEY') || '',
-                }
-            },
-            inject: [ConfigService],
-        }),
         AuthModule.forRootAsync({
             definitions: {
                 useFactory: (config: ConfigService) => {
@@ -105,6 +96,14 @@ import { HashingModule } from '@mercury-labs/hashing'
                         usernameField: 'username',
                         passwordField: 'password',
                         httpAdaptorType: 'fastfify'
+                    }
+                },
+                inject: [ConfigService],
+            },
+            hashing: {
+                useFactory: (config: ConfigService) => {
+                    return {
+                        secretKey: config.get('HASHING_SECRET_KEY') || '',
                     }
                 },
                 inject: [ConfigService],
