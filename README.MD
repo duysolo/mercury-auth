@@ -6,9 +6,9 @@
 ## Install
 
 ```shell
-npm install --save @mercury-labs/hashing @mercury-labs/auth
+npm install --save @mercury-labs/auth
 ```
-Learn more about the package `@mercury-labs/hashing` [@mercury-labs/hashing](https://www.npmjs.com/package/@mercury-labs/hashing)
+Learn more about the relevant package [@mercury-labs/hashing](https://www.npmjs.com/package/@mercury-labs/hashing)
 
 ## Define a database repository to get user info
 

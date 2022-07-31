@@ -69,15 +69,26 @@ export class LocalLoginAction {
           .pipe(map((user) => ({ user, impersonated })))
       ),
       mergeMap(({ user, impersonated }) =>
-        user ? this.doLogin(dto, user, impersonated) : of(undefined)
+        user
+          ? this.doLogin(dto, user, impersonated).pipe(
+              map((res) => ({ user: res, impersonated }))
+            )
+          : of({ user: undefined, impersonated })
       ),
-      tap((user) => {
+      map(({ user, impersonated }) => {
         if (!user) {
           throw new UnauthorizedException()
         }
+
+        return {
+          user: hideRedactedFields(this.authDefinitions.redactedFields)(user),
+          impersonated,
+        }
       }),
-      map(hideRedactedFields(this.authDefinitions.redactedFields)),
-      tap((user) => this.eventBus.publish(new UserLoggedInEvent(user)))
+      tap(({ user, impersonated }) =>
+        this.eventBus.publish(new UserLoggedInEvent(user, impersonated))
+      ),
+      map(({ user }) => user)
     )
   }
 

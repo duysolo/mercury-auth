@@ -54,8 +54,8 @@ export class AuthDefinitionsModule {
     return {
       module: AuthDefinitionsModule,
       providers: [authModuleProvider],
-      exports: [authModuleProvider],
-      imports: [...(options.imports || [])],
+      exports: [AUTH_DEFINITIONS_MODULE_OPTIONS],
+      imports: options.imports || [],
       global: true,
     }
   }
