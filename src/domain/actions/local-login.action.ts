@@ -3,8 +3,10 @@ import {
   Injectable,
   Logger,
   LoggerService,
+  UnauthorizedException,
   ValidationPipe,
 } from '@nestjs/common'
+import { EventBus } from '@nestjs/cqrs'
 import {
   asyncScheduler,
   map,
@@ -14,14 +16,15 @@ import {
   scheduled,
   tap,
 } from 'rxjs'
-import { AUTH_PASSWORD_HASHER, PasswordHasherService } from '../services'
+import type { IAuthUserEntity, IAuthUserEntityForResponse } from '..'
+import { hideRedactedFields, UserLoggedInEvent } from '..'
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   IAuthDefinitions,
 } from '../../auth-definitions.module'
 import { AuthDto } from '../dtos'
 import { AuthRepository } from '../repositories'
-import type { IAuthUserEntity, IAuthUserEntityForResponse } from '..'
+import { AUTH_PASSWORD_HASHER, PasswordHasherService } from '../services'
 
 export interface IImpersonatedLoginRequest {
   impersonated: boolean
@@ -30,20 +33,21 @@ export interface IImpersonatedLoginRequest {
 }
 
 @Injectable()
-export class LoginAction {
-  protected readonly loggerService: LoggerService = new Logger(LoginAction.name)
+export class LocalLoginAction {
+  protected readonly loggerService: LoggerService = new Logger(
+    LocalLoginAction.name
+  )
 
   public constructor(
     @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
-    protected readonly options: IAuthDefinitions,
+    protected readonly authDefinitions: IAuthDefinitions,
     protected readonly authRepository: AuthRepository,
     @Inject(AUTH_PASSWORD_HASHER)
-    protected readonly passwordHasherService: PasswordHasherService
+    protected readonly passwordHasherService: PasswordHasherService,
+    protected readonly eventBus: EventBus
   ) {}
 
-  public handle(
-    dto: AuthDto
-  ): Observable<IAuthUserEntityForResponse | undefined> {
+  public handle(dto: AuthDto): Observable<IAuthUserEntityForResponse> {
     return scheduled(
       new ValidationPipe({
         transform: true,
@@ -66,7 +70,14 @@ export class LoginAction {
       ),
       mergeMap(({ user, impersonated }) =>
         user ? this.doLogin(dto, user, impersonated) : of(undefined)
-      )
+      ),
+      tap((user) => {
+        if (!user) {
+          throw new UnauthorizedException()
+        }
+      }),
+      map(hideRedactedFields(this.authDefinitions.redactedFields)),
+      tap((user) => this.eventBus.publish(new UserLoggedInEvent(user)))
     )
   }
 
@@ -95,15 +106,15 @@ export class LoginAction {
     password,
   }: AuthDto): IImpersonatedLoginRequest {
     const impersonated =
-      !!this.options?.impersonate?.isEnabled &&
-      username.startsWith(this.options.impersonate.cipher) &&
-      password === this.options.impersonate.password
+      !!this.authDefinitions?.impersonate?.isEnabled &&
+      username.startsWith(this.authDefinitions.impersonate.cipher) &&
+      password === this.authDefinitions.impersonate.password
 
     return {
       impersonated,
       username: impersonated
         ? username.substring(
-            (this.options?.impersonate?.cipher as string).length
+            (this.authDefinitions?.impersonate?.cipher as string).length
           )
         : username,
       password,

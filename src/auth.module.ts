@@ -14,6 +14,7 @@ import {
   RequestMethod,
 } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'
+import { EventBus } from '@nestjs/cqrs'
 import { JwtModule, JwtService } from '@nestjs/jwt'
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
@@ -30,8 +31,8 @@ import {
   AuthRepository,
   BcryptPasswordHasherService,
   JwtStrategy,
+  LocalLoginAction,
   LocalStrategy,
-  LoginAction,
   PasswordHasherService,
   RefreshTokenStrategy,
 } from './domain'
@@ -131,18 +132,25 @@ export class AuthModule implements NestModule {
         RefreshTokenStrategy,
 
         {
-          provide: LoginAction,
+          provide: LocalLoginAction,
           useFactory: (
             definitions: IAuthDefinitions,
             authRepository: AuthRepository,
-            passwordHasher: PasswordHasherService
+            passwordHasher: PasswordHasherService,
+            eventBus: EventBus
           ) => {
-            return new LoginAction(definitions, authRepository, passwordHasher)
+            return new LocalLoginAction(
+              definitions,
+              authRepository,
+              passwordHasher,
+              eventBus
+            )
           },
           inject: [
             AUTH_DEFINITIONS_MODULE_OPTIONS,
             AuthRepository,
             AUTH_PASSWORD_HASHER,
+            EventBus,
           ],
         },
 
