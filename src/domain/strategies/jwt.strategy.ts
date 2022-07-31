@@ -1,7 +1,14 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, JwtFromRequestFunction, Strategy } from 'passport-jwt'
-import { lastValueFrom, map, mergeMap, of } from 'rxjs'
+import {
+  asyncScheduler,
+  lastValueFrom,
+  map,
+  mergeMap,
+  of,
+  scheduled,
+} from 'rxjs'
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   IAuthDefinitions,
@@ -65,7 +72,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
   ): Promise<IAuthUserEntityForResponse | undefined> {
     try {
       return lastValueFrom(
-        validateEntity(payload, JwtPayload).pipe(
+        scheduled(validateEntity(payload, JwtPayload), asyncScheduler).pipe(
           map((res) => this.jwtService.decodeAccessTokenFromRawDecoded(res)),
           mergeMap((validatedPayload) => {
             if (!validatedPayload?.username) {
