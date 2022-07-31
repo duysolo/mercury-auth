@@ -363,6 +363,34 @@ export class ProfileController {
 }
 ```
 
+## Triggered Events
+### `UserLoggedInEvent`
+Triggered when user logged in successfully.
+
+Sample usages
+```typescript
+import { UserLoggedInEvent } from '@mercury-labs/auth'
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs'
+import { delay, lastValueFrom, of, tap } from 'rxjs'
+
+@EventsHandler(UserLoggedInEvent)
+export class UserLoggedInEventHandler implements IEventHandler<UserLoggedInEvent> {
+  public async handle(event: UserLoggedInEvent): Promise<void> {
+    await lastValueFrom(
+      of(event).pipe(
+        delay(1200),
+        tap(({ user }) => {
+          console.log('UserLoggedInEvent', user)
+        })
+      )
+    )
+  }
+}
+```
+
+#### Notes:
+- You must install package `@nestjs/cqrs` to work with auth events.
+
 ## Next plan
 I will implement some famous oauth methods
 - Login using google/facebook/github

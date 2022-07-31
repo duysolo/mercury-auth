@@ -17,7 +17,7 @@ import { CookieAuthInterceptor } from '../interceptors'
 @UseInterceptors(CookieAuthInterceptor)
 export class LoginController {
   public constructor(
-    private readonly _mercuryJwtService: AuthenticationService
+    private readonly _authenticationService: AuthenticationService
   ) {
   }
 
@@ -28,6 +28,6 @@ export class LoginController {
   public handle(
     @CurrentUser() user: IAuthUserEntityForResponse
   ): Observable<IJwtTokenResponse> {
-    return this._mercuryJwtService.generateTokenResponse(user)
+    return this._authenticationService.generateTokenResponse(user)
   }
 }
