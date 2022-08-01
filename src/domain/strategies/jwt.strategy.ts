@@ -1,4 +1,4 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, JwtFromRequestFunction, Strategy } from 'passport-jwt'
 import {
@@ -9,11 +9,9 @@ import {
   of,
   scheduled,
 } from 'rxjs'
-import {
-  AUTH_DEFINITIONS_MODULE_OPTIONS,
-  IAuthDefinitions,
-} from '../../auth-definitions.module'
-import { IAuthUserEntityForResponse } from '../definitions'
+import { IAuthDefinitions } from '../../infrastructure'
+import { InjectAuthDefinitions } from '../decorators'
+import type { IAuthUserEntityForResponse } from '../definitions'
 import { IJwtPayload, JwtPayload } from '../entities'
 import {
   getRequestCookie,
@@ -29,6 +27,7 @@ export const JWT_STRATEGY_NAME: string = 'jwt'
 
 const cookieExtractor: JwtFromRequestFunction = (
   request: IHttpRequest
+// eslint-disable-next-line @rushstack/no-new-null
 ): string | null => {
   return (getRequestCookie(request, 'AccessToken') as unknown as string) || null
 }
@@ -52,7 +51,7 @@ const accessTokenHeaderExtractor: JwtFromRequestFunction = (
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
   public constructor(
-    @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
+    @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
     protected readonly authRepository: AuthRepository,
     protected readonly jwtService: AuthenticationService

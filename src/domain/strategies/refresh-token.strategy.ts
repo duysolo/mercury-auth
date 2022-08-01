@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common'
+import { HttpStatus, Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
 import { Strategy } from 'passport-strategy'
@@ -11,10 +11,9 @@ import {
   IHttpRequest,
   IJwtPayload,
 } from '..'
-import {
-  AUTH_DEFINITIONS_MODULE_OPTIONS,
-  IAuthDefinitions,
-} from '../../auth-definitions.module'
+import { InjectAuthDefinitions } from '../decorators'
+
+import { IAuthDefinitions } from '../../infrastructure'
 import { AuthRepository } from '../repositories'
 import { AuthenticationService } from '../services'
 
@@ -22,6 +21,7 @@ export const REFRESH_TOKEN_STRATEGY_NAME: string = 'mercury-refresh-token'
 
 const cookieExtractor: JwtFromRequestFunction = (
   request: IHttpRequest
+  // eslint-disable-next-line @rushstack/no-new-null
 ): string | null => {
   return (
     (getRequestCookie(request, 'RefreshToken') as unknown as string) || null
@@ -30,6 +30,7 @@ const cookieExtractor: JwtFromRequestFunction = (
 
 const refreshTokenHeaderExtractor: JwtFromRequestFunction = (
   request: IHttpRequest
+  // eslint-disable-next-line @rushstack/no-new-null
 ): string | null => {
   return (
     (getRequestHeader(request, 'refresh-token') as unknown as string) || null
@@ -47,7 +48,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
   ]) as any
 
   public constructor(
-    @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
+    @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
     protected readonly authRepository: AuthRepository,
     protected readonly jwtService: AuthenticationService

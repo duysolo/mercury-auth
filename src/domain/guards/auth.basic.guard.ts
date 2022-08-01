@@ -1,13 +1,6 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Inject,
-  Injectable,
-} from '@nestjs/common'
-import {
-  AUTH_DEFINITIONS_MODULE_OPTIONS,
-  IAuthDefinitions,
-} from '../../auth-definitions.module'
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
+import { IAuthDefinitions } from '../../infrastructure'
+import { InjectAuthDefinitions } from '../decorators'
 import { getRequestFromContext, getRequestHeader } from '../helpers'
 
 export interface IBasicAuthCredentials {
@@ -20,7 +13,7 @@ export class AuthBasicGuard implements CanActivate {
   private _credentials: IBasicAuthCredentials
 
   public constructor(
-    @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
+    @InjectAuthDefinitions()
     credentials: IAuthDefinitions
   ) {
     this._credentials = credentials.basicAuth

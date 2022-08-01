@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   Logger,
   LoggerService,
@@ -16,15 +15,17 @@ import {
   scheduled,
   tap,
 } from 'rxjs'
-import type { IAuthUserEntity, IAuthUserEntityForResponse } from '..'
-import { hideRedactedFields, UserLoggedInEvent } from '..'
-import {
-  AUTH_DEFINITIONS_MODULE_OPTIONS,
-  IAuthDefinitions,
-} from '../../auth-definitions.module'
+import type {
+  IAuthUserEntity,
+  IAuthUserEntityForResponse,
+} from '../definitions'
+import { hideRedactedFields } from '../helpers'
+import { UserLoggedInEvent } from '../events'
+import { InjectAuthDefinitions, InjectPasswordHasher } from '../decorators'
+import { IAuthDefinitions } from '../../infrastructure'
 import { AuthDto } from '../dtos'
 import { AuthRepository } from '../repositories'
-import { AUTH_PASSWORD_HASHER, PasswordHasherService } from '../services'
+import { PasswordHasherService } from '../services'
 
 export interface IImpersonatedLoginRequest {
   impersonated: boolean
@@ -39,13 +40,14 @@ export class LocalLoginAction {
   )
 
   public constructor(
-    @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
+    @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
     protected readonly authRepository: AuthRepository,
-    @Inject(AUTH_PASSWORD_HASHER)
+    @InjectPasswordHasher()
     protected readonly passwordHasherService: PasswordHasherService,
     protected readonly eventBus: EventBus
-  ) {}
+  ) {
+  }
 
   public handle(dto: AuthDto): Observable<IAuthUserEntityForResponse> {
     return scheduled(
@@ -71,8 +73,8 @@ export class LocalLoginAction {
       mergeMap(({ user, impersonated }) =>
         user
           ? this.doLogin(dto, user, impersonated).pipe(
-              map((res) => ({ user: res, impersonated }))
-            )
+            map((res) => ({ user: res, impersonated }))
+          )
           : of({ user: undefined, impersonated })
       ),
       map(({ user, impersonated }) => {
@@ -125,8 +127,8 @@ export class LocalLoginAction {
       impersonated,
       username: impersonated
         ? username.substring(
-            (this.authDefinitions?.impersonate?.cipher as string).length
-          )
+          (this.authDefinitions?.impersonate?.cipher as string).length
+        )
         : username,
       password,
     }

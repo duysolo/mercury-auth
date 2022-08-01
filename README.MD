@@ -94,18 +94,10 @@ import { Module } from '@nestjs/common'
                                 'AUTH_TRANSFER_TOKEN_METHOD'
                         ),
                         redactedFields: ['password'],
+                        hashingSecretKey: config.get('HASHING_SECRET_KEY') || '',
                         usernameField: 'username',
                         passwordField: 'password',
                         httpAdaptorType: 'fastfify'
-                    }
-                },
-                inject: [ConfigService],
-            },
-            hashing: {
-                useFactory: (config: ConfigService) => {
-                    return {
-                        // 32 characters string
-                        secretKey: config.get('HASHING_SECRET_KEY'),
                     }
                 },
                 inject: [ConfigService],
@@ -178,6 +170,12 @@ interface IAuthDefinitions {
     ignoredRoutes?: string[]
 
     /**
+     * Used to encode/decode the access/refresh token
+     * 32 characters string
+     */
+    hashingSecretKey: string
+
+    /**
      * We accepted these 3 values: cookie|bearer|both
      * - cookie: after user login, their accessToken and refreshToken will be sent using cookie
      * - bearer: after user login, their accessToken and refreshToken will be sent to response body
@@ -221,7 +219,7 @@ export interface IPbkdf2Hash {
 
 @Injectable()
 export class Pbkdf2PasswordHasherService implements PasswordHasherService<IPbkdf2Hash> {
-    public hash(password: string): Promise<IPbkdf2Hash> {
+    public async hash(password: string): Promise<IPbkdf2Hash> {
         const salt = crypto.randomBytes(16).toString('hex')
 
         const hash = crypto.pbkdf2Sync(
@@ -235,7 +233,7 @@ export class Pbkdf2PasswordHasherService implements PasswordHasherService<IPbkdf
         return { salt, hash }
     }
 
-    public compare(password: string, hashedPassword: IPbkdf2Hash): Promise<boolean> {
+    public async compare(password: string, hashedPassword: IPbkdf2Hash): Promise<boolean> {
         const hashPassword = crypto.pbkdf2Sync(
             password,
             hashedPassword.salt,
@@ -340,8 +338,13 @@ curl --request POST \
   --header 'Authorization: Bearer eyJpdiI6IjFmNTY4ZWZmN2RmODRmZjkxNjQx...'
 ```
 
+### Injection Decorators
+`@InjectAuthDefinitions()`: inject `IAuthDefinitions` to your injectable classes.
+
+`@InjectPasswordHasher()`: inject `PasswordHasherService` to your injectable classes.
+
 ### Controller Decorators
-`Public()` This decorator will help your controller available for all users. No authentication required.
+`@Public()` This decorator will help your controller available for all users. No authentication required.
 ```typescript
 import { Public } from '@mercury-labs/auth'
 import { Controller, Get } from '@nestjs/common'
@@ -356,7 +359,7 @@ export class AppController {
 }
 ```
 
-`InternalOnly()` You need to use basic auth while accessing your controller.
+`@InternalOnly()` You need to use basic auth while accessing your controller.
 
 ```typescript
 import { InternalOnly } from '@mercury-labs/auth'
@@ -386,7 +389,7 @@ Authorization: Bearer {your_access_token}
 Refesh-Token: {your_refresh_token}
 ```
 
-`CurrentUser()` This decorator will return the current logged-in user.
+`@CurrentUser()` This decorator will return the current logged-in user.
 ```typescript
 import { Controller, Get } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'

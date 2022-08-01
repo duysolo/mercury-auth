@@ -1,12 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { Strategy } from 'passport-local'
 import { lastValueFrom } from 'rxjs'
-import { IAuthUserEntityForResponse } from '..'
-import {
-  AUTH_DEFINITIONS_MODULE_OPTIONS,
-  IAuthDefinitions,
-} from '../../auth-definitions.module'
+import type { IAuthUserEntityForResponse } from '../definitions'
+import { InjectAuthDefinitions } from '../decorators'
+import { IAuthDefinitions } from '../../infrastructure'
 import { LocalLoginAction } from '../actions'
 
 export const LOCAL_STRATEGY_NAME: string = 'local'
@@ -15,7 +13,7 @@ export const LOCAL_STRATEGY_NAME: string = 'local'
 export class LocalStrategy extends PassportStrategy(Strategy) {
   public constructor(
     protected readonly loginAction: LocalLoginAction,
-    @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
+    @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions
   ) {
     super({

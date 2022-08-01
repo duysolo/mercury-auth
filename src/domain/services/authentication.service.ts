@@ -1,18 +1,16 @@
 import { HashTextService } from '@mercury-labs/hashing'
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import _ from 'lodash/fp'
 import moment from 'moment'
 import { map, Observable, of } from 'rxjs'
-import {
+import type {
   IAuthUserEntityForResponse,
   IJwtPayload,
   IJwtPayloadRawDecoded,
 } from '..'
-import {
-  AUTH_DEFINITIONS_MODULE_OPTIONS,
-  IAuthDefinitions,
-} from '../../auth-definitions.module'
+import { InjectAuthDefinitions } from '../decorators'
+import { IAuthDefinitions } from '../../infrastructure'
 
 export interface IJwtTokenResponse {
   accessToken: string
@@ -25,7 +23,7 @@ export class AuthenticationService {
   public constructor(
     protected readonly jwtService: JwtService,
     protected readonly hashTextService: HashTextService,
-    @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
+    @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions
   ) {}
 

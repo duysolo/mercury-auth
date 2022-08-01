@@ -1,7 +1,6 @@
 import {
   CallHandler,
   ExecutionContext,
-  Inject,
   Injectable,
   NestInterceptor,
 } from '@nestjs/common'
@@ -11,18 +10,17 @@ import {
   CookieSerializeOptions,
   getResponseFromContext,
   IHttpResponse,
+  InjectAuthDefinitions,
 } from '../../domain'
-import {
-  AUTH_DEFINITIONS_MODULE_OPTIONS,
-  IAuthDefinitions,
-} from '../../auth-definitions.module'
+import { IAuthDefinitions } from '../../infrastructure'
 
 @Injectable()
 export class ClearAuthCookieInterceptor implements NestInterceptor {
-  constructor(
-    @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
+  public constructor(
+    @InjectAuthDefinitions()
     protected readonly definitions: IAuthDefinitions
-  ) {}
+  ) {
+  }
 
   public intercept(
     context: ExecutionContext,

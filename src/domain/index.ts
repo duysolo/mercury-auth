@@ -1,4 +1,5 @@
 export * from './actions'
+export * from './decorators'
 export * from './definitions'
 export * from './dtos'
 export * from './entities'

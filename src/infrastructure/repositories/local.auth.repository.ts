@@ -1,17 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import _ from 'lodash/fp'
 import { asyncScheduler, map, Observable, scheduled } from 'rxjs'
 import {
-  AUTH_PASSWORD_HASHER,
   AuthRepository,
   IAuthUserEntity,
+  InjectPasswordHasher,
   PasswordHasherService,
 } from '../../domain'
 
 @Injectable()
 export class LocalAuthRepository implements AuthRepository {
   public constructor(
-    @Inject(AUTH_PASSWORD_HASHER)
+    @InjectPasswordHasher()
     protected readonly hasher: PasswordHasherService
   ) {}
 

@@ -1,10 +1,8 @@
-import { ExecutionContext, Inject, Injectable } from '@nestjs/common'
+import { ExecutionContext, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Observable } from 'rxjs'
-import {
-  AUTH_DEFINITIONS_MODULE_OPTIONS,
-  IAuthDefinitions,
-} from '../../auth-definitions.module'
+import { IAuthDefinitions } from '../../infrastructure'
+import { InjectAuthDefinitions } from '../decorators'
 import { AuthBasicGuard } from './auth.basic.guard'
 import { AuthJwtGuard } from './auth.jwt.guard'
 import { AuthRefreshTokenGuard } from './auth.refresh-token.guard'
@@ -21,7 +19,7 @@ export class AuthGlobalGuard extends AuthJwtGuard {
     private readonly _reflector: Reflector,
     private readonly _basicAuthGuard: AuthBasicGuard,
     private readonly _refreshTokenGuard: AuthRefreshTokenGuard,
-    @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
+    @InjectAuthDefinitions()
     private readonly _options: IAuthDefinitions
   ) {
     super()

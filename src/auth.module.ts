@@ -1,8 +1,4 @@
-import {
-  HashingModule,
-  HashingModuleOptionsAsync,
-  HashTextService,
-} from '@mercury-labs/hashing'
+import { HashingModule } from '@mercury-labs/hashing'
 import {
   DynamicModule,
   InjectionToken,
@@ -14,14 +10,7 @@ import {
   RequestMethod,
 } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'
-import { EventBus } from '@nestjs/cqrs'
-import { JwtModule, JwtService } from '@nestjs/jwt'
-import {
-  AUTH_DEFINITIONS_MODULE_OPTIONS,
-  AuthDefinitionsModule,
-  IAuthDefinitions,
-  IAuthDefinitionsModuleOptions,
-} from './auth-definitions.module'
+import { JwtModule } from '@nestjs/jwt'
 import {
   AUTH_PASSWORD_HASHER,
   AuthBasicGuard,
@@ -36,7 +25,13 @@ import {
   PasswordHasherService,
   RefreshTokenStrategy,
 } from './domain'
-import { BasicAuthMiddleware, LocalAuthRepository } from './infrastructure'
+import {
+  AUTH_DEFINITIONS_MODULE_OPTIONS,
+  AuthDefinitionsModule,
+  BasicAuthMiddleware,
+  IAuthDefinitions,
+  IAuthDefinitionsModuleOptions,
+} from './infrastructure'
 import {
   ClearAuthCookieInterceptor,
   CookieAuthInterceptor,
@@ -49,7 +44,6 @@ import { LogoutController } from './presentation/controllers/logout.controller'
 export interface IAuthModuleOptions
   extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   definitions: IAuthDefinitionsModuleOptions
-  hashing: Omit<HashingModuleOptionsAsync, 'global'>
   authRepository: {
     useFactory: (...args: any[]) => Promise<AuthRepository> | AuthRepository
     inject?: Array<InjectionToken | OptionalFactoryDependency>
@@ -69,8 +63,15 @@ export class AuthModule implements NestModule {
       module: AuthModule,
       imports: [
         ...(options.imports || []),
-        HashingModule.forRootAsync(options.hashing),
         AuthDefinitionsModule.forRootAsync(options.definitions),
+        HashingModule.forRootAsync({
+          useFactory: (definitions: IAuthDefinitions) => {
+            return {
+              secretKey: definitions.hashingSecretKey,
+            }
+          },
+          inject: [AUTH_DEFINITIONS_MODULE_OPTIONS],
+        }),
         JwtModule.registerAsync({
           useFactory: (definitions: IAuthDefinitions) => {
             return {
@@ -81,7 +82,6 @@ export class AuthModule implements NestModule {
             }
           },
           inject: [AUTH_DEFINITIONS_MODULE_OPTIONS],
-          imports: [AuthDefinitionsModule],
         }),
       ],
       providers: [
@@ -95,11 +95,8 @@ export class AuthModule implements NestModule {
 
         {
           provide: AuthRepository,
-          useFactory:
-            options.authRepository.useFactory ||
-            ((hasher: PasswordHasherService) =>
-              new LocalAuthRepository(hasher)),
-          inject: options.authRepository.inject || [AUTH_PASSWORD_HASHER],
+          useFactory: options.authRepository.useFactory,
+          inject: options.authRepository.inject || [],
         },
 
         {
@@ -107,52 +104,13 @@ export class AuthModule implements NestModule {
           useClass: AuthGlobalGuard,
         },
 
-        {
-          provide: AuthenticationService,
-          useFactory: (
-            jwtService: JwtService,
-            hashTextService: HashTextService,
-            authDefinitions: IAuthDefinitions
-          ) => {
-            return new AuthenticationService(
-              jwtService,
-              hashTextService,
-              authDefinitions
-            )
-          },
-          inject: [
-            JwtService,
-            HashTextService,
-            AUTH_DEFINITIONS_MODULE_OPTIONS,
-          ],
-        },
+        AuthenticationService,
 
         LocalStrategy,
         JwtStrategy,
         RefreshTokenStrategy,
 
-        {
-          provide: LocalLoginAction,
-          useFactory: (
-            definitions: IAuthDefinitions,
-            authRepository: AuthRepository,
-            passwordHasher: PasswordHasherService,
-            eventBus: EventBus
-          ) => {
-            return new LocalLoginAction(
-              definitions,
-              authRepository,
-              passwordHasher,
-              eventBus
-            )
-          },
-          inject: [
-            AUTH_DEFINITIONS_MODULE_OPTIONS,
-            AuthRepository,
-            AUTH_PASSWORD_HASHER,
-            EventBus,
-          ],
-        },
+        LocalLoginAction,
 
         AuthBasicGuard,
         AuthRefreshTokenGuard,
@@ -171,6 +129,7 @@ export class AuthModule implements NestModule {
       exports: [
         AuthRepository,
         AuthenticationService,
+
         AUTH_PASSWORD_HASHER,
 
         ClearAuthCookieInterceptor,

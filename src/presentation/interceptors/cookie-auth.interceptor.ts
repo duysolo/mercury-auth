@@ -1,7 +1,6 @@
 import {
   CallHandler,
   ExecutionContext,
-  Inject,
   Injectable,
   NestInterceptor,
 } from '@nestjs/common'
@@ -13,11 +12,9 @@ import {
   getResponseFromContext,
   IHttpResponse,
   IJwtTokenResponse,
+  InjectAuthDefinitions,
 } from '../../domain'
-import {
-  AUTH_DEFINITIONS_MODULE_OPTIONS,
-  IAuthDefinitions,
-} from '../../auth-definitions.module'
+import { IAuthDefinitions } from '../../infrastructure'
 
 const transferFromResponseToCookie: (
   response: IHttpResponse,
@@ -75,9 +72,10 @@ const transferFromResponseToCookie: (
 @Injectable()
 export class CookieAuthInterceptor implements NestInterceptor {
   public constructor(
-    @Inject(AUTH_DEFINITIONS_MODULE_OPTIONS)
+    @InjectAuthDefinitions()
     protected readonly definitions: IAuthDefinitions
-  ) {}
+  ) {
+  }
 
   public intercept(
     context: ExecutionContext,
@@ -93,7 +91,7 @@ export class CookieAuthInterceptor implements NestInterceptor {
           (res.httpAdaptorType === 'fastify' && !res.setCookie) ||
           (res.httpAdaptorType === 'express' && !res.cookie) ||
           this.definitions.transferTokenMethod ===
-            AuthTransferTokenMethod.BEARER_ONLY ||
+          AuthTransferTokenMethod.BEARER_ONLY ||
           !tokenResponse.accessToken
         ) {
           return tokenResponse
