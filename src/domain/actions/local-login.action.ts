@@ -137,7 +137,10 @@ export class LocalLoginAction {
     authUser: IAuthUserEntity
   ): Observable<boolean> {
     return scheduled(
-      this.passwordHasherService.compare(password, authUser.password || ''),
+      this.passwordHasherService.compare(
+        password,
+        authUser[this.authDefinitions.passwordField || 'password']
+      ),
       asyncScheduler
     )
   }

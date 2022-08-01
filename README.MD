@@ -34,6 +34,7 @@ export class CmsAuthRepository implements AuthRepository {
     public getAuthUserByUsername(
         username: string
     ): Observable<IAuthUserEntity | undefined> {
+        // Create sample hashed password for demo only
         return scheduled(this.hasher.hash('some-password-phrase'))
             .pipe(
                 // Sample user for demo only
@@ -231,7 +232,7 @@ export class Pbkdf2PasswordHasherService implements PasswordHasherService<IPbkdf
             'sha512'
         ).toString('hex')
 
-        return {salt, hash}
+        return { salt, hash }
     }
 
     public compare(password: string, hashedPassword: IPbkdf2Hash): Promise<boolean> {
@@ -258,6 +259,49 @@ AuthModule.forRootAsync({
         },
     }
 })
+```
+
+#### Sample updated `CmsAuthRepository`
+```typescript
+@Injectable()
+export class CmsAuthRepository implements AuthRepository {
+    public constructor(
+        @Inject(AUTH_PASSWORD_HASHER)
+        protected readonly hasher: PasswordHasherService<IPbkdf2Hash>
+    ) {
+    }
+
+    public getAuthUserByUsername(
+        username: string
+    ): Observable<IAuthUserEntity | undefined> {
+        // Create sample hashed password for demo only
+        return scheduled(this.hasher.hash('some-password-phrase'))
+            .pipe(
+                // Sample user for demo only
+                map((password: IPbkdf2Hash) => ({
+                    id: '123456',
+                    firstName: 'John Doe',
+                    lastName: '',
+                    email: 'sample-email+dev@gmail.com',
+                    password,
+                    createdAt: moment().toDate(),
+                    updatedAt: moment().toDate(),
+                })),
+                map((user) => {
+                    if (
+                        user.email !== username
+                    ) {
+                        return undefined
+                    }
+
+                    return {
+                        ...user,
+                        username: user.email,
+                    }
+                })
+            )
+    }
+}
 ```
 
 #### Access the login route
@@ -389,7 +433,7 @@ export class UserLoggedInEventHandler implements IEventHandler<UserLoggedInEvent
 ```
 
 #### Notes:
-- You must install package `@nestjs/cqrs` to work with auth events.
+- You must install package [@nestjs/cqrs](https://www.npmjs.com/package/@nestjs/cqrs) to work with auth events.
 
 ## Next plan
 I will implement some famous oauth methods
