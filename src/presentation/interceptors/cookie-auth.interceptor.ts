@@ -39,7 +39,6 @@ const transferFromResponseToCookie: (
     return token
   }
 
-  // eslint-disable-next-line guard-for-in
   for (const responseKey in mapKeys) {
     if (token[responseKey]) {
       const cookieOptions: CookieSerializeOptions = {

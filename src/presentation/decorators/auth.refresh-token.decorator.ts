@@ -1,6 +1,5 @@
 import { CustomDecorator, SetMetadata } from '@nestjs/common'
-
-export const IS_REFRESH_TOKEN_KEY: string = 'isRefreshToken'
+import { IS_REFRESH_TOKEN_KEY } from '../../domain'
 
 export const ShouldUseRefreshToken: () => CustomDecorator = () =>
   SetMetadata(IS_REFRESH_TOKEN_KEY, true)

@@ -379,8 +379,8 @@ export class UserLoggedInEventHandler implements IEventHandler<UserLoggedInEvent
     await lastValueFrom(
       of(event).pipe(
         delay(1200),
-        tap(({ user }) => {
-          console.log('UserLoggedInEvent', user)
+        tap(({ user, isImpersonated }) => {
+          console.log('UserLoggedInEvent', { user, isImpersonated })
         })
       )
     )
@@ -393,5 +393,6 @@ export class UserLoggedInEventHandler implements IEventHandler<UserLoggedInEvent
 
 ## Next plan
 I will implement some famous oauth methods
-- Login using google/facebook/github
+- Login using google/facebook/github...
 - Allow user to revoke `accessToken`, `refreshToken` of some user.
+- E2E tests, more tests...

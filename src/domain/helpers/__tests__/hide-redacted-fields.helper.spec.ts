@@ -19,4 +19,10 @@ describe('hideRedactedFields helper', () => {
 
     expect(userWithoutPassword.username).toEqual(fixture.username)
   })
+
+  it('should ignore non-blacklisted fields', () => {
+    const userWithoutPassword = hideRedactedFields(['notExistedField'])(fixture)
+
+    expect(userWithoutPassword).toEqual(fixture)
+  })
 })

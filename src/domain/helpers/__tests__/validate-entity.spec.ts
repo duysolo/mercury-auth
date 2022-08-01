@@ -27,18 +27,21 @@ describe('validateEntity helper', () => {
     gender: 'male',
   }
 
-  it('should not able to ignore required fields', async () => {
+  it('should throw exception when validation does not match', async () => {
     await expect(
       validateEntity({ gender: 'male' }, EntityForValidating)
     ).rejects.toBeInstanceOf(BadRequestException)
+
+    await expect(
+      validateEntity({ gender: 1 }, EntityForValidating)
+    ).rejects.toBeInstanceOf(BadRequestException)
   })
 
-  it('should able to access whitelist fields', async () => {
+  it('should able to access whitelisted fields', async () => {
     const entity = await validateEntity(correctBody, EntityForValidating)
 
     expect(entity.firstName).toEqual(correctBody.firstName)
     expect(entity.lastName).toEqual(correctBody.lastName)
-    expect(entity.gender).toEqual(correctBody.gender)
   })
 
   it('should able to ignore optional fields', async () => {
@@ -54,7 +57,7 @@ describe('validateEntity helper', () => {
     expect(entity.gender).toBeUndefined()
   })
 
-  it('should not able to access non-whitelist fields', async () => {
+  it('should not able to access non-whitelisted fields', async () => {
     const entity: any = await validateEntity(correctBody, EntityForValidating)
 
     expect(entity.nonExistedField).toBeUndefined()
