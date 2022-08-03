@@ -24,7 +24,7 @@ describe('AuthModule', () => {
   let app: TestingModule
 
   beforeEach(async () => {
-    app = await createTestingModule(defaultAuthDefinitionsFixture)
+    app = await createTestingModule(defaultAuthDefinitionsFixture())
   })
 
   it('all relevant controllers/providers should be defined', function () {

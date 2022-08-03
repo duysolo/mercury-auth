@@ -29,54 +29,95 @@ describe('AuthModule (e2e) - Fastify Adaptor', () => {
     }
   })
 
-  describe('LoginController - Fastify', () => {
-    it('should login failed if user does not match', async () => {
-      await _shouldLoginFailed(app, generateInvalidUserPayload())
-    })
+  describe('PUBLIC', () => {
+    describe('LoginController - Fastify', () => {
+      it('should login failed if user does not match', async () => {
+        await _shouldLoginFailed(app, generateInvalidUserPayload())
+      })
 
-    it('should login failed if invalid payload', async () => {
-      await _shouldLoginFailed(app, {})
-    })
+      it('should login failed if invalid payload', async () => {
+        await _shouldLoginFailed(app, {})
+      })
 
-    it('should login failed if user does not match - impersonate', async () => {
-      await _shouldLoginFailed(app, generateInvalidUserPayloadImpersonate())
-    })
+      it('should login failed if user does not match - impersonate', async () => {
+        await _shouldLoginFailed(app, generateInvalidUserPayloadImpersonate())
+      })
 
-    it('should login success', async () => {
-      await _shouldLoginSuccess(app, generateCorrectUserPayload())
-    })
+      it('should login success', async () => {
+        await _shouldLoginSuccess(app, generateCorrectUserPayload())
+      })
 
-    it('should login success - impersonate', async () => {
-      await _shouldLoginSuccess(
-        app,
-        generateCorrectUserPayloadImpersonate(
-          defaultFixture.impersonate || {
-            cipher: '',
-            password: '',
-          }
+      it('should login success - impersonate', async () => {
+        await _shouldLoginSuccess(
+          app,
+          generateCorrectUserPayloadImpersonate(
+            defaultFixture.impersonate || {
+              cipher: '',
+              password: '',
+            }
+          )
         )
-      )
+      })
     })
   })
 
-  describe('ProfileController', () => {
-    let user: IJwtTokenResponse
+  describe('JWT', () => {
+    let accessTokenResponse: IJwtTokenResponse
 
     beforeAll(async () => {
-      user = await doLoginRequest(app, generateCorrectUserPayload()).then(
-        (res) => res?.json<IJwtTokenResponse>() || ({} as IJwtTokenResponse)
+      accessTokenResponse = await doLoginRequest(
+        app,
+        generateCorrectUserPayload()
+      ).then(
+        (res) => res.json<IJwtTokenResponse>() || ({} as IJwtTokenResponse)
       )
     })
 
-    it('should show user profile', async () => {
-      await fastifyRequest(app, {
-        method: 'GET',
-        path: '/auth/profile',
-        headers: {
-          Authorization: `Bearer ${user.accessToken}`,
-        },
-      }).then((res) => {
-        expect(res?.statusCode).toEqual(HttpStatus.OK)
+    describe('ProfileController', () => {
+      it('should show user profile', async () => {
+        await fastifyRequest(app, {
+          method: 'GET',
+          path: '/auth/profile',
+          headers: {
+            Authorization: `Bearer ${accessTokenResponse.accessToken}`,
+          },
+        }).then((res) => {
+          expect(res.statusCode).toEqual(HttpStatus.OK)
+        })
+      })
+    })
+
+    describe('RefreshTokenController', () => {
+      it('should allow user to refresh tokens', async () => {
+        await fastifyRequest(app, {
+          method: 'POST',
+          path: '/auth/refresh-token',
+          headers: {
+            'Refresh-Token': `${accessTokenResponse.refreshToken}`,
+          },
+        }).then((res) => {
+          const parsedTokenResponse: IJwtTokenResponse =
+            res.json<IJwtTokenResponse>() || {}
+
+          expect(res.statusCode).toEqual(HttpStatus.CREATED)
+          expect(parsedTokenResponse.accessToken).toBeDefined()
+          expect(parsedTokenResponse.refreshToken).toBeDefined()
+          expect(parsedTokenResponse.expiryDate).toBeDefined()
+        })
+      })
+    })
+
+    describe('LogoutController', () => {
+      it('should allow user to logout', async () => {
+        await fastifyRequest(app, {
+          method: 'POST',
+          path: '/auth/logout',
+          headers: {
+            Authorization: `Bearer ${accessTokenResponse.accessToken}`,
+          },
+        }).then((res) => {
+          expect(res.statusCode).toEqual(HttpStatus.CREATED)
+        })
       })
     })
   })
@@ -87,10 +128,10 @@ async function _shouldLoginSuccess(
   body: Record<string, any>
 ) {
   return doLoginRequest(app, body).then((res) => {
-    expect(res?.statusCode).toEqual(HttpStatus.CREATED)
+    expect(res.statusCode).toEqual(HttpStatus.CREATED)
 
     const parsedTokenResponse =
-      res?.json<IJwtTokenResponse>() || ({} as IJwtTokenResponse)
+      res.json<IJwtTokenResponse>() || ({} as IJwtTokenResponse)
 
     expect(parsedTokenResponse.accessToken).toBeDefined()
     expect(parsedTokenResponse.refreshToken).toBeDefined()
@@ -103,7 +144,7 @@ async function _shouldLoginFailed(
   body: Record<string, any>
 ) {
   return doLoginRequest(app, body).then((res) => {
-    expect(res?.statusCode).toEqual(HttpStatus.UNAUTHORIZED)
+    expect(res.statusCode).toEqual(HttpStatus.UNAUTHORIZED)
   })
 }
 

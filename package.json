@@ -1,6 +1,6 @@
 {
   "name": "@mercury-labs/auth",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "Mercury framework auth library",
   "author": "duysolo <duypt.dev@gmail.com>",
   "repository": {
@@ -11,7 +11,14 @@
     "mercury-labs",
     "basic auth",
     "jwt auth",
-    "nestjs auth, basic auth, jwt auth"
+    "nestjs auth",
+    "nestjs basic auth",
+    "nestjs jwt auth",
+    "nestjs jwt auth with cookie",
+    "basic auth",
+    "jwt auth",
+    "jwt auth with cookie",
+    "nestjs auth with cookie"
   ],
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -26,7 +33,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --verbose=true --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@mercury-labs/hashing": "^1.0.0",
