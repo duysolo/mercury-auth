@@ -12,6 +12,7 @@ import {
 import { IAuthDefinitions } from '../../infrastructure'
 import { InjectAuthDefinitions } from '../decorators'
 import type { IAuthUserEntityForResponse } from '../definitions'
+import { AuthTransferTokenMethod } from '../definitions'
 import { IJwtPayload, JwtPayload } from '../entities'
 import {
   getRequestCookie,
@@ -25,28 +26,45 @@ import { AuthenticationService } from '../services'
 
 export const JWT_STRATEGY_NAME: string = 'jwt'
 
-const cookieExtractor: JwtFromRequestFunction = (
-  request: IHttpRequest
-// eslint-disable-next-line @rushstack/no-new-null
-): string | null => {
-  return (getRequestCookie(request, 'AccessToken') as unknown as string) || null
-}
+const cookieExtractor: (
+  definitions: IAuthDefinitions
+) => JwtFromRequestFunction =
+  (definitions) =>
+  (request: IHttpRequest): string | any => {
+    if (
+      definitions.transferTokenMethod === AuthTransferTokenMethod.BEARER_ONLY
+    ) {
+      return null
+    }
 
-const accessTokenHeaderExtractor: JwtFromRequestFunction = (
-  request: IHttpRequest
-): string | undefined | any => {
-  const authHeader = getRequestHeader(request, 'authorization')
-
-  if (!authHeader || typeof authHeader !== 'string') {
-    return undefined
+    return (
+      (getRequestCookie(request, 'AccessToken') as unknown as string) || null
+    )
   }
 
-  if (authHeader.toLowerCase().startsWith('bearer ')) {
-    return authHeader.substring('bearer '.length)
-  }
+const accessTokenHeaderExtractor: (
+  definitions: IAuthDefinitions
+) => JwtFromRequestFunction =
+  (definitions) =>
+  (request: IHttpRequest): string | any => {
+    if (
+      definitions.transferTokenMethod === AuthTransferTokenMethod.COOKIE_ONLY
+    ) {
+      return null
+    }
 
-  return authHeader
-}
+    const authHeader = getRequestHeader(request, 'authorization')
+
+    if (!authHeader || typeof authHeader !== 'string') {
+      return null
+    }
+
+    if (authHeader.toLowerCase().startsWith('bearer ')) {
+      return authHeader.substring('bearer '.length)
+    }
+
+    return authHeader
+  }
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
@@ -58,8 +76,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        cookieExtractor,
-        accessTokenHeaderExtractor,
+        cookieExtractor(authDefinitions),
+        accessTokenHeaderExtractor(authDefinitions),
       ]),
       ignoreExpiration: false,
       secretOrKey: authDefinitions.jwt.secret,

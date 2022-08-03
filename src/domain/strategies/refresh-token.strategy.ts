@@ -4,6 +4,7 @@ import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
 import { Strategy } from 'passport-strategy'
 import { lastValueFrom, map } from 'rxjs'
 import {
+  AuthTransferTokenMethod,
   getRequestCookie,
   getRequestHeader,
   hideRedactedFields,
@@ -11,41 +12,52 @@ import {
   IHttpRequest,
   IJwtPayload,
 } from '..'
-import { InjectAuthDefinitions } from '../decorators'
 
 import { IAuthDefinitions } from '../../infrastructure'
+import { InjectAuthDefinitions } from '../decorators'
 import { AuthRepository } from '../repositories'
 import { AuthenticationService } from '../services'
 
 export const REFRESH_TOKEN_STRATEGY_NAME: string = 'mercury-refresh-token'
 
-const cookieExtractor: JwtFromRequestFunction = (
-  request: IHttpRequest
-  // eslint-disable-next-line @rushstack/no-new-null
-): string | null => {
-  return (
-    (getRequestCookie(request, 'RefreshToken') as unknown as string) || null
-  )
-}
+const cookieExtractor: (
+  definitions: IAuthDefinitions
+) => JwtFromRequestFunction =
+  (definitions) =>
+    (request: IHttpRequest): string | any => {
+      if (
+        definitions.transferTokenMethod === AuthTransferTokenMethod.BEARER_ONLY
+      ) {
+        return null
+      }
 
-const refreshTokenHeaderExtractor: JwtFromRequestFunction = (
-  request: IHttpRequest
-  // eslint-disable-next-line @rushstack/no-new-null
-): string | null => {
-  return (
-    (getRequestHeader(request, 'refresh-token') as unknown as string) || null
-  )
-}
+      return (
+        (getRequestCookie(request, 'RefreshToken') as unknown as string) || null
+      )
+    }
+
+const refreshTokenHeaderExtractor: (
+  definitions: IAuthDefinitions
+) => JwtFromRequestFunction =
+  (definitions) =>
+    (request: IHttpRequest): string | any => {
+      if (
+        definitions.transferTokenMethod === AuthTransferTokenMethod.COOKIE_ONLY
+      ) {
+        return null
+      }
+
+      return (
+        (getRequestHeader(request, 'refresh-token') as unknown as string) || null
+      )
+    }
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
   Strategy,
   REFRESH_TOKEN_STRATEGY_NAME
 ) {
-  protected jwtFromRequest: JwtFromRequestFunction = ExtractJwt.fromExtractors([
-    cookieExtractor,
-    refreshTokenHeaderExtractor,
-  ]) as any
+  protected jwtFromRequest: JwtFromRequestFunction
 
   public constructor(
     @InjectAuthDefinitions()
@@ -54,6 +66,11 @@ export class RefreshTokenStrategy extends PassportStrategy(
     protected readonly jwtService: AuthenticationService
   ) {
     super()
+
+    this.jwtFromRequest = ExtractJwt.fromExtractors([
+      cookieExtractor(authDefinitions),
+      refreshTokenHeaderExtractor(authDefinitions),
+    ]) as any
   }
 
   public async authenticate(req: any, options?: any): Promise<void> {

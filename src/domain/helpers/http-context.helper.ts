@@ -1,6 +1,6 @@
 import { ExecutionContext } from '@nestjs/common'
 
-export interface CookieSerializeOptions {
+export interface ICookieSerializeOptions {
   domain?: string
   expires?: Date
   httpOnly?: boolean
@@ -24,7 +24,7 @@ export type IHttpResponse =
       setCookie?: (
         key: string,
         value: string,
-        options: CookieSerializeOptions
+        options: ICookieSerializeOptions
       ) => void
     }
   | {
@@ -32,7 +32,7 @@ export type IHttpResponse =
       cookie?: (
         key: string,
         value: string,
-        options: CookieSerializeOptions
+        options: ICookieSerializeOptions
       ) => void
     }
 
@@ -52,7 +52,7 @@ export function getRequestHeader(
 ): string | IHttpRequest['headers'] | undefined {
   const res = key ? request.headers[key] : request.headers
 
-  if (!res) return undefined
+  return res || undefined
 }
 
 export function getRequestCookie(

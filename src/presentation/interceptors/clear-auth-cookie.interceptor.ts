@@ -7,7 +7,7 @@ import {
 import moment from 'moment'
 import { Observable, tap } from 'rxjs'
 import {
-  CookieSerializeOptions,
+  ICookieSerializeOptions,
   getResponseFromContext,
   IHttpResponse,
   InjectAuthDefinitions,
@@ -45,7 +45,7 @@ export class ClearAuthCookieInterceptor implements NestInterceptor {
       return
     }
 
-    const cookieOptions: CookieSerializeOptions = {
+    const cookieOptions: ICookieSerializeOptions = {
       httpOnly: true,
       path: '/',
       maxAge: 0,

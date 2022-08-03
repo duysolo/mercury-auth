@@ -8,7 +8,7 @@ import moment from 'moment'
 import { map, Observable } from 'rxjs'
 import {
   AuthTransferTokenMethod,
-  CookieSerializeOptions,
+  ICookieSerializeOptions,
   getResponseFromContext,
   IHttpResponse,
   IJwtTokenResponse,
@@ -38,7 +38,7 @@ const transferFromResponseToCookie: (
 
   for (const responseKey in mapKeys) {
     if (token[responseKey]) {
-      const cookieOptions: CookieSerializeOptions = {
+      const cookieOptions: ICookieSerializeOptions = {
         httpOnly: true,
         expires: moment(token.expiryDate).toDate(),
         path: '/',

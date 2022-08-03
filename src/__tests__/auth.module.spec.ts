@@ -1,30 +1,33 @@
 import { TestingModule } from '@nestjs/testing'
 import {
-  AUTH_PASSWORD_HASHER, AuthBasicGuard,
-  AuthenticationService, AuthRefreshTokenGuard,
+  AUTH_PASSWORD_HASHER,
+  AuthBasicGuard,
+  AuthenticationService,
+  AuthRefreshTokenGuard,
   AuthRepository,
   JwtStrategy,
   LocalLoginAction,
   LocalStrategy,
-  RefreshTokenStrategy
+  RefreshTokenStrategy,
 } from '../domain'
 import {
-  ClearAuthCookieInterceptor, CookieAuthInterceptor,
+  ClearAuthCookieInterceptor,
+  CookieAuthInterceptor,
   LoginController,
   ProfileController,
   RefreshTokenController,
 } from '../presentation'
 import { LogoutController } from '../presentation/controllers/logout.controller'
-import { createTestAuthModule, defaultAuthDefinitionsFixture } from './helpers'
+import { createTestingModule, defaultAuthDefinitionsFixture } from './helpers'
 
 describe('AuthModule', () => {
   let app: TestingModule
 
   beforeEach(async () => {
-    app = await createTestAuthModule(defaultAuthDefinitionsFixture)
+    app = await createTestingModule(defaultAuthDefinitionsFixture)
   })
 
-  it('all relevant controllers/providers should be defined', function() {
+  it('all relevant controllers/providers should be defined', function () {
     expect(app.get(LoginController)).toBeDefined()
     expect(app.get(LogoutController)).toBeDefined()
     expect(app.get(ProfileController)).toBeDefined()
