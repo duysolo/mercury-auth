@@ -10,6 +10,7 @@ import {
   RequestMethod,
 } from '@nestjs/common'
 import { APP_GUARD } from '@nestjs/core'
+import { CqrsModule } from '@nestjs/cqrs'
 import { JwtModule } from '@nestjs/jwt'
 import {
   AUTH_PASSWORD_HASHER,
@@ -63,6 +64,7 @@ export class AuthModule implements NestModule {
       module: AuthModule,
       imports: [
         ...(options.imports || []),
+        CqrsModule,
         AuthDefinitionsModule.forRootAsync(options.definitions),
         HashingModule.forRootAsync({
           useFactory: (definitions: IAuthDefinitions) => {
@@ -105,12 +107,11 @@ export class AuthModule implements NestModule {
         },
 
         AuthenticationService,
+        LocalLoginAction,
 
         LocalStrategy,
         JwtStrategy,
         RefreshTokenStrategy,
-
-        LocalLoginAction,
 
         AuthBasicGuard,
         AuthRefreshTokenGuard,

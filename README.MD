@@ -97,7 +97,7 @@ import { Module } from '@nestjs/common'
                         hashingSecretKey: config.get('HASHING_SECRET_KEY') || '',
                         usernameField: 'username',
                         passwordField: 'password',
-                        httpAdaptorType: 'fastfify'
+                        httpAdaptorType: 'fastify'
                     }
                 },
                 inject: [ConfigService],

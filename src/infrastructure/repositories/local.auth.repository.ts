@@ -21,8 +21,8 @@ export class LocalAuthRepository implements AuthRepository {
     return scheduled(this.hasher.hash('testLogin@12345'), asyncScheduler).pipe(
       map((password: string) => ({
         id: _.random(1, 1999).toString(),
-        username: 'duypt.dev@gmail.com',
-        email: 'duypt.dev@gmail.com',
+        username: 'sample-user@gmail.com',
+        email: 'sample-user@gmail.com',
         password,
       })),
       map((user) => {
