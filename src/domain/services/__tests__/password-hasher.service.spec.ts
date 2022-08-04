@@ -1,7 +1,20 @@
-import { BcryptPasswordHasherService } from '../password-hasher.service'
+import {
+  createTestingModule,
+  defaultAuthDefinitionsFixture,
+} from '../../../__tests__/helpers'
+import {
+  AUTH_PASSWORD_HASHER,
+  PasswordHasherService,
+} from '../password-hasher.service'
 
 describe('BcryptPasswordHasherService', () => {
-  const service = new BcryptPasswordHasherService()
+  let service: PasswordHasherService
+
+  beforeAll(async () => {
+    const app = await createTestingModule(defaultAuthDefinitionsFixture())
+
+    service = app.get(AUTH_PASSWORD_HASHER)
+  })
 
   it('should able to hash the password', async () => {
     const hashedPassword = await service.hash('sample-password')
