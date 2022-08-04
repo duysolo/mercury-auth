@@ -9,7 +9,7 @@ import {
 } from '../../domain'
 
 @Injectable()
-export class LocalAuthRepository implements AuthRepository {
+export class SampleAuthRepository implements AuthRepository {
   public constructor(
     @InjectPasswordHasher()
     protected readonly hasher: PasswordHasherService

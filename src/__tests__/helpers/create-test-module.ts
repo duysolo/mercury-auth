@@ -7,13 +7,13 @@ import {
 import { Test } from '@nestjs/testing'
 import { TestingModule } from '@nestjs/testing/testing-module'
 import cookieParser from 'cookie-parser'
-import { AuthModule } from '../../auth.module'
+import { AuthModule, IAuthModuleOptions } from '../../auth.module'
 import {
   AUTH_PASSWORD_HASHER,
   AuthTransferTokenMethod,
   PasswordHasherService,
 } from '../../domain'
-import { IAuthDefinitions, LocalAuthRepository } from '../../infrastructure'
+import { IAuthDefinitions, SampleAuthRepository } from '../../infrastructure'
 import FastifyCookie from '@fastify/cookie'
 
 export const defaultAuthDefinitionsFixture: (
@@ -94,8 +94,18 @@ export async function createTestAuthApplicationFastify(
 }
 
 export async function createTestingModule(
-  definitions: IAuthDefinitions
+  definitions: IAuthDefinitions,
+  otherOptions: Partial<Omit<IAuthModuleOptions, 'definitions'>> = {}
 ): Promise<TestingModule> {
+  if (!otherOptions.authRepository) {
+    otherOptions.authRepository = {
+      useFactory: (hasher: PasswordHasherService) => {
+        return new SampleAuthRepository(hasher)
+      },
+      inject: [AUTH_PASSWORD_HASHER],
+    }
+  }
+
   return await Test.createTestingModule({
     imports: [
       CqrsModule,
@@ -103,12 +113,7 @@ export async function createTestingModule(
         definitions: {
           useFactory: () => definitions,
         },
-        authRepository: {
-          useFactory: (hasher: PasswordHasherService) => {
-            return new LocalAuthRepository(hasher)
-          },
-          inject: [AUTH_PASSWORD_HASHER],
-        },
+        ...(otherOptions as any),
       }),
     ],
   }).compile()

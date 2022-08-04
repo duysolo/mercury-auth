@@ -1,4 +1,3 @@
-import { TestingModule } from '@nestjs/testing'
 import {
   AUTH_PASSWORD_HASHER,
   AuthBasicGuard,
@@ -8,6 +7,7 @@ import {
   JwtStrategy,
   LocalLoginAction,
   LocalStrategy,
+  PasswordHasherService,
   RefreshTokenStrategy,
 } from '../domain'
 import {
@@ -20,32 +20,82 @@ import {
 import { LogoutController } from '../presentation/controllers/logout.controller'
 import { createTestingModule, defaultAuthDefinitionsFixture } from './helpers'
 
-describe('AuthModule', () => {
-  let app: TestingModule
+import crypto from 'crypto'
+import { Injectable } from '@nestjs/common'
 
-  beforeEach(async () => {
-    app = await createTestingModule(defaultAuthDefinitionsFixture())
+interface IPbkdf2Hash {
+  hash: string
+  salt: string
+}
+
+@Injectable()
+class Pbkdf2PasswordHasherService
+  implements PasswordHasherService<IPbkdf2Hash>
+{
+  public async hash(password: string): Promise<IPbkdf2Hash> {
+    const salt = crypto.randomBytes(16).toString('hex')
+
+    const hash = crypto
+      .pbkdf2Sync(password, salt, 10000, 512, 'sha512')
+      .toString('hex')
+
+    return { salt, hash }
+  }
+
+  public async compare(
+    password: string,
+    hashedPassword: IPbkdf2Hash
+  ): Promise<boolean> {
+    const hashPassword = crypto
+      .pbkdf2Sync(password, hashedPassword.salt, 10000, 512, 'sha512')
+      .toString('hex')
+
+    return hashedPassword.hash === hashPassword
+  }
+}
+
+describe('AuthModule', () => {
+  it('all relevant controllers/providers should be defined', async function () {
+    const app = await createTestingModule(defaultAuthDefinitionsFixture())
+
+    const items: any[] = [
+      LoginController,
+      LogoutController,
+      ProfileController,
+      RefreshTokenController,
+
+      AUTH_PASSWORD_HASHER,
+      AuthRepository,
+      AuthenticationService,
+      LocalLoginAction,
+
+      LocalStrategy,
+      JwtStrategy,
+      RefreshTokenStrategy,
+
+      AuthBasicGuard,
+      AuthRefreshTokenGuard,
+
+      ClearAuthCookieInterceptor,
+      CookieAuthInterceptor,
+    ]
+
+    items.forEach((item) => {
+      expect(app.get(item)).toBeDefined()
+    })
   })
 
-  it('all relevant controllers/providers should be defined', function () {
-    expect(app.get(LoginController)).toBeDefined()
-    expect(app.get(LogoutController)).toBeDefined()
-    expect(app.get(ProfileController)).toBeDefined()
-    expect(app.get(RefreshTokenController)).toBeDefined()
+  it('should allow user to customize hasher algorithm', async () => {
+    const app = await createTestingModule(defaultAuthDefinitionsFixture(), {
+      passwordHasher: {
+        useFactory: () => {
+          return new Pbkdf2PasswordHasherService()
+        },
+      },
+    })
 
-    expect(app.get(AUTH_PASSWORD_HASHER)).toBeDefined()
-    expect(app.get(AuthRepository)).toBeDefined()
-    expect(app.get(AuthenticationService)).toBeDefined()
-    expect(app.get(LocalLoginAction)).toBeDefined()
-
-    expect(app.get(LocalStrategy)).toBeDefined()
-    expect(app.get(JwtStrategy)).toBeDefined()
-    expect(app.get(RefreshTokenStrategy)).toBeDefined()
-
-    expect(app.get(AuthBasicGuard)).toBeDefined()
-    expect(app.get(AuthRefreshTokenGuard)).toBeDefined()
-
-    expect(app.get(ClearAuthCookieInterceptor)).toBeDefined()
-    expect(app.get(CookieAuthInterceptor)).toBeDefined()
+    expect(app.get(AUTH_PASSWORD_HASHER)).toBeInstanceOf(
+      Pbkdf2PasswordHasherService
+    )
   })
 })

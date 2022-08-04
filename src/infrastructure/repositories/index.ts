@@ -1,1 +1,1 @@
-export * from './local.auth.repository'
+export * from './sample.auth.repository'
