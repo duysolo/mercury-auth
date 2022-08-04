@@ -1,8 +1,9 @@
 name: Mercury Auth - NestJS package for authentication
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -15,7 +16,7 @@ jobs:
       - run: npm ci
       - run: npm test
 
-  publish-gpr:
+  publish-npm:
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -28,6 +29,9 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org
           scope: '@mercury-labs'
+      - name: Set VERSION variable from tag
+        run: |
+          echo "VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
       - run: npm ci
       - run: npm run build
       - run: npm publish
