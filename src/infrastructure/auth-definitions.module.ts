@@ -7,6 +7,7 @@ export interface IAuthDefinitions {
   basicAuth: {
     username: string
     password: string
+    realm?: string
   }
 
   jwt: {

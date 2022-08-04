@@ -29,11 +29,11 @@ import {
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   AuthDefinitionsModule,
-  BasicAuthMiddleware,
   IAuthDefinitions,
   IAuthDefinitionsModuleOptions,
 } from './infrastructure'
 import {
+  BasicAuthMiddleware,
   ClearAuthCookieInterceptor,
   CookieAuthInterceptor,
   LoginController,

@@ -21,36 +21,32 @@ import { AuthenticationService } from '../services'
 export const REFRESH_TOKEN_STRATEGY_NAME: string = 'mercury-refresh-token'
 
 const cookieExtractor: (
-  definitions: IAuthDefinitions
+  transferTokenMethod: AuthTransferTokenMethod
 ) => JwtFromRequestFunction =
-  (definitions) =>
-    (request: IHttpRequest): string | any => {
-      if (
-        definitions.transferTokenMethod === AuthTransferTokenMethod.BEARER_ONLY
-      ) {
-        return null
-      }
-
-      return (
-        (getRequestCookie(request, 'RefreshToken') as unknown as string) || null
-      )
+  (transferTokenMethod) =>
+  (request: IHttpRequest): string | any => {
+    if (transferTokenMethod === AuthTransferTokenMethod.BEARER_ONLY) {
+      return null
     }
+
+    return (
+      (getRequestCookie(request, 'RefreshToken') as unknown as string) || null
+    )
+  }
 
 const refreshTokenHeaderExtractor: (
-  definitions: IAuthDefinitions
+  transferTokenMethod: AuthTransferTokenMethod
 ) => JwtFromRequestFunction =
-  (definitions) =>
-    (request: IHttpRequest): string | any => {
-      if (
-        definitions.transferTokenMethod === AuthTransferTokenMethod.COOKIE_ONLY
-      ) {
-        return null
-      }
-
-      return (
-        (getRequestHeader(request, 'refresh-token') as unknown as string) || null
-      )
+  (transferTokenMethod) =>
+  (request: IHttpRequest): string | any => {
+    if (transferTokenMethod === AuthTransferTokenMethod.COOKIE_ONLY) {
+      return null
     }
+
+    return (
+      (getRequestHeader(request, 'refresh-token') as unknown as string) || null
+    )
+  }
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -68,8 +64,8 @@ export class RefreshTokenStrategy extends PassportStrategy(
     super()
 
     this.jwtFromRequest = ExtractJwt.fromExtractors([
-      cookieExtractor(authDefinitions),
-      refreshTokenHeaderExtractor(authDefinitions),
+      cookieExtractor(authDefinitions.transferTokenMethod),
+      refreshTokenHeaderExtractor(authDefinitions.transferTokenMethod),
     ]) as any
   }
 

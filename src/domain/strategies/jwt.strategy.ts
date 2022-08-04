@@ -27,13 +27,11 @@ import { AuthenticationService } from '../services'
 export const JWT_STRATEGY_NAME: string = 'jwt'
 
 const cookieExtractor: (
-  definitions: IAuthDefinitions
+  transferTokenMethod: AuthTransferTokenMethod
 ) => JwtFromRequestFunction =
-  (definitions) =>
+  (transferTokenMethod) =>
   (request: IHttpRequest): string | any => {
-    if (
-      definitions.transferTokenMethod === AuthTransferTokenMethod.BEARER_ONLY
-    ) {
+    if (transferTokenMethod === AuthTransferTokenMethod.BEARER_ONLY) {
       return null
     }
 
@@ -43,13 +41,11 @@ const cookieExtractor: (
   }
 
 const accessTokenHeaderExtractor: (
-  definitions: IAuthDefinitions
+  transferTokenMethod: AuthTransferTokenMethod
 ) => JwtFromRequestFunction =
-  (definitions) =>
+  (transferTokenMethod) =>
   (request: IHttpRequest): string | any => {
-    if (
-      definitions.transferTokenMethod === AuthTransferTokenMethod.COOKIE_ONLY
-    ) {
+    if (transferTokenMethod === AuthTransferTokenMethod.COOKIE_ONLY) {
       return null
     }
 
@@ -76,8 +72,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        cookieExtractor(authDefinitions),
-        accessTokenHeaderExtractor(authDefinitions),
+        cookieExtractor(authDefinitions.transferTokenMethod),
+        accessTokenHeaderExtractor(authDefinitions.transferTokenMethod),
       ]),
       ignoreExpiration: false,
       secretOrKey: authDefinitions.jwt.secret,

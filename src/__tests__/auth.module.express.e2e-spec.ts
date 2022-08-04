@@ -26,6 +26,7 @@ describe('AuthModule (e2e) - Express Adaptor', () => {
           return {
             statusCode: response.statusCode,
             token: JSON.parse(response.text || '{}'),
+            headers: response.headers
           }
         })
     },
@@ -41,6 +42,7 @@ describe('AuthModule (e2e) - Express Adaptor', () => {
           return {
             statusCode: response.statusCode,
             token: JSON.parse(response.text || '{}'),
+            headers: response.headers
           }
         })
     },

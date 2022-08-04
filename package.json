@@ -1,7 +1,7 @@
 {
   "name": "@mercury-labs/auth",
-  "version": "1.1.11",
-  "description": "Mercury framework auth library",
+  "version": "1.1.12",
+  "description": "Mercury framework auth library. It supports local auth, jwt with both bearer token and cookie, basic auth.",
   "author": "duysolo <duypt.dev@gmail.com>",
   "repository": {
     "type": "git",

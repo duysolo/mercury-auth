@@ -27,6 +27,7 @@ describe('AuthModule (e2e) - Fastify Adaptor', () => {
           return {
             statusCode: response.statusCode,
             token: response.json() || {},
+            headers: response.headers
           }
         })
     },
@@ -42,6 +43,7 @@ describe('AuthModule (e2e) - Fastify Adaptor', () => {
           return {
             statusCode: response.statusCode,
             token: response.json() || {},
+            headers: response.headers
           }
         })
     },

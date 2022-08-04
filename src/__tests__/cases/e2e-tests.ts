@@ -11,6 +11,7 @@ import {
 interface ITokenResponse {
   statusCode: HttpStatus
   token: IJwtTokenResponse
+  headers: Record<string, any>
 }
 
 interface IProfileResponse {
@@ -67,6 +68,13 @@ export function e2eTestsSetup<T extends INestApplication>(
     expect(res.token.accessToken).toBeDefined()
     expect(res.token.refreshToken).toBeDefined()
     expect(res.token.expiryDate).toBeDefined()
+
+    expect(res.headers['www-authenticate']).toBeDefined()
+    expect(res.headers['www-authenticate']).toEqual(
+      `Basic realm="${
+        authDefinitions?.basicAuth?.realm || 'Mercury Labs Authentication'
+      }", charset="UTF-8"`
+    )
   }
   const loginFailedCheck = (res) => {
     expect(res.statusCode).toEqual(HttpStatus.UNAUTHORIZED)

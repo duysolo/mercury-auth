@@ -124,6 +124,10 @@ interface IAuthDefinitions {
     basicAuth: {
         username: string
         password: string
+        /**
+         * The realm name for WWW-Authenticate header
+         */
+        realm?: string
     }
 
     /**
