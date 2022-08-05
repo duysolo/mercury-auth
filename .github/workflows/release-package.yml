@@ -29,12 +29,10 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org
           scope: '@mercury-labs'
-      - name: Set VERSION variable from tag
-        run: |
-          echo "NEW_PACKAGE_VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
       - run: npm ci
       - run: npm run build
       - run: npm run increase-version
       - run: npm publish
         env:
+          NEW_PACKAGE_VERSION: ${{ github.event.release.tag_name }}
           NODE_AUTH_TOKEN: ${{secrets.NPM_PUBLISH_TOKEN}}
