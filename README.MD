@@ -185,7 +185,15 @@ interface IAuthDefinitions {
      * - bearer: after user login, their accessToken and refreshToken will be sent to response body
      * - both: mixed those 2 above values.
      */
-    transferTokenMethod: AuthTransferTokenMethod
+    transferTokenMethod: AuthTransferTokenMethod,
+
+    cookieOptions?: {
+        domain?: string
+        path?: string // Default '/'
+        sameSite?: boolean | 'lax' | 'strict' | 'none' // Default true
+        signed?: boolean
+        httpOnly?: boolean // Default true
+    },
 
     /**
      * Username field when login

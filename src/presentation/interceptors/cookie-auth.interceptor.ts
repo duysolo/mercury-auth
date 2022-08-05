@@ -39,10 +39,12 @@ const transferFromResponseToCookie: (
   for (const responseKey in mapKeys) {
     if (token[responseKey]) {
       const cookieOptions: ICookieSerializeOptions = {
-        httpOnly: true,
-        expires: moment(token.expiryDate).toDate(),
         path: '/',
+        httpOnly: true,
         sameSite: 'none',
+        ...definitions.cookieOptions,
+
+        expires: moment(token.expiryDate).toDate(),
         secure: process.env.NODE_ENV !== 'local',
       }
 

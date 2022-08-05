@@ -1,7 +1,7 @@
 import { DynamicModule, Module, ModuleMetadata, Provider } from '@nestjs/common'
 import { InjectionToken } from '@nestjs/common/interfaces/modules/injection-token.interface'
 import { OptionalFactoryDependency } from '@nestjs/common/interfaces/modules/optional-factory-dependency.interface'
-import { AuthTransferTokenMethod } from '../domain'
+import { AuthTransferTokenMethod, ICookieSerializeOptions } from '../domain'
 
 export interface IAuthDefinitions {
   basicAuth: {
@@ -27,6 +27,11 @@ export interface IAuthDefinitions {
   hashingSecretKey: string
 
   transferTokenMethod: AuthTransferTokenMethod
+
+  cookieOptions?: Pick<
+    ICookieSerializeOptions,
+    'domain' | 'path' | 'sameSite' | 'signed' | 'httpOnly'
+  >
 
   usernameField?: string
   passwordField?: string

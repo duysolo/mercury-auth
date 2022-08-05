@@ -46,10 +46,11 @@ export class ClearAuthCookieInterceptor implements NestInterceptor {
     }
 
     const cookieOptions: ICookieSerializeOptions = {
-      httpOnly: true,
       path: '/',
-      maxAge: 0,
+      httpOnly: true,
       sameSite: 'none',
+      ...this.definitions.cookieOptions,
+      
       expires: moment().toDate(),
       secure: process.env.NODE_ENV !== 'local',
     }
