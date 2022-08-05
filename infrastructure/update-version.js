@@ -9,4 +9,4 @@ const packageContent = JSON.parse(raw)
 packageContent.version =
   process.env.NEW_PACKAGE_VERSION || packageContent.version
 
-fs.writeFileSync('./package.json', JSON.stringify(packageContent))
+fs.writeFileSync('./package.json', JSON.stringify(packageContent, undefined, 2))

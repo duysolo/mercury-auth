@@ -31,7 +31,7 @@ jobs:
           scope: '@mercury-labs'
       - name: Set VERSION variable from tag
         run: |
-          echo "NEW_PACKAGE_VERSION=${{ github.event.release.tag_name }}" >> $NEW_PACKAGE_VERSION
+          echo "NEW_PACKAGE_VERSION=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
       - run: npm ci
       - run: npm run build
       - run: npm run increase-version
