@@ -9,6 +9,10 @@ const packageContent = JSON.parse(raw)
 packageContent.version =
   process.env.NEW_PACKAGE_VERSION || packageContent.version
 
+console.log({
+  newVersion: packageContent.version
+})
+
 fs.writeFileSync(
   './package.json',
   JSON.stringify(packageContent, undefined, 2)
