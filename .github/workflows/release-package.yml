@@ -1,9 +1,8 @@
 name: Mercury Auth - NestJS package for authentication
 
 on:
-  push:
-    tags:
-      - '*'
+  release:
+    types: [created]
 
 jobs:
   build:
@@ -32,8 +31,6 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org
           scope: '@mercury-labs'
-      run: |
-        echo "The NEW_PACKAGE_VERSION key is:${{env.NEW_PACKAGE_VERSION}}"
       - run: npm ci
       - run: npm run build
       - run: npm run increase-version
