@@ -24,10 +24,12 @@ describe('AuthModule (e2e) - Fastify Adaptor', () => {
           path: '/auth/login',
           body,
         }).then((response) => {
+          const parsedResponseBody = response.json() || {}
+
           return {
             statusCode: response.statusCode,
-            token: response.json() || {},
-            headers: response.headers
+            token: parsedResponseBody.token,
+            headers: response.headers,
           }
         })
     },
@@ -40,10 +42,12 @@ describe('AuthModule (e2e) - Fastify Adaptor', () => {
             'Refresh-Token': `${refreshToken}`,
           },
         }).then((response) => {
+          const parsedResponseBody = response.json() || {}
+
           return {
             statusCode: response.statusCode,
-            token: response.json() || {},
-            headers: response.headers
+            token: parsedResponseBody.token,
+            headers: response.headers,
           }
         })
     },

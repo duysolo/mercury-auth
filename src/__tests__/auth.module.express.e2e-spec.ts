@@ -23,10 +23,12 @@ describe('AuthModule (e2e) - Express Adaptor', () => {
           path: '/auth/login',
           body,
         }).then((response) => {
+          const parsedResponseBody = JSON.parse(response.text || '{}')
+
           return {
             statusCode: response.statusCode,
-            token: JSON.parse(response.text || '{}'),
-            headers: response.headers
+            token: parsedResponseBody.token,
+            headers: response.headers,
           }
         })
     },
@@ -39,10 +41,12 @@ describe('AuthModule (e2e) - Express Adaptor', () => {
             'Refresh-Token': `${refreshToken}`,
           },
         }).then((response) => {
+          const parsedResponseBody = JSON.parse(response.text || '{}')
+
           return {
             statusCode: response.statusCode,
-            token: JSON.parse(response.text || '{}'),
-            headers: response.headers
+            token: parsedResponseBody.token,
+            headers: response.headers,
           }
         })
     },
