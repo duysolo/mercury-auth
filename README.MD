@@ -147,6 +147,7 @@ interface IAuthDefinitions {
          * Eg: 60, “2 days”, “10h”, “7d”
          */
         expiresIn: string | number
+        refreshTokenExpiresIn: string | number
     }
 
     /**
