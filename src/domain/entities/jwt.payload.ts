@@ -1,17 +1,15 @@
 import { IsInt, IsNotEmpty, IsString } from 'class-validator'
 
-export interface IJwtPayload<T = string> {
-  iat: number
-  exp: number
-  username: string
-  sub: T
-}
-
 export interface IJwtPayloadRawDecoded {
   iat: number
   exp: number
   username: string
   sub: string
+}
+
+export interface IJwtPayload<T = string>
+  extends Omit<IJwtPayloadRawDecoded, 'sub'> {
+  sub: T
 }
 
 export class JwtPayload implements IJwtPayload {

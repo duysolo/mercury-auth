@@ -1,8 +1,9 @@
 import { HttpStatus, Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
+import moment from 'moment'
 import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
 import { Strategy } from 'passport-strategy'
-import { lastValueFrom, map } from 'rxjs'
+import { lastValueFrom, map, mergeMap, of } from 'rxjs'
 import {
   AuthTransferTokenMethod,
   getRequestCookie,
@@ -87,11 +88,22 @@ export class RefreshTokenStrategy extends PassportStrategy(
 
   protected async validate(
     payload: IJwtPayload
-  ): Promise<IAuthUserEntityForResponse> {
+  ): Promise<IAuthUserEntityForResponse | undefined> {
     return lastValueFrom(
-      this.authRepository
-        .getAuthUserByUsername(payload.username)
-        .pipe(map(hideRedactedFields(this.authDefinitions.redactedFields)))
+      of(payload).pipe(
+        mergeMap((res) => {
+          /**
+           * Do not allow expired refreshToken to proceed.
+           */
+          if (moment().isAfter(moment(payload.exp * 1000).toDate())) {
+            return of(undefined)
+          }
+
+          return this.authRepository
+            .getAuthUserByUsername(res.username)
+            .pipe(map(hideRedactedFields(this.authDefinitions.redactedFields)))
+        })
+      )
     )
   }
 }
