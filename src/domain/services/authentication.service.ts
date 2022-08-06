@@ -10,7 +10,7 @@ import type {
   IJwtPayloadRawDecoded,
 } from '..'
 import { InjectAuthDefinitions } from '../decorators'
-import type { IAuthDefinitions } from '../../infrastructure'
+import type { IAuthDefinitions } from '../../domain'
 
 export interface IJwtTokenResponse {
   accessToken: string

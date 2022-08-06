@@ -9,7 +9,7 @@ import {
   of,
   scheduled,
 } from 'rxjs'
-import { IAuthDefinitions } from '../../infrastructure'
+import { IAuthDefinitions } from '../../domain'
 import { InjectAuthDefinitions } from '../decorators'
 import type { IAuthUserEntityForResponse } from '../definitions'
 import { AuthTransferTokenMethod } from '../definitions'

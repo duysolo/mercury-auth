@@ -4,7 +4,7 @@ import { Strategy } from 'passport-local'
 import { lastValueFrom } from 'rxjs'
 import type { IAuthUserEntityForResponse } from '../definitions'
 import { InjectAuthDefinitions } from '../decorators'
-import { IAuthDefinitions } from '../../infrastructure'
+import { IAuthDefinitions } from '../../domain'
 import { LocalLoginAction } from '../actions'
 
 export const LOCAL_STRATEGY_NAME: string = 'local'

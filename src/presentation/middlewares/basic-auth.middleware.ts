@@ -1,7 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common'
 import { IncomingMessage, ServerResponse } from 'http'
-import { InjectAuthDefinitions } from '../../domain'
-import { IAuthDefinitions } from '../../infrastructure'
+import { IAuthDefinitions, InjectAuthDefinitions } from '../../domain'
 
 @Injectable()
 export class BasicAuthMiddleware implements NestMiddleware {

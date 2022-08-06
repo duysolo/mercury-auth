@@ -8,13 +8,13 @@ import moment from 'moment'
 import { map, Observable } from 'rxjs'
 import {
   AuthTransferTokenMethod,
-  ICookieSerializeOptions,
   getResponseFromContext,
+  IAuthDefinitions,
+  ICookieSerializeOptions,
   IHttpResponse,
   IJwtTokenResponse,
   InjectAuthDefinitions,
 } from '../../domain'
-import { IAuthDefinitions } from '../../infrastructure'
 
 const transferFromResponseToCookie: (
   response: IHttpResponse,
@@ -76,8 +76,7 @@ export class CookieAuthInterceptor implements NestInterceptor {
   public constructor(
     @InjectAuthDefinitions()
     protected readonly definitions: IAuthDefinitions
-  ) {
-  }
+  ) {}
 
   public intercept(
     context: ExecutionContext,
@@ -93,7 +92,7 @@ export class CookieAuthInterceptor implements NestInterceptor {
           (res.httpAdaptorType === 'fastify' && !res.setCookie) ||
           (res.httpAdaptorType === 'express' && !res.cookie) ||
           this.definitions.transferTokenMethod ===
-          AuthTransferTokenMethod.BEARER_ONLY ||
+            AuthTransferTokenMethod.BEARER_ONLY ||
           !tokenResponse.accessToken
         ) {
           return tokenResponse

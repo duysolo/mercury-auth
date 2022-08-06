@@ -7,12 +7,12 @@ import {
 import moment from 'moment'
 import { Observable, tap } from 'rxjs'
 import {
-  ICookieSerializeOptions,
   getResponseFromContext,
+  IAuthDefinitions,
+  ICookieSerializeOptions,
   IHttpResponse,
   InjectAuthDefinitions,
 } from '../../domain'
-import { IAuthDefinitions } from '../../infrastructure'
 
 @Injectable()
 export class ClearAuthCookieInterceptor implements NestInterceptor {
@@ -50,7 +50,7 @@ export class ClearAuthCookieInterceptor implements NestInterceptor {
       httpOnly: true,
       sameSite: 'none',
       ...this.definitions.cookieOptions,
-      
+
       expires: moment().toDate(),
       secure: process.env.NODE_ENV !== 'local',
     }

@@ -13,7 +13,7 @@ import {
   IJwtPayload,
 } from '..'
 
-import { IAuthDefinitions } from '../../infrastructure'
+import { IAuthDefinitions } from '../../domain'
 import { InjectAuthDefinitions } from '../decorators'
 import { AuthRepository } from '../repositories'
 import { AuthenticationService } from '../services'

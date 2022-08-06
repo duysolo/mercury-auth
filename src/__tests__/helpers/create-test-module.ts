@@ -11,9 +11,10 @@ import { AuthModule, IAuthModuleOptions } from '../../auth.module'
 import {
   AUTH_PASSWORD_HASHER,
   AuthTransferTokenMethod,
+  IAuthDefinitions,
   PasswordHasherService,
 } from '../../domain'
-import { IAuthDefinitions, SampleAuthRepository } from '../../infrastructure'
+import { SampleAuthRepository } from '../../infrastructure'
 import FastifyCookie from '@fastify/cookie'
 
 export const defaultAuthDefinitionsFixture: (
@@ -32,6 +33,7 @@ export const defaultAuthDefinitionsFixture: (
     jwt: {
       secret: 'jugTLY7xOuhcLu5OCH9WIFAStLeXZmyH',
       expiresIn: '1d',
+      refreshTokenExpiresIn: '1d',
     },
     transferTokenMethod: AuthTransferTokenMethod.BEARER_ONLY,
     redactedFields: ['password'],

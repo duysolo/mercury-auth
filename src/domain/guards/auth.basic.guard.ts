@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
-import { IAuthDefinitions } from '../../infrastructure'
+import { IAuthDefinitions } from '../../domain'
 import { InjectAuthDefinitions } from '../decorators'
 import { getRequestFromContext, getRequestHeader } from '../helpers'
 

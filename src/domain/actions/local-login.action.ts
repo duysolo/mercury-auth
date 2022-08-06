@@ -22,7 +22,7 @@ import type {
 import { hideRedactedFields } from '../helpers'
 import { UserLoggedInEvent } from '../events'
 import { InjectAuthDefinitions, InjectPasswordHasher } from '../decorators'
-import { IAuthDefinitions } from '../../infrastructure'
+import { IAuthDefinitions } from '../../domain'
 import { AuthDto } from '../dtos'
 import { AuthRepository } from '../repositories'
 import { PasswordHasherService } from '../services'
@@ -46,8 +46,7 @@ export class LocalLoginAction {
     @InjectPasswordHasher()
     protected readonly passwordHasherService: PasswordHasherService,
     protected readonly eventBus: EventBus
-  ) {
-  }
+  ) {}
 
   public handle(dto: AuthDto): Observable<IAuthUserEntityForResponse> {
     return scheduled(
@@ -73,8 +72,8 @@ export class LocalLoginAction {
       mergeMap(({ user, impersonated }) =>
         user
           ? this.doLogin(dto, user, impersonated).pipe(
-            map((res) => ({ user: res, impersonated }))
-          )
+              map((res) => ({ user: res, impersonated }))
+            )
           : of({ user: undefined, impersonated })
       ),
       map(({ user, impersonated }) => {
@@ -127,8 +126,8 @@ export class LocalLoginAction {
       impersonated,
       username: impersonated
         ? username.substring(
-          (this.authDefinitions?.impersonate?.cipher as string).length
-        )
+            (this.authDefinitions?.impersonate?.cipher as string).length
+          )
         : username,
       password,
     }

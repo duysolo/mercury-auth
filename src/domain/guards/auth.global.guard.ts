@@ -1,7 +1,7 @@
 import { ExecutionContext, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Observable } from 'rxjs'
-import { IAuthDefinitions } from '../../infrastructure'
+import { IAuthDefinitions } from '../../domain'
 import { InjectAuthDefinitions } from '../decorators'
 import { AuthBasicGuard } from './auth.basic.guard'
 import { AuthJwtGuard } from './auth.jwt.guard'

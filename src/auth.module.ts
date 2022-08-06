@@ -20,6 +20,7 @@ import {
   AuthRefreshTokenGuard,
   AuthRepository,
   BcryptPasswordHasherService,
+  IAuthDefinitions,
   JwtStrategy,
   LocalLoginAction,
   LocalStrategy,
@@ -29,7 +30,6 @@ import {
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   AuthDefinitionsModule,
-  IAuthDefinitions,
   IAuthDefinitionsModuleOptions,
 } from './infrastructure'
 import {
