@@ -7,8 +7,7 @@ export class BasicAuthMiddleware implements NestMiddleware {
   public constructor(
     @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions
-  ) {
-  }
+  ) {}
 
   public use(
     req: IncomingMessage,

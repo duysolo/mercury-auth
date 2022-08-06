@@ -2,9 +2,9 @@ import { Controller, Post, UseInterceptors } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { map, Observable } from 'rxjs'
 import {
-  TokenService,
   IAuthUserEntityForResponse,
   IJwtTokenResponse,
+  TokenService,
 } from '../../domain'
 import { CurrentUser, ShouldUseRefreshToken } from '../decorators'
 import { CookieAuthInterceptor } from '../interceptors'
@@ -14,10 +14,7 @@ import { CookieAuthInterceptor } from '../interceptors'
 @ShouldUseRefreshToken()
 @UseInterceptors(CookieAuthInterceptor)
 export class RefreshTokenController {
-  public constructor(
-    private readonly _mercuryJwtService: TokenService
-  ) {
-  }
+  public constructor(private readonly _mercuryJwtService: TokenService) {}
 
   @ApiOperation({
     summary: 'Regenerate access token',

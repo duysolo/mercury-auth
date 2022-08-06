@@ -1,7 +1,9 @@
+import { Injectable } from '@nestjs/common'
+
+import crypto from 'crypto'
 import {
   AUTH_PASSWORD_HASHER,
   AuthBasicGuard,
-  TokenService,
   AuthRefreshTokenGuard,
   AuthRepository,
   JwtStrategy,
@@ -9,6 +11,7 @@ import {
   LocalStrategy,
   PasswordHasherService,
   RefreshTokenStrategy,
+  TokenService,
 } from '../domain'
 import {
   ClearAuthCookieInterceptor,
@@ -19,9 +22,6 @@ import {
 } from '../presentation'
 import { LogoutController } from '../presentation/controllers/logout.controller'
 import { createTestingModule, defaultAuthDefinitionsFixture } from './helpers'
-
-import crypto from 'crypto'
-import { Injectable } from '@nestjs/common'
 
 interface IPbkdf2Hash {
   hash: string

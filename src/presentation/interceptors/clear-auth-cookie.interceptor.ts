@@ -19,8 +19,7 @@ export class ClearAuthCookieInterceptor implements NestInterceptor {
   public constructor(
     @InjectAuthDefinitions()
     protected readonly definitions: IAuthDefinitions
-  ) {
-  }
+  ) {}
 
   public intercept(
     context: ExecutionContext,

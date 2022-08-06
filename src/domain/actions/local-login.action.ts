@@ -15,15 +15,15 @@ import {
   scheduled,
   tap,
 } from 'rxjs'
+import { IAuthDefinitions } from '../../domain'
+import { InjectAuthDefinitions, InjectPasswordHasher } from '../decorators'
 import type {
   IAuthUserEntity,
   IAuthUserEntityForResponse,
 } from '../definitions'
-import { hideRedactedFields } from '../helpers'
-import { UserLoggedInEvent } from '../events'
-import { InjectAuthDefinitions, InjectPasswordHasher } from '../decorators'
-import { IAuthDefinitions } from '../../domain'
 import { AuthDto } from '../dtos'
+import { UserLoggedInEvent } from '../events'
+import { hideRedactedFields } from '../helpers'
 import { AuthRepository } from '../repositories'
 import { PasswordHasherService } from '../services'
 
@@ -42,9 +42,9 @@ export class LocalLoginAction {
   public constructor(
     @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
-    protected readonly authRepository: AuthRepository,
     @InjectPasswordHasher()
     protected readonly passwordHasherService: PasswordHasherService,
+    protected readonly authRepository: AuthRepository,
     protected readonly eventBus: EventBus
   ) {}
 

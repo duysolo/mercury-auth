@@ -34,8 +34,10 @@ export interface IAuthDefinitions {
 
   transferTokenMethod: AuthTransferTokenMethod
 
-  cookieOptions?: Pick<ICookieSerializeOptions,
-    'domain' | 'path' | 'sameSite' | 'signed' | 'httpOnly'>
+  cookieOptions?: Pick<
+    ICookieSerializeOptions,
+    'domain' | 'path' | 'sameSite' | 'signed' | 'httpOnly'
+  >
 
   usernameField?: string
   passwordField?: string

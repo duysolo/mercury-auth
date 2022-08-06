@@ -1,9 +1,9 @@
+import { e2eTestsSetup } from './cases/e2e-tests'
 import {
   createTestAuthApplicationExpress,
   defaultAuthDefinitionsFixture,
   expressRequest,
 } from './helpers'
-import { e2eTestsSetup } from './cases/e2e-tests'
 
 describe('AuthModule (e2e) - Express Adaptor', () => {
   e2eTestsSetup({

@@ -22,7 +22,7 @@ module.exports = {
   ignorePatterns: ['.eslintrc.js'],
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
+    // '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-parameter-properties': [
       'error',
       { allows: ['public readonly', 'protected readonly', 'private readonly'] },

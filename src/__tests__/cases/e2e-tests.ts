@@ -45,7 +45,7 @@ interface IE2ETestsSetupOptions<NestAppType = INestApplication> {
 
 export function e2eTestsSetup<T extends INestApplication>(
   options: IE2ETestsSetupOptions<T>
-) {
+): void {
   let app: T
 
   let authDefinitions: IAuthDefinitions
@@ -66,7 +66,7 @@ export function e2eTestsSetup<T extends INestApplication>(
     }
   })
 
-  const loginSuccessCheck = (res) => {
+  const loginSuccessCheck: (res: any) => void = (res) => {
     expect(res.statusCode).toEqual(HttpStatus.CREATED)
     expect(res.token.accessToken).toBeDefined()
     expect(res.token.refreshToken).toBeDefined()
@@ -79,7 +79,7 @@ export function e2eTestsSetup<T extends INestApplication>(
       }", charset="UTF-8"`
     )
   }
-  const loginFailedCheck = (res) => {
+  const loginFailedCheck: (res: any) => void = (res) => {
     expect(res.statusCode).toEqual(HttpStatus.UNAUTHORIZED)
   }
 

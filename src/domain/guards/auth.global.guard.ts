@@ -16,11 +16,11 @@ export const IS_REFRESH_TOKEN_KEY: string = 'isRefreshToken'
 @Injectable()
 export class AuthGlobalGuard extends AuthJwtGuard {
   public constructor(
+    @InjectAuthDefinitions()
+    private readonly _options: IAuthDefinitions,
     private readonly _reflector: Reflector,
     private readonly _basicAuthGuard: AuthBasicGuard,
-    private readonly _refreshTokenGuard: AuthRefreshTokenGuard,
-    @InjectAuthDefinitions()
-    private readonly _options: IAuthDefinitions
+    private readonly _refreshTokenGuard: AuthRefreshTokenGuard
   ) {
     super()
   }

@@ -9,8 +9,8 @@ import type {
   IJwtPayload,
   IJwtPayloadRawDecoded,
 } from '..'
-import { InjectAuthDefinitions } from '../decorators'
 import type { IAuthDefinitions } from '../../domain'
+import { InjectAuthDefinitions } from '../decorators'
 
 export interface IJwtTokenResponse {
   accessToken: string
@@ -21,10 +21,10 @@ export interface IJwtTokenResponse {
 @Injectable()
 export class TokenService {
   public constructor(
-    protected readonly jwtService: JwtService,
-    protected readonly hashTextService: HashTextService,
     @InjectAuthDefinitions()
-    protected readonly authDefinitions: IAuthDefinitions
+    protected readonly authDefinitions: IAuthDefinitions,
+    protected readonly jwtService: JwtService,
+    protected readonly hashTextService: HashTextService
   ) {}
 
   public generateTokenResponse(
@@ -133,6 +133,8 @@ export class TokenService {
   }
 }
 
-function transform<Output>(iteratee: (input: any) => Output) {
+function transform<Output>(
+  iteratee: (input: any) => Output
+): (value: any) => Output {
   return (value) => iteratee(value) as unknown as Output
 }

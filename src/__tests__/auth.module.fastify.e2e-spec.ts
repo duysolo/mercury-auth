@@ -1,10 +1,10 @@
 import { NestFastifyApplication } from '@nestjs/platform-fastify'
+import { e2eTestsSetup } from './cases/e2e-tests'
 import {
   createTestAuthApplicationFastify,
   defaultAuthDefinitionsFixture,
   fastifyRequest,
 } from './helpers'
-import { e2eTestsSetup } from './cases/e2e-tests'
 
 describe('AuthModule (e2e) - Fastify Adaptor', () => {
   e2eTestsSetup<NestFastifyApplication>({

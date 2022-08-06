@@ -2,10 +2,10 @@ import { Controller, Post, UseGuards, UseInterceptors } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { map, Observable } from 'rxjs'
 import {
-  TokenService,
   AuthLocalGuard,
   IAuthUserEntityForResponse,
   IJwtTokenResponse,
+  TokenService,
 } from '../../domain'
 import { CurrentUser, Public } from '../decorators'
 import { CookieAuthInterceptor } from '../interceptors'
@@ -16,9 +16,7 @@ import { CookieAuthInterceptor } from '../interceptors'
 @UseGuards(AuthLocalGuard)
 @UseInterceptors(CookieAuthInterceptor)
 export class LoginController {
-  public constructor(
-    private readonly _authenticationService: TokenService
-  ) {}
+  public constructor(private readonly _authenticationService: TokenService) {}
 
   @ApiOperation({
     summary: 'Login',

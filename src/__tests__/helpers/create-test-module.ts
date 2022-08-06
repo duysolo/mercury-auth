@@ -1,3 +1,4 @@
+import FastifyCookie from '@fastify/cookie'
 import { INestApplication } from '@nestjs/common'
 import { CqrsModule } from '@nestjs/cqrs'
 import {
@@ -15,7 +16,6 @@ import {
   PasswordHasherService,
 } from '../../domain'
 import { SampleAuthRepository } from '../../infrastructure'
-import FastifyCookie from '@fastify/cookie'
 
 export const defaultAuthDefinitionsFixture: (
   options?: Partial<IAuthDefinitions>

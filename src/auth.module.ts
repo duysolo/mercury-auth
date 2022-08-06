@@ -15,7 +15,6 @@ import { JwtModule } from '@nestjs/jwt'
 import {
   AUTH_PASSWORD_HASHER,
   AuthBasicGuard,
-  TokenService,
   AuthGlobalGuard,
   AuthRefreshTokenGuard,
   AuthRepository,
@@ -26,6 +25,7 @@ import {
   LocalStrategy,
   PasswordHasherService,
   RefreshTokenStrategy,
+  TokenService,
 } from './domain'
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
