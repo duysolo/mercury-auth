@@ -1,7 +1,7 @@
 import {
   AUTH_PASSWORD_HASHER,
   AuthBasicGuard,
-  AuthenticationService,
+  TokenService,
   AuthRefreshTokenGuard,
   AuthRepository,
   JwtStrategy,
@@ -66,7 +66,7 @@ describe('AuthModule', () => {
 
       AUTH_PASSWORD_HASHER,
       AuthRepository,
-      AuthenticationService,
+      TokenService,
       LocalLoginAction,
 
       LocalStrategy,

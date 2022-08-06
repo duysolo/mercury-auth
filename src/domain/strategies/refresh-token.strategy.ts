@@ -16,7 +16,7 @@ import {
 import { IAuthDefinitions } from '../../domain'
 import { InjectAuthDefinitions } from '../decorators'
 import { AuthRepository } from '../repositories'
-import { AuthenticationService } from '../services'
+import { TokenService } from '../services'
 
 export const REFRESH_TOKEN_STRATEGY_NAME: string = 'mercury-refresh-token'
 
@@ -59,7 +59,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
     protected readonly authRepository: AuthRepository,
-    protected readonly jwtService: AuthenticationService
+    protected readonly jwtService: TokenService
   ) {
     super()
 

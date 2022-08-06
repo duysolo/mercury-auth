@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import _ from 'lodash/fp'
 import moment from 'moment'
-import { map, Observable, of } from 'rxjs'
+import { forkJoin, map, Observable, of } from 'rxjs'
 import type {
   IAuthUserEntityForResponse,
   IJwtPayload,
@@ -19,7 +19,7 @@ export interface IJwtTokenResponse {
 }
 
 @Injectable()
-export class AuthenticationService {
+export class TokenService {
   public constructor(
     protected readonly jwtService: JwtService,
     protected readonly hashTextService: HashTextService,
@@ -30,28 +30,45 @@ export class AuthenticationService {
   public generateTokenResponse(
     userInfo: IAuthUserEntityForResponse
   ): Observable<IJwtTokenResponse> {
-    return this.generateAccessToken(userInfo).pipe(
-      map((accessToken) => {
+    return forkJoin([
+      this.generateAccessToken(userInfo),
+      this.generateRefreshToken(userInfo),
+    ]).pipe(
+      map(([accessToken, refreshToken]) => {
         const jwtPayload = this.decodeAccessToken(accessToken) as IJwtPayload
 
         return {
           accessToken,
-          refreshToken: this.generateRefreshToken(accessToken),
+          refreshToken,
           expiryDate: moment(_.toInteger(jwtPayload.exp) * 1000).toDate(),
         }
       })
     )
   }
 
-  public generateAccessToken(
-    userInfo: IAuthUserEntityForResponse
+  public generateJwtToken(
+    userInfo: IAuthUserEntityForResponse,
+    expiresIn: string | number
   ): Observable<string> {
     return of({
       username: this.hashTextService.encode(
         userInfo[this.authDefinitions.usernameField || 'username']
       ),
       sub: this.hashTextService.encode(userInfo.id),
-    }).pipe(map((payload) => this.jwtService.sign(payload)))
+    }).pipe(
+      map((payload) =>
+        this.jwtService.sign(payload, {
+          ...(this.authDefinitions.jwt.signOptions || {}),
+          expiresIn,
+        })
+      )
+    )
+  }
+
+  public generateAccessToken(
+    userInfo: IAuthUserEntityForResponse
+  ): Observable<string> {
+    return this.generateJwtToken(userInfo, this.authDefinitions.jwt.expiresIn)
   }
 
   public decodeAccessToken(token: string): IJwtPayload | undefined {
@@ -77,8 +94,13 @@ export class AuthenticationService {
     return undefined
   }
 
-  public generateRefreshToken(accessToken: string): string {
-    return this.hashTextService.encode(accessToken)
+  public generateRefreshToken(
+    userInfo: IAuthUserEntityForResponse
+  ): Observable<string> {
+    return this.generateJwtToken(
+      userInfo,
+      this.authDefinitions.jwt.refreshTokenExpiresIn
+    ).pipe(map((res) => this.hashTextService.encode(res)))
   }
 
   public decodeRefreshToken(refreshToken: string): IJwtPayload | undefined {

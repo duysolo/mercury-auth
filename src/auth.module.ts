@@ -15,7 +15,7 @@ import { JwtModule } from '@nestjs/jwt'
 import {
   AUTH_PASSWORD_HASHER,
   AuthBasicGuard,
-  AuthenticationService,
+  TokenService,
   AuthGlobalGuard,
   AuthRefreshTokenGuard,
   AuthRepository,
@@ -106,7 +106,7 @@ export class AuthModule implements NestModule {
           useClass: AuthGlobalGuard,
         },
 
-        AuthenticationService,
+        TokenService,
         LocalLoginAction,
 
         LocalStrategy,
@@ -129,7 +129,7 @@ export class AuthModule implements NestModule {
       ],
       exports: [
         AuthRepository,
-        AuthenticationService,
+        TokenService,
 
         AUTH_PASSWORD_HASHER,
 

@@ -5,10 +5,10 @@ import {
   defaultAuthDefinitionsFixture,
 } from '../../../__tests__/helpers'
 import { IAuthUserEntityForResponse } from '../../definitions'
-import { AuthenticationService } from '../authentication.service'
+import { TokenService } from '../token.service'
 
-describe('AuthenticationService', () => {
-  let service: AuthenticationService
+describe('TokenService', () => {
+  let service: TokenService
 
   const userInfo: IAuthUserEntityForResponse = {
     id: '123456',
@@ -18,7 +18,7 @@ describe('AuthenticationService', () => {
   beforeAll(async () => {
     const app = await createTestingModule(defaultAuthDefinitionsFixture())
 
-    service = app.get(AuthenticationService)
+    service = app.get(TokenService)
   })
 
   it('should able to generate token response', async () => {
@@ -36,8 +36,8 @@ describe('AuthenticationService', () => {
 
   it('should able to decode access token', async () => {
     await lastValueFrom(
-      service.generateTokenResponse(userInfo).pipe(
-        map((res) => service.decodeAccessToken(res.accessToken)),
+      service.generateAccessToken(userInfo).pipe(
+        map((res) => service.decodeAccessToken(res)),
         tap((res) => {
           expect(res?.username).toEqual(userInfo.username)
           expect(res?.sub).toEqual(userInfo.id)
@@ -50,8 +50,7 @@ describe('AuthenticationService', () => {
 
   it('should able to generate refresh token', async () => {
     await lastValueFrom(
-      service.generateTokenResponse(userInfo).pipe(
-        map((res) => service.generateRefreshToken(res.accessToken)),
+      service.generateRefreshToken(userInfo).pipe(
         tap((res) => {
           expect(res).toBeDefined()
           expect(isString(res)).toBeTruthy()

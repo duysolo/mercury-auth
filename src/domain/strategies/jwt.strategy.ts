@@ -22,7 +22,7 @@ import {
   validateEntity,
 } from '../helpers'
 import { AuthRepository } from '../repositories'
-import { AuthenticationService } from '../services'
+import { TokenService } from '../services'
 
 export const JWT_STRATEGY_NAME: string = 'jwt'
 
@@ -68,7 +68,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
     @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
     protected readonly authRepository: AuthRepository,
-    protected readonly jwtService: AuthenticationService
+    protected readonly jwtService: TokenService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([

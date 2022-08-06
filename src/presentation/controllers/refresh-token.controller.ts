@@ -2,7 +2,7 @@ import { Controller, Post, UseInterceptors } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { map, Observable } from 'rxjs'
 import {
-  AuthenticationService,
+  TokenService,
   IAuthUserEntityForResponse,
   IJwtTokenResponse,
 } from '../../domain'
@@ -15,7 +15,7 @@ import { CookieAuthInterceptor } from '../interceptors'
 @UseInterceptors(CookieAuthInterceptor)
 export class RefreshTokenController {
   public constructor(
-    private readonly _mercuryJwtService: AuthenticationService
+    private readonly _mercuryJwtService: TokenService
   ) {
   }
 
