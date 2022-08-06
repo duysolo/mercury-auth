@@ -1,6 +1,9 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
-import { IAuthUserEntityForResponse, IJwtTokenResponse } from '../../domain'
-import { IAuthDefinitions } from '../../infrastructure'
+import {
+  IAuthDefinitions,
+  IAuthUserEntityForResponse,
+  IJwtTokenResponse,
+} from '../../domain'
 import {
   generateCorrectUserPayload,
   generateCorrectUserPayloadImpersonate,
