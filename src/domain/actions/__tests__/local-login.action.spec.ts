@@ -1,14 +1,26 @@
 import { UnauthorizedException } from '@nestjs/common'
+import { EventBus, EventsHandler, IEventHandler } from '@nestjs/cqrs'
+import { TestingModule } from '@nestjs/testing'
 import { catchError, lastValueFrom, of, tap } from 'rxjs'
 import {
   createTestingModule,
   defaultAuthDefinitionsFixture,
 } from '../../../__tests__/helpers'
 import { AuthDto } from '../../dtos'
+import { UserLoggedInEvent } from '../../events'
 import { LocalLoginAction } from '../local-login.action'
+
+@EventsHandler(UserLoggedInEvent)
+export class UserLoggedInEventHandler implements IEventHandler {
+  public async handle(event: UserLoggedInEvent): Promise<void> {
+    console.log(event)
+  }
+}
 
 describe('LocalLoginAction', () => {
   let action: LocalLoginAction
+
+  let app: TestingModule
 
   const correctUserInfo: AuthDto = {
     username: 'sample-user@gmail.com',
@@ -26,7 +38,13 @@ describe('LocalLoginAction', () => {
   }
 
   beforeAll(async () => {
-    const app = await createTestingModule(defaultAuthDefinitionsFixture())
+    app = await createTestingModule(
+      defaultAuthDefinitionsFixture(),
+      {},
+      {
+        providers: [UserLoggedInEventHandler],
+      }
+    )
 
     action = app.get(LocalLoginAction)
   })
@@ -61,6 +79,27 @@ describe('LocalLoginAction', () => {
         catchError((error) => {
           expect(error).toBeInstanceOf(UnauthorizedException)
           return of(undefined)
+        })
+      )
+    )
+  })
+
+  it('should handle UserLoggedInEvent', async function () {
+    const userLoggedInEventHandler = app.get(UserLoggedInEventHandler)
+
+    expect(userLoggedInEventHandler).toBeDefined()
+
+    const eventBus: EventBus = action['eventBus']
+
+    const spyEventBus = jest.spyOn(eventBus, 'publish')
+
+    await lastValueFrom(
+      action.handle(correctUserInfo).pipe(
+        tap((res) => {
+          expect(spyEventBus).toHaveBeenCalledTimes(1)
+          expect(spyEventBus).toHaveBeenCalledWith(
+            new UserLoggedInEvent(res, false)
+          )
         })
       )
     )

@@ -1,5 +1,6 @@
 import FastifyCookie from '@fastify/cookie'
 import { INestApplication } from '@nestjs/common'
+import { ModuleMetadata } from '@nestjs/common/interfaces/modules/module-metadata.interface'
 import { CqrsModule } from '@nestjs/cqrs'
 import {
   FastifyAdapter,
@@ -97,7 +98,8 @@ export async function createTestAuthApplicationFastify(
 
 export async function createTestingModule(
   definitions: IAuthDefinitions,
-  otherOptions: Partial<Omit<IAuthModuleOptions, 'definitions'>> = {}
+  otherOptions: Partial<Omit<IAuthModuleOptions, 'definitions'>> = {},
+  testModuleMetadata: ModuleMetadata = {}
 ): Promise<TestingModule> {
   if (!otherOptions.authRepository) {
     otherOptions.authRepository = {
@@ -117,6 +119,9 @@ export async function createTestingModule(
         },
         ...(otherOptions as any),
       }),
+      ...(testModuleMetadata.imports || []),
     ],
+    providers: testModuleMetadata.providers || [],
+    controllers: testModuleMetadata.controllers || [],
   }).compile()
 }

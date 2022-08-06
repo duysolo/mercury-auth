@@ -86,9 +86,9 @@ export class LocalLoginAction {
           impersonated,
         }
       }),
-      tap(({ user, impersonated }) =>
+      tap(({ user, impersonated }) => {
         this.eventBus.publish(new UserLoggedInEvent(user, impersonated))
-      ),
+      }),
       map(({ user }) => user)
     )
   }
