@@ -37,7 +37,7 @@ export const defaultAuthDefinitionsFixture: (
       expiresIn: '1d',
       refreshTokenExpiresIn: '1d',
     },
-    transferTokenMethod: AuthTransferTokenMethod.BEARER_ONLY,
+    transferTokenMethod: AuthTransferTokenMethod.BOTH,
     redactedFields: ['password'],
     hashingSecretKey: 'LqeRsYk5d82mgYFKujl34e8DxvHMrB5T',
     usernameField: 'username',
@@ -49,9 +49,7 @@ export const defaultAuthDefinitionsFixture: (
 
 @EventsHandler(UserLoggedInEvent)
 export class UserLoggedInEventHandler implements IEventHandler {
-  public async handle(event: UserLoggedInEvent): Promise<void> {
-    console.log(event)
-  }
+  public async handle(event: UserLoggedInEvent): Promise<void> {}
 }
 
 export async function createTestAuthApplicationExpress(

@@ -1,8 +1,8 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import {
   IAuthDefinitions,
+  IAuthResponse,
   IAuthUserEntityForResponse,
-  IJwtTokenResponse,
 } from '../../domain'
 import {
   generateCorrectUserPayload,
@@ -14,8 +14,9 @@ import {
 
 interface ITokenResponse {
   statusCode: HttpStatus
-  token: IJwtTokenResponse
+  authResponse: IAuthResponse
   headers: Record<string, any>
+  cookies: any
 }
 
 interface IProfileResponse {
@@ -67,14 +68,14 @@ export function e2eTestsSetup<T extends INestApplication>(
     }
   })
 
-  const loginSuccessCheck: (res: any, isImpersonated: boolean) => void = (
+  const loginSuccessCheck: (res: ITokenResponse, isImpersonated: boolean) => void = (
     res,
     isImpersonated
   ) => {
     expect(res.statusCode).toEqual(HttpStatus.CREATED)
-    expect(res.token.accessToken).toBeDefined()
-    expect(res.token.refreshToken).toBeDefined()
-    expect(res.token.expiryDate).toBeDefined()
+    expect(res.authResponse.token.accessToken).toBeDefined()
+    expect(res.authResponse.token.refreshToken).toBeDefined()
+    expect(res.authResponse.token.expiryDate).toBeDefined()
 
     expect(res.headers['www-authenticate']).toBeDefined()
     expect(res.headers['www-authenticate']).toEqual(
@@ -147,7 +148,7 @@ export function e2eTestsSetup<T extends INestApplication>(
       it('should show user profile', async () => {
         const res = await options.getProfileRequest()(
           app,
-          response.token.accessToken
+          response.authResponse.token.accessToken
         )
 
         expect(res.statusCode).toEqual(HttpStatus.OK)
@@ -160,7 +161,10 @@ export function e2eTestsSetup<T extends INestApplication>(
     describe('RefreshTokenController', () => {
       it('should allow user to refresh tokens', async () => {
         loginSuccessCheck(
-          await options.refreshTokenRequest()(app, response.token.refreshToken),
+          await options.refreshTokenRequest()(
+            app,
+            response.authResponse.token.refreshToken
+          ),
           true
         )
       })
@@ -170,7 +174,7 @@ export function e2eTestsSetup<T extends INestApplication>(
       it('should allow user to logout', async () => {
         const res = await options.logoutRequest()(
           app,
-          response.token.accessToken
+          response.authResponse.token.accessToken
         )
 
         expect(res.statusCode).toEqual(HttpStatus.CREATED)

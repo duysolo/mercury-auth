@@ -1,3 +1,4 @@
+import { IAuthResponse } from '../domain'
 import { e2eTestsSetup } from './cases/e2e-tests'
 import {
   createTestAuthApplicationExpress,
@@ -23,12 +24,15 @@ describe('AuthModule (e2e) - Express Adaptor', () => {
           path: '/auth/login',
           body,
         }).then((response) => {
-          const parsedResponseBody = JSON.parse(response.text || '{}')
+          const parsedResponseBody: IAuthResponse = JSON.parse(
+            response.text || '{}'
+          )
 
           return {
             statusCode: response.statusCode,
-            token: parsedResponseBody.token,
+            authResponse: parsedResponseBody,
             headers: response.headers,
+            cookies: response.headers['Cookie'],
           }
         })
     },
@@ -41,12 +45,15 @@ describe('AuthModule (e2e) - Express Adaptor', () => {
             'Refresh-Token': `${refreshToken}`,
           },
         }).then((response) => {
-          const parsedResponseBody = JSON.parse(response.text || '{}')
+          const parsedResponseBody: IAuthResponse = JSON.parse(
+            response.text || '{}'
+          )
 
           return {
             statusCode: response.statusCode,
-            token: parsedResponseBody.token,
+            authResponse: parsedResponseBody,
             headers: response.headers,
+            cookies: response.headers['Cookie'],
           }
         })
     },

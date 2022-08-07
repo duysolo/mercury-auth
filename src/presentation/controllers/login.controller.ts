@@ -3,8 +3,8 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { map, Observable } from 'rxjs'
 import {
   AuthLocalGuard,
+  IAuthResponse,
   IAuthUserEntityForResponse,
-  IJwtTokenResponse,
   TokenService,
 } from '../../domain'
 import { CurrentUser, Public } from '../decorators'
@@ -22,10 +22,9 @@ export class LoginController {
     summary: 'Login',
   })
   @Post('login')
-  public handle(@CurrentUser() user: IAuthUserEntityForResponse): Observable<{
-    user: IAuthUserEntityForResponse
-    token: IJwtTokenResponse
-  }> {
+  public handle(
+    @CurrentUser() user: IAuthUserEntityForResponse
+  ): Observable<IAuthResponse> {
     return this._authenticationService
       .generateTokenResponse(user)
       .pipe(map((res) => ({ user, token: res })))
