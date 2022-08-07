@@ -194,6 +194,7 @@ interface IAuthDefinitions {
         sameSite?: boolean | 'lax' | 'strict' | 'none' // Default true
         signed?: boolean
         httpOnly?: boolean // Default true
+        secure?: boolean
     },
 
     /**

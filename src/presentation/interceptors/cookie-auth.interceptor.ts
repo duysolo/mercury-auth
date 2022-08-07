@@ -4,7 +4,6 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common'
-import moment from 'moment'
 import { map, Observable } from 'rxjs'
 import {
   AuthTransferTokenMethod,
@@ -42,10 +41,10 @@ const transferFromResponseToCookie: (
         path: '/',
         httpOnly: true,
         sameSite: 'none',
+        secure: process.env.NODE_ENV !== 'local',
         ...definitions.cookieOptions,
 
-        expires: moment(token.expiryDate).toDate(),
-        secure: process.env.NODE_ENV !== 'local',
+        expires: token.expiryDate,
       }
 
       if (response.httpAdaptorType === 'fastify' && response.setCookie) {

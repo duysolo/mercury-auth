@@ -48,10 +48,11 @@ export class ClearAuthCookieInterceptor implements NestInterceptor {
       path: '/',
       httpOnly: true,
       sameSite: 'none',
+      secure: process.env.NODE_ENV !== 'local',
+
       ...this.definitions.cookieOptions,
 
       expires: moment().toDate(),
-      secure: process.env.NODE_ENV !== 'local',
     }
 
     if (res.httpAdaptorType === 'fastify' && res.setCookie) {

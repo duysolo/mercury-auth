@@ -36,7 +36,7 @@ export interface IAuthDefinitions {
 
   cookieOptions?: Pick<
     ICookieSerializeOptions,
-    'domain' | 'path' | 'sameSite' | 'signed' | 'httpOnly'
+    'domain' | 'path' | 'sameSite' | 'signed' | 'httpOnly' | 'secure'
   >
 
   usernameField?: string
