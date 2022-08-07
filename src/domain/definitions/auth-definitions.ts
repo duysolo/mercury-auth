@@ -1,4 +1,4 @@
-import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces'
+import { JwtSignOptions } from '@nestjs/jwt'
 import { ICookieSerializeOptions } from '../helpers'
 import { AuthTransferTokenMethod } from './auth-transfer-token-method.enum'
 
