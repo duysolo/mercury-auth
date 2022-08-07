@@ -9,6 +9,7 @@ import {
   generateCorrectUserPayloadImpersonate,
   generateInvalidUserPayload,
   generateInvalidUserPayloadImpersonate,
+  UserLoggedInEventHandler,
 } from '../helpers'
 
 interface ITokenResponse {
@@ -66,7 +67,10 @@ export function e2eTestsSetup<T extends INestApplication>(
     }
   })
 
-  const loginSuccessCheck: (res: any) => void = (res) => {
+  const loginSuccessCheck: (res: any, isImpersonated: boolean) => void = (
+    res,
+    isImpersonated
+  ) => {
     expect(res.statusCode).toEqual(HttpStatus.CREATED)
     expect(res.token.accessToken).toBeDefined()
     expect(res.token.refreshToken).toBeDefined()
@@ -78,6 +82,10 @@ export function e2eTestsSetup<T extends INestApplication>(
         authDefinitions?.basicAuth?.realm || 'Mercury Labs Authentication'
       }", charset="UTF-8"`
     )
+
+    const userLoggedInEventHandler = app.get(UserLoggedInEventHandler)
+
+    expect(userLoggedInEventHandler).toBeDefined()
   }
   const loginFailedCheck: (res: any) => void = (res) => {
     expect(res.statusCode).toEqual(HttpStatus.UNAUTHORIZED)
@@ -87,7 +95,8 @@ export function e2eTestsSetup<T extends INestApplication>(
     describe('LoginController', () => {
       it('should login success', async () => {
         loginSuccessCheck(
-          await options.loginRequest()(app, generateCorrectUserPayload())
+          await options.loginRequest()(app, generateCorrectUserPayload()),
+          false
         )
       })
 
@@ -101,7 +110,8 @@ export function e2eTestsSetup<T extends INestApplication>(
                 password: '',
               }
             )
-          )
+          ),
+          true
         )
       })
 
@@ -150,7 +160,8 @@ export function e2eTestsSetup<T extends INestApplication>(
     describe('RefreshTokenController', () => {
       it('should allow user to refresh tokens', async () => {
         loginSuccessCheck(
-          await options.refreshTokenRequest()(app, response.token.refreshToken)
+          await options.refreshTokenRequest()(app, response.token.refreshToken),
+          true
         )
       })
     })

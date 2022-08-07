@@ -1,7 +1,7 @@
 import FastifyCookie from '@fastify/cookie'
 import { INestApplication } from '@nestjs/common'
 import { ModuleMetadata } from '@nestjs/common/interfaces/modules/module-metadata.interface'
-import { CqrsModule } from '@nestjs/cqrs'
+import { CqrsModule, EventsHandler, IEventHandler } from '@nestjs/cqrs'
 import {
   FastifyAdapter,
   NestFastifyApplication,
@@ -15,6 +15,7 @@ import {
   AuthTransferTokenMethod,
   IAuthDefinitions,
   PasswordHasherService,
+  UserLoggedInEvent,
 } from '../../domain'
 import { SampleAuthRepository } from '../../infrastructure'
 
@@ -46,10 +47,23 @@ export const defaultAuthDefinitionsFixture: (
   }
 }
 
+@EventsHandler(UserLoggedInEvent)
+export class UserLoggedInEventHandler implements IEventHandler {
+  public async handle(event: UserLoggedInEvent): Promise<void> {
+    console.log(event)
+  }
+}
+
 export async function createTestAuthApplicationExpress(
   defaultDefinitions: IAuthDefinitions
 ): Promise<INestApplication> {
-  const moduleFixture = await createTestingModule(defaultDefinitions)
+  const moduleFixture = await createTestingModule(
+    defaultDefinitions,
+    {},
+    {
+      providers: [UserLoggedInEventHandler],
+    }
+  )
 
   const app = moduleFixture.createNestApplication()
 
@@ -73,7 +87,13 @@ export async function createTestAuthApplicationExpress(
 export async function createTestAuthApplicationFastify(
   defaultDefinitions: IAuthDefinitions
 ): Promise<NestFastifyApplication> {
-  const moduleFixture = await createTestingModule(defaultDefinitions)
+  const moduleFixture = await createTestingModule(
+    defaultDefinitions,
+    {},
+    {
+      providers: [UserLoggedInEventHandler],
+    }
+  )
 
   const app: NestFastifyApplication = moduleFixture.createNestApplication(
     new FastifyAdapter()

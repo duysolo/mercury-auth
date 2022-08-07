@@ -1,5 +1,5 @@
 import { UnauthorizedException } from '@nestjs/common'
-import { EventBus, EventsHandler, IEventHandler } from '@nestjs/cqrs'
+import { EventBus } from '@nestjs/cqrs'
 import { TestingModule } from '@nestjs/testing'
 import { catchError, lastValueFrom, of, tap } from 'rxjs'
 import {
@@ -9,13 +9,6 @@ import {
 import { AuthDto } from '../../dtos'
 import { UserLoggedInEvent } from '../../events'
 import { LocalLoginAction } from '../local-login.action'
-
-@EventsHandler(UserLoggedInEvent)
-export class UserLoggedInEventHandler implements IEventHandler {
-  public async handle(event: UserLoggedInEvent): Promise<void> {
-    console.log(event)
-  }
-}
 
 describe('LocalLoginAction', () => {
   let action: LocalLoginAction
@@ -38,13 +31,7 @@ describe('LocalLoginAction', () => {
   }
 
   beforeAll(async () => {
-    app = await createTestingModule(
-      defaultAuthDefinitionsFixture(),
-      {},
-      {
-        providers: [UserLoggedInEventHandler],
-      }
-    )
+    app = await createTestingModule(defaultAuthDefinitionsFixture())
 
     action = app.get(LocalLoginAction)
   })
@@ -53,7 +40,7 @@ describe('LocalLoginAction', () => {
     expect(action).toBeDefined()
   })
 
-  it('should able to login using username/password', async function () {
+  it('should able to login using username/password', async function() {
     await lastValueFrom(
       action.handle(correctUserInfo).pipe(
         tap((res) => {
@@ -63,7 +50,7 @@ describe('LocalLoginAction', () => {
     )
   })
 
-  it('should able to login using impersonate', async function () {
+  it('should able to login using impersonate', async function() {
     await lastValueFrom(
       action.handle(correctUserInfoImpersonate).pipe(
         tap((res) => {
@@ -73,7 +60,7 @@ describe('LocalLoginAction', () => {
     )
   })
 
-  it('should throw error if invalid credentials', async function () {
+  it('should throw error if invalid credentials', async function() {
     await lastValueFrom(
       action.handle(invalidUserInfo).pipe(
         catchError((error) => {
@@ -84,11 +71,7 @@ describe('LocalLoginAction', () => {
     )
   })
 
-  it('should handle UserLoggedInEvent', async function () {
-    const userLoggedInEventHandler = app.get(UserLoggedInEventHandler)
-
-    expect(userLoggedInEventHandler).toBeDefined()
-
+  it('should handle UserLoggedInEvent', async function() {
     const eventBus: EventBus = action['eventBus']
 
     const spyEventBus = jest.spyOn(eventBus, 'publish')
