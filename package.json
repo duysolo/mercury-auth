@@ -67,6 +67,7 @@
     "@rushstack/eslint-config": "~2.6.1",
     "@types/bcrypt": "~5.0.0",
     "@types/cookie-parser": "^1.4.3",
+    "@types/express": "^4.17.13",
     "@types/jest": "27.0.2",
     "@types/lodash": "~4.14.182",
     "@types/node": "^16.0.0",
@@ -110,7 +111,9 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.(t|j)s",
+      "!**/node_modules/**",
+      "!**/__tests__/**"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"

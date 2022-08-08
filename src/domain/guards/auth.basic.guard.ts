@@ -37,11 +37,9 @@ export class AuthBasicGuard implements CanActivate {
   }
 
   protected validateLogin(username: string, password: string): boolean {
-    if (!this._credentials.username || !this._credentials.password) {
-      return false
-    }
-
     return (
+      !!this._credentials.username &&
+      !!this._credentials.password &&
       username === this._credentials.username &&
       password === this._credentials.password
     )
