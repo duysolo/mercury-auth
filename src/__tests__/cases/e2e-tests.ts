@@ -3,6 +3,7 @@ import {
   IAuthDefinitions,
   IAuthResponse,
   IAuthUserEntityForResponse,
+  IRefreshTokenAuthResponse,
 } from '../../domain'
 import {
   generateCorrectUserPayload,
@@ -12,9 +13,9 @@ import {
   UserLoggedInEventHandler,
 } from '../helpers'
 
-interface ITokenResponse {
+interface ITokenResponse<T = IAuthResponse> {
   statusCode: HttpStatus
-  authResponse: IAuthResponse
+  authResponse: T
   headers: Record<string, any>
   cookies: any
 }
@@ -33,7 +34,10 @@ interface IE2ETestsSetupOptions<NestAppType = INestApplication> {
   ) => Promise<ITokenResponse>
   refreshTokenRequest: (
     useCookie?: boolean
-  ) => (app: NestAppType, refreshToken: string) => Promise<ITokenResponse>
+  ) => (
+    app: NestAppType,
+    refreshToken: string
+  ) => Promise<ITokenResponse<IRefreshTokenAuthResponse>>
   getProfileRequest: (
     useCookie?: boolean
   ) => (app: NestAppType, accessToken: string) => Promise<IProfileResponse>
@@ -68,10 +72,10 @@ export function e2eTestsSetup<T extends INestApplication>(
     }
   })
 
-  const loginSuccessCheck: (res: ITokenResponse, isImpersonated: boolean) => void = (
-    res,
-    isImpersonated
-  ) => {
+  const loginSuccessCheck: (
+    res: ITokenResponse,
+    isImpersonated: boolean
+  ) => void = (res) => {
     expect(res.statusCode).toEqual(HttpStatus.CREATED)
     expect(res.authResponse.token.accessToken).toBeDefined()
     expect(res.authResponse.token.refreshToken).toBeDefined()
@@ -160,13 +164,15 @@ export function e2eTestsSetup<T extends INestApplication>(
 
     describe('RefreshTokenController', () => {
       it('should allow user to refresh tokens', async () => {
-        loginSuccessCheck(
-          await options.refreshTokenRequest()(
-            app,
-            response.authResponse.token.refreshToken
-          ),
-          true
+        const res = await options.refreshTokenRequest()(
+          app,
+          response.authResponse.token.refreshToken
         )
+
+        expect(res.statusCode).toEqual(HttpStatus.CREATED)
+        expect(res.authResponse.token.accessToken).toBeDefined()
+        expect(res.authResponse.token['refreshToken']).toBeUndefined()
+        expect(res.authResponse.token.expiryDate).toBeDefined()
       })
     })
 

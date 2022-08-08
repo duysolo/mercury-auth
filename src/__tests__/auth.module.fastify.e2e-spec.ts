@@ -1,5 +1,5 @@
 import { NestFastifyApplication } from '@nestjs/platform-fastify'
-import { IAuthResponse } from '../domain'
+import { IAuthResponse, IRefreshTokenAuthResponse } from '../domain'
 import { e2eTestsSetup } from './cases/e2e-tests'
 import {
   createTestAuthApplicationFastify,
@@ -44,7 +44,8 @@ describe('AuthModule (e2e) - Fastify Adaptor', () => {
             'Refresh-Token': `${refreshToken}`,
           },
         }).then((response) => {
-          const parsedResponseBody: IAuthResponse = response.json() || {}
+          const parsedResponseBody: IRefreshTokenAuthResponse =
+            response.json() || {}
 
           return {
             statusCode: response.statusCode,

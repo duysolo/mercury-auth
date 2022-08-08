@@ -1,9 +1,10 @@
 import { Controller, Post, UseInterceptors } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import _ from 'lodash/fp'
 import { map, Observable } from 'rxjs'
 import {
-  IAuthResponse,
   IAuthUserEntityForResponse,
+  IRefreshTokenAuthResponse,
   TokenService,
 } from '../../domain'
 import { CurrentUser, ShouldUseRefreshToken } from '../decorators'
@@ -22,9 +23,9 @@ export class RefreshTokenController {
   @Post('refresh-token')
   public index(
     @CurrentUser() user: IAuthUserEntityForResponse
-  ): Observable<IAuthResponse> {
+  ): Observable<IRefreshTokenAuthResponse> {
     return this._mercuryJwtService
       .generateTokenResponse(user)
-      .pipe(map((res) => ({ user, token: res })))
+      .pipe(map((res) => ({ user, token: _.omit(['refreshToken'], res) })))
   }
 }
