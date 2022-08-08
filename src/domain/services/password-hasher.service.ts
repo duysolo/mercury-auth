@@ -21,6 +21,6 @@ export class BcryptPasswordHasherService
     password: string,
     hashedPassword: string
   ): Promise<boolean> {
-    return compare(password, hashedPassword || '')
+    return compare(password, hashedPassword)
   }
 }

@@ -119,6 +119,8 @@ export class AuthModule implements NestModule {
         ClearAuthCookieInterceptor,
         CookieAuthInterceptor,
 
+        BasicAuthMiddleware,
+
         ...(options.providers || []),
       ],
       controllers: [
