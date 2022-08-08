@@ -12,17 +12,20 @@ import {
   IAuthResponse,
   ICookieSerializeOptions,
   IHttpResponse,
+  IJwtTokenResponse,
   InjectAuthDefinitions,
 } from '../../domain'
+
+type IMapKeys<T> = {
+  [responseKey in keyof T]: string
+}
 
 const transferFromResponseToCookie: (
   response: IHttpResponse,
   definitions: IAuthDefinitions
 ) => (
   authResponse: IAuthResponse,
-  mapKeys: {
-    [responseKey: string]: string
-  }
+  mapKeys: IMapKeys<IJwtTokenResponse>
 ) => Record<string, any> =
   (response, definitions) => (authResponse, mapKeys) => {
     if (
