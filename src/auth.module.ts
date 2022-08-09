@@ -46,7 +46,9 @@ export interface IAuthModuleOptions
   extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   definitions: IAuthDefinitionsModuleOptions
   authRepository: {
-    useFactory: (...args: any[]) => Promise<AuthRepository> | AuthRepository
+    useFactory: (
+      ...args: any[]
+    ) => Promise<AuthRepository<any>> | AuthRepository<any>
     inject?: Array<InjectionToken | OptionalFactoryDependency>
   }
   passwordHasher?: {
