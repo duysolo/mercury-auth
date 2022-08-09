@@ -3,8 +3,8 @@ import { Observable } from 'rxjs'
 import { IAuthUserEntity } from '..'
 
 @Injectable()
-export abstract class AuthRepository {
+export abstract class AuthRepository<T = any> {
   public abstract getAuthUserByUsername(
     username: string
-  ): Observable<IAuthUserEntity | undefined>
+  ): Observable<IAuthUserEntity<T> | undefined>
 }
