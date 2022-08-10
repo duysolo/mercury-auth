@@ -3,7 +3,7 @@ import { InternalOnly } from '../auth.internal-only.decorator'
 import { metadataDecoratorTestHelper } from './helpers/metadata-decorator.test.helper'
 
 metadataDecoratorTestHelper(
-  'InternalOnly decorator',
+  'InternalOnly',
   InternalOnly,
   IS_INTERNAL_ONLY,
   true

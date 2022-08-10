@@ -8,7 +8,7 @@ export function metadataDecoratorTestHelper(
   metadataKey: any,
   expectedValue: any
 ) {
-  describe(name, () => {
+  describe(`${name} decorator tests`, () => {
     const testClass: Type = generateTestDecorator(decorator, 'class')
     const testMethod: Type = generateTestDecorator(decorator, 'method')
 
