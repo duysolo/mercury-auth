@@ -13,6 +13,12 @@ describe('LoginController', () => {
 
   const fixture = defaultAuthDefinitionsFixture()
 
+  const currentUserFixture = {
+    id: 'sample-user-id',
+    username: 'sample-user@gmail.com',
+    email: 'sample-user@gmail.com',
+  }
+
   beforeAll(async () => {
     testModule = await createTestingModule(fixture)
 
@@ -24,16 +30,23 @@ describe('LoginController', () => {
     expect(controller).toBeInstanceOf(LoginController)
   })
 
-  it('should able to show token response', async function () {
-    const currentUser = {
-      id: 'sample-user-id',
-      username: 'sample-user@gmail.com',
-      email: 'sample-user@gmail.com',
-    }
+  it('the token service should be called', async () => {
+    const spy = jest.spyOn(controller['_tokenService'], 'generateTokenResponse')
+
     await lastValueFrom(
-      controller.handle(currentUser).pipe(
+      controller.handle(currentUserFixture).pipe(
+        tap(() => {
+          expect(spy).toHaveBeenCalledWith(currentUserFixture)
+        })
+      )
+    )
+  })
+
+  it('should able to show token response', async function () {
+    await lastValueFrom(
+      controller.handle(currentUserFixture).pipe(
         tap((res) => {
-          expect(res.user).toMatchObject(currentUser)
+          expect(res.user).toMatchObject(currentUserFixture)
 
           expect(res.token?.accessToken).toBeDefined()
           expect(res.token?.refreshToken).toBeDefined()

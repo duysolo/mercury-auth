@@ -15,16 +15,16 @@ import { CookieAuthInterceptor } from '../interceptors'
 @ShouldUseRefreshToken()
 @UseInterceptors(CookieAuthInterceptor)
 export class RefreshTokenController {
-  public constructor(private readonly _mercuryJwtService: TokenService) {}
+  public constructor(private readonly _tokenService: TokenService) {}
 
   @ApiOperation({
     summary: 'Regenerate access token',
   })
   @Post('refresh-token')
-  public index(
+  public handle(
     @CurrentUser() user: IAuthUserEntityForResponse
   ): Observable<IRefreshTokenAuthResponse> {
-    return this._mercuryJwtService
+    return this._tokenService
       .generateTokenResponse(user)
       .pipe(map((res) => ({ user, token: _.omit(['refreshToken'], res) })))
   }

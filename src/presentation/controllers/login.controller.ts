@@ -16,7 +16,7 @@ import { CookieAuthInterceptor } from '../interceptors'
 @UseGuards(AuthLocalGuard)
 @UseInterceptors(CookieAuthInterceptor)
 export class LoginController {
-  public constructor(private readonly _authenticationService: TokenService) {}
+  public constructor(private readonly _tokenService: TokenService) {}
 
   @ApiOperation({
     summary: 'Login',
@@ -25,7 +25,7 @@ export class LoginController {
   public handle(
     @CurrentUser() user: IAuthUserEntityForResponse
   ): Observable<IAuthResponse> {
-    return this._authenticationService
+    return this._tokenService
       .generateTokenResponse(user)
       .pipe(map((res) => ({ user, token: res })))
   }
