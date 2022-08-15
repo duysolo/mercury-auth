@@ -96,28 +96,31 @@ export class CookieAuthInterceptor implements NestInterceptor {
 
     res.httpAdaptorType = this.definitions.httpAdaptorType
 
-    return next.handle().pipe(
-      map((tokenResponse: IAuthResponse) => {
-        if (
-          (res.httpAdaptorType === 'fastify' && !res.setCookie) ||
-          (res.httpAdaptorType === 'express' && !res.cookie) ||
-          this.definitions.transferTokenMethod ===
-            AuthTransferTokenMethod.BEARER_ONLY ||
-          !tokenResponse.token.accessToken
-        ) {
-          return tokenResponse
-        }
-
-        const transferFunction = transferFromResponseToCookie(
-          res,
-          this.definitions
+    return next
+      .handle()
+      .pipe(
+        map((tokenResponse: IAuthResponse) =>
+          this.setCookieToken(res, tokenResponse)
         )
+      )
+  }
 
-        return transferFunction(tokenResponse, {
-          accessToken: 'AccessToken',
-          refreshToken: 'RefreshToken',
-        })
-      })
-    )
+  public setCookieToken(res: IHttpResponse, tokenResponse: IAuthResponse): any {
+    if (
+      (res.httpAdaptorType === 'fastify' && !res.setCookie) ||
+      (res.httpAdaptorType === 'express' && !res.cookie) ||
+      this.definitions.transferTokenMethod ===
+        AuthTransferTokenMethod.BEARER_ONLY ||
+      !tokenResponse.token.accessToken
+    ) {
+      return tokenResponse
+    }
+
+    const transferFunction = transferFromResponseToCookie(res, this.definitions)
+
+    return transferFunction(tokenResponse, {
+      accessToken: 'AccessToken',
+      refreshToken: 'RefreshToken',
+    })
   }
 }
