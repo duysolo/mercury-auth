@@ -1,37 +1,46 @@
 import { ExecutionContext } from '@nestjs/common'
 
 export function generateExecutionContextForJwtStrategy(accessToken: string) {
-  const context: ExecutionContext = {
-    switchToHttp: () => context,
-    getRequest: () => {
+  const getRequest = () => {
+    return {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    }
+  }
+
+  return {
+    switchToHttp: () => {
       return {
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
+        getResponse: () => ({}),
+        getRequest,
       }
     },
-    getResponse: () => {},
+    getRequest,
   } as unknown as ExecutionContext
-
-  return context
 }
 
 export function generateExecutionContextForRefreshTokenStrategy(
   refreshToken: string
 ) {
-  const context: ExecutionContext = {
-    switchToHttp: () => context,
-    getRequest: () => {
+  const getRequest = () => {
+    return {
+      headers: {
+        'refresh-token': `${refreshToken}`,
+      },
+    }
+  }
+
+  return {
+    switchToHttp: () => {
       return {
-        headers: {
-          'refresh-token': `${refreshToken}`,
-        },
+        getResponse: () => ({}),
+        getRequest,
       }
     },
-    getResponse: () => {},
+    getRequest,
+    getResponse: () => ({}),
   } as unknown as ExecutionContext
-
-  return context
 }
 
 export function generateExecutionContextForBasicAuth(
@@ -40,19 +49,24 @@ export function generateExecutionContextForBasicAuth(
 ) {
   const token = Buffer.from(`${username}:${password}`).toString('base64')
 
-  const context: ExecutionContext = {
-    switchToHttp: () => context,
-    getRequest: () => {
+  const getRequest = () => {
+    return {
+      headers: {
+        authorization: `Basic ${token}`,
+      },
+    }
+  }
+
+  return {
+    switchToHttp: () => {
       return {
-        headers: {
-          authorization: `Basic ${token}`,
-        },
+        getResponse: () => ({}),
+        getRequest,
       }
     },
-    getResponse: () => {},
+    getRequest,
+    getResponse: () => ({}),
   } as unknown as ExecutionContext
-
-  return context
 }
 
 export function generateExecutionContextForLocalAuth(
@@ -61,18 +75,23 @@ export function generateExecutionContextForLocalAuth(
   usernameField: string,
   passwordField: string
 ) {
-  const context: ExecutionContext = {
-    switchToHttp: () => context,
-    getRequest: () => {
+  const getRequest = () => {
+    return {
+      body: {
+        [usernameField]: username,
+        [passwordField]: password,
+      },
+    }
+  }
+
+  return {
+    switchToHttp: () => {
       return {
-        body: {
-          [usernameField]: username,
-          [passwordField]: password,
-        },
+        getResponse: () => ({}),
+        getRequest,
       }
     },
-    getResponse: () => {},
+    getRequest,
+    getResponse: () => ({}),
   } as unknown as ExecutionContext
-
-  return context
 }
