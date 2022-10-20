@@ -5,7 +5,7 @@
   "author": "duysolo <duypt.dev@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/duysolo/mercury-auth"
+    "url": "git+https://github.com/duysolo/mercury-auth.git"
   },
   "keywords": [
     "mercury-labs",
@@ -123,5 +123,12 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "bugs": {
+    "url": "https://github.com/duysolo/mercury-auth/issues"
+  },
+  "homepage": "https://github.com/duysolo/mercury-auth#readme",
+  "directories": {
+    "test": "test"
   }
 }
