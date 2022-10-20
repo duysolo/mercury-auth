@@ -1,15 +1,16 @@
 import { JwtSignOptions } from '@nestjs/jwt'
 import { ICookieSerializeOptions } from '../helpers'
 import { AuthTransferTokenMethod } from './auth-transfer-token-method.enum'
+import { Type } from '@nestjs/common'
 
 export interface IAuthDefinitions {
-  basicAuth: {
+  basicAuth?: {
     username: string
     password: string
     realm?: string
   }
 
-  jwt: {
+  jwt?: {
     secret: string
     /**
      * Expressed in seconds or a string describing a time span zeit/ms.
@@ -30,9 +31,9 @@ export interface IAuthDefinitions {
   redactedFields?: string[]
   ignoredRoutes?: string[]
 
-  hashingSecretKey: string
+  hashingSecretKey?: string
 
-  transferTokenMethod: AuthTransferTokenMethod
+  transferTokenMethod?: AuthTransferTokenMethod
 
   cookieOptions?: Pick<
     ICookieSerializeOptions,
@@ -41,6 +42,7 @@ export interface IAuthDefinitions {
 
   usernameField?: string
   passwordField?: string
+  requestPayload?: Type
 
   httpAdaptorType: 'fastify' | 'express'
 }

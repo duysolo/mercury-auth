@@ -4,6 +4,7 @@ import {
   createTestingModule,
   defaultAuthDefinitionsFixture,
 } from '../../../__tests__/helpers'
+import { IAuthDefinitions } from '../../../domain'
 import { BasicAuthMiddleware } from '../basic-auth.middleware'
 
 describe('BasicAuthMiddleware', () => {
@@ -33,9 +34,9 @@ describe('BasicAuthMiddleware', () => {
     const appCustomRealm: TestingModule = await createTestingModule({
       ...fixture,
       basicAuth: {
-        ...fixture.basicAuth,
+        ...(fixture.basicAuth || {}),
         realm: customRealmName,
-      },
+      } as IAuthDefinitions['basicAuth'],
     })
 
     const customRealmNameMiddleware = appCustomRealm.get(BasicAuthMiddleware)

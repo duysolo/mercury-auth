@@ -1,6 +1,6 @@
 {
-  "name": "@mercury-labs/auth",
-  "version": "1.1.0",
+  "name": "@mercury-labs/nest-auth",
+  "version": "2.0.0",
   "description": "Mercury framework auth library. It supports local auth, jwt with both bearer token and cookie, basic auth.",
   "author": "duysolo <duypt.dev@gmail.com>",
   "repository": {
@@ -18,7 +18,8 @@
     "basic auth",
     "jwt auth",
     "jwt auth with cookie",
-    "nestjs auth with cookie"
+    "nestjs auth with cookie",
+    "nestjs auth graphql"
   ],
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -37,14 +38,15 @@
     "test:e2e": "jest --verbose=true --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@mercury-labs/hashing": "^1.0.0",
+    "@mercury-labs/nest-hashing": "^2.0.0",
     "@nestjs/common": "^9.0.0 || ^8.0.0 || ^7.0.0",
     "@nestjs/core": "^9.0.0 || ^8.0.0 || ^7.0.0",
     "@nestjs/cqrs": "^9.0.0 || ^8.0.0 || ^7.0.0",
     "@nestjs/jwt": "^9.0.0 || ^8.0.0 || ^7.0.0",
+    "@nestjs/graphql": "^10.0.0 || ^9.0.0 || ^8.0.0 || ^7.0.0",
     "@nestjs/passport": "^9.0.0 || ^8.0.0 || ^7.0.0",
     "@nestjs/swagger": "^6.0.0 || ^5.0.0",
-    "bcrypt": "~5.0.1",
+    "bcrypt": "^5.0.0",
     "class-transformer": "~0.5.1",
     "class-validator": "~0.13.2",
     "lodash": "~4.17.21",
@@ -97,7 +99,10 @@
     "@nestjs/cqrs": "^9.0.0 || ^8.0.0 || ^7.0.0",
     "@nestjs/jwt": "^9.0.0 || ^8.0.0 || ^7.0.0",
     "@nestjs/passport": "^9.0.0 || ^8.0.0 || ^7.0.0",
-    "@nestjs/swagger": "^6.0.0 || ^5.0.0"
+    "@nestjs/swagger": "^6.0.0 || ^5.0.0",
+    "@nestjs/graphql": "^10.0.0 || ^9.0.0 || ^8.0.0 || ^7.0.0",
+    "@nestjs/platform-express": "^9.0.0 || ^8.0.0 || ^7.0.0",
+    "@nestjs/platform-fastify": "^9.0.0 || ^8.0.0 || ^7.0.0"
   },
   "jest": {
     "moduleFileExtensions": [

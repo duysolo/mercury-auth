@@ -34,7 +34,7 @@ describe('RefreshTokenController', () => {
     const spy = jest.spyOn(controller['_tokenService'], 'generateTokenResponse')
 
     await lastValueFrom(
-      controller.handle(currentUserFixture).pipe(
+      controller.index(currentUserFixture).pipe(
         tap(() => {
           expect(spy).toHaveBeenCalledWith(currentUserFixture)
         })
@@ -44,9 +44,9 @@ describe('RefreshTokenController', () => {
 
   it('should able to show token response', async function () {
     await lastValueFrom(
-      controller.handle(currentUserFixture).pipe(
+      controller.index(currentUserFixture).pipe(
         tap((res) => {
-          expect(res.user).toMatchObject(currentUserFixture)
+          expect(res.userData).toMatchObject(currentUserFixture)
 
           expect(res.token?.accessToken).toBeDefined()
           expect(res.token?.['refreshToken']).toBeUndefined()

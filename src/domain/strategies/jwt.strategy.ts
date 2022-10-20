@@ -9,7 +9,6 @@ import {
   of,
   scheduled,
 } from 'rxjs'
-import { IAuthDefinitions } from '../../domain'
 import { InjectAuthDefinitions } from '../decorators'
 import type { IAuthUserEntityForResponse } from '../definitions'
 import { AuthTransferTokenMethod } from '../definitions'
@@ -21,13 +20,14 @@ import {
   IHttpRequest,
   validateEntity,
 } from '../helpers'
+import { IAuthDefinitions } from '../index'
 import { AuthRepository } from '../repositories'
 import { TokenService } from '../services'
 
 export const JWT_STRATEGY_NAME: string = 'jwt'
 
 const cookieExtractor: (
-  transferTokenMethod: AuthTransferTokenMethod
+  transferTokenMethod: AuthTransferTokenMethod | undefined
 ) => JwtFromRequestFunction =
   (transferTokenMethod) =>
   (request: IHttpRequest): string | any => {
@@ -41,7 +41,7 @@ const cookieExtractor: (
   }
 
 const accessTokenHeaderExtractor: (
-  transferTokenMethod: AuthTransferTokenMethod
+  transferTokenMethod: AuthTransferTokenMethod | undefined
 ) => JwtFromRequestFunction =
   (transferTokenMethod) =>
   (request: IHttpRequest): string | any => {
@@ -76,7 +76,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
         accessTokenHeaderExtractor(authDefinitions.transferTokenMethod),
       ]),
       ignoreExpiration: false,
-      secretOrKey: authDefinitions.jwt.secret,
+      secretOrKey: authDefinitions.jwt?.secret || 'NOT_DEFINED',
     })
   }
 
@@ -85,8 +85,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
   ): Promise<IAuthUserEntityForResponse | undefined> {
     try {
       return lastValueFrom(
-        scheduled(validateEntity(payload, JwtPayload), asyncScheduler).pipe(
-          map((res) => this.jwtService.decodeAccessTokenFromRawDecoded(res)),
+        scheduled(
+          validateEntity(payload, JwtPayload, false),
+          asyncScheduler
+        ).pipe(
+          map((res) => {
+            return this.jwtService.decodeAccessTokenFromRawDecoded(res)
+          }),
           mergeMap((validatedPayload) => {
             if (!validatedPayload?.username) {
               return of(undefined)

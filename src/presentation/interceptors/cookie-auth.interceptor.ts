@@ -16,9 +16,9 @@ import {
   InjectAuthDefinitions,
 } from '../../domain'
 
-type IMapKeys<T> = {
+type IMapKeys<T> = Partial<{
   [responseKey in keyof T]: string
-}
+}>
 
 const transferFromResponseToCookie: (
   response: IHttpResponse,
@@ -31,6 +31,7 @@ const transferFromResponseToCookie: (
     if (
       (response.httpAdaptorType === 'fastify' && !response.setCookie) ||
       (response.httpAdaptorType === 'express' && !response.cookie) ||
+      !definitions.transferTokenMethod ||
       ![
         AuthTransferTokenMethod.COOKIE_ONLY,
         AuthTransferTokenMethod.BOTH,
@@ -39,7 +40,7 @@ const transferFromResponseToCookie: (
       return authResponse
     }
 
-    const token = authResponse.token
+    const token: IJwtTokenResponse = authResponse.token
 
     for (const responseKey in mapKeys) {
       if (token[responseKey]) {

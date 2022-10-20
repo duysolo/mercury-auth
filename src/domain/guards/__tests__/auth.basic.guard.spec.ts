@@ -12,8 +12,8 @@ describe('AuthBasicGuard', () => {
     expect(
       guard.canActivate(
         generateExecutionContextForBasicAuth(
-          fixture.basicAuth.username,
-          fixture.basicAuth.password
+          fixture.basicAuth?.username as string,
+          fixture.basicAuth?.password as string
         )
       )
     ).toBeTruthy()

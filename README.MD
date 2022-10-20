@@ -6,7 +6,7 @@
 ## Install
 
 ```shell
-npm install --save @mercury-labs/auth
+npm install --save @mercury-labs/nest-auth
 ```
 Learn more about the relevant package [@mercury-labs/hashing](https://www.npmjs.com/package/@mercury-labs/hashing)
 
@@ -18,7 +18,7 @@ import {
     AuthRepository,
     IAuthUserEntity,
     PasswordHasherService
-} from '@mercury-labs/auth'
+} from '@mercury-labs/nest-auth'
 import { Injectable } from '@nestjs/common'
 import moment from 'moment'
 import { map, Observable, scheduled } from 'rxjs'
@@ -67,7 +67,7 @@ export class CmsAuthRepository implements AuthRepository {
 ## Register `AuthModule` to your application module
 
 ```typescript
-import { AuthModule, AuthTransferTokenMethod } from '@mercury-labs/auth'
+import { AuthModule, AuthTransferTokenMethod } from '@mercury-labs/nest-auth'
 import { ConfigService } from '@nestjs/config'
 import { Module } from '@nestjs/common'
 
@@ -223,7 +223,7 @@ password.
 
 ```typescript
 import crypto from 'crypto'
-import { PasswordHasherService } from '@mercury-labs/auth'
+import { PasswordHasherService } from '@mercury-labs/nest-auth'
 import { Injectable } from '@nestjs/common'
 
 export interface IPbkdf2Hash {
@@ -360,7 +360,7 @@ curl --request POST \
 ### Controller Decorators
 `@Public()` This decorator will help your controller available for all users. No authentication required.
 ```typescript
-import { Public } from '@mercury-labs/auth'
+import { Public } from '@mercury-labs/nest-auth'
 import { Controller, Get } from '@nestjs/common'
 
 @Controller()
@@ -376,7 +376,7 @@ export class AppController {
 `@InternalOnly()` You need to use basic auth while accessing your controller.
 
 ```typescript
-import { InternalOnly } from '@mercury-labs/auth'
+import { InternalOnly } from '@mercury-labs/nest-auth'
 import { Controller, Get } from '@nestjs/common'
 
 @Controller()
@@ -407,7 +407,7 @@ Refesh-Token: {your_refresh_token}
 ```typescript
 import { Controller, Get } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { IAuthUserEntityForResponse, CurrentUser } from '@mercury-labs/auth'
+import { IAuthUserEntityForResponse, CurrentUser } from '@mercury-labs/nest-auth'
 
 @ApiTags('User details')
 @Controller({ path: 'users/-' })
@@ -430,7 +430,7 @@ Triggered when user logged in successfully.
 
 Sample usages
 ```typescript
-import { UserLoggedInEvent } from '@mercury-labs/auth'
+import { UserLoggedInEvent } from '@mercury-labs/nest-auth'
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs'
 import { delay, lastValueFrom, of, tap } from 'rxjs'
 

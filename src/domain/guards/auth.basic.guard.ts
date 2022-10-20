@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
-import { IAuthDefinitions } from '../../domain'
+import { IAuthDefinitions } from '../index'
 import { InjectAuthDefinitions } from '../decorators'
 import { getRequestFromContext, getRequestHeader } from '../helpers'
 
@@ -10,7 +10,7 @@ export interface IBasicAuthCredentials {
 
 @Injectable()
 export class AuthBasicGuard implements CanActivate {
-  private _credentials: IBasicAuthCredentials
+  private _credentials?: IBasicAuthCredentials
 
   public constructor(
     @InjectAuthDefinitions()
@@ -37,9 +37,11 @@ export class AuthBasicGuard implements CanActivate {
   }
 
   protected validateLogin(username: string, password: string): boolean {
+    if (!this._credentials?.username || !this._credentials?.password) {
+      return false
+    }
+
     return (
-      !!this._credentials.username &&
-      !!this._credentials.password &&
       username === this._credentials.username &&
       password === this._credentials.password
     )

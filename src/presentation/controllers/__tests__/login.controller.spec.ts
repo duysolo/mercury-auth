@@ -46,7 +46,7 @@ describe('LoginController', () => {
     await lastValueFrom(
       controller.handle(currentUserFixture).pipe(
         tap((res) => {
-          expect(res.user).toMatchObject(currentUserFixture)
+          expect(res.userData).toMatchObject(currentUserFixture)
 
           expect(res.token?.accessToken).toBeDefined()
           expect(res.token?.refreshToken).toBeDefined()

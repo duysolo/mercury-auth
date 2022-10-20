@@ -1,6 +1,4 @@
-import { HashTextService } from '@mercury-labs/hashing'
-
-export * as NestJSPassport from '@nestjs/passport'
+import { HashTextService } from '@mercury-labs/nest-hashing'
 
 export { HashTextService }
 

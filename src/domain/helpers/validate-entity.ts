@@ -2,15 +2,14 @@ import { Type, ValidationPipe } from '@nestjs/common'
 
 export async function validateEntity<T>(
   value: unknown,
-  toEntity: Type<T>
+  toEntity: Type<T>,
+  whitelist: boolean = false
 ): Promise<T> {
-  const res = await new ValidationPipe({
+  return await new ValidationPipe({
     transform: true,
-    whitelist: true,
+    whitelist,
   }).transform(value, {
     type: 'body',
     metatype: toEntity as unknown as Type<T>,
   })
-
-  return res as T
 }

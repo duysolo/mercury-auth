@@ -1,9 +1,8 @@
 import { HttpStatus, Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
-import moment from 'moment'
 import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
 import { Strategy } from 'passport-strategy'
-import { lastValueFrom, map, mergeMap, of } from 'rxjs'
+import { lastValueFrom, map } from 'rxjs'
 import {
   AuthTransferTokenMethod,
   getRequestCookie,
@@ -12,9 +11,9 @@ import {
   IAuthUserEntityForResponse,
   IHttpRequest,
   IJwtPayload,
-} from '..'
+} from '../index'
 
-import { IAuthDefinitions } from '../../domain'
+import { IAuthDefinitions } from '../index'
 import { InjectAuthDefinitions } from '../decorators'
 import { AuthRepository } from '../repositories'
 import { TokenService } from '../services'
@@ -22,7 +21,7 @@ import { TokenService } from '../services'
 export const REFRESH_TOKEN_STRATEGY_NAME: string = 'mercury-refresh-token'
 
 const cookieExtractor: (
-  transferTokenMethod: AuthTransferTokenMethod
+  transferTokenMethod: AuthTransferTokenMethod | undefined
 ) => JwtFromRequestFunction =
   (transferTokenMethod) =>
   (request: IHttpRequest): string | any => {
@@ -36,7 +35,7 @@ const cookieExtractor: (
   }
 
 const refreshTokenHeaderExtractor: (
-  transferTokenMethod: AuthTransferTokenMethod
+  transferTokenMethod: AuthTransferTokenMethod | undefined
 ) => JwtFromRequestFunction =
   (transferTokenMethod) =>
   (request: IHttpRequest): string | any => {
@@ -70,7 +69,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     ]) as any
   }
 
-  public async authenticate(req: any, options?: any): Promise<void> {
+  public async authenticate(req: any): Promise<void> {
     const token: string | any = this.jwtFromRequest(req)
 
     const jwtPayload = token
@@ -88,22 +87,11 @@ export class RefreshTokenStrategy extends PassportStrategy(
 
   protected async validate(
     payload: IJwtPayload
-  ): Promise<IAuthUserEntityForResponse | undefined> {
+  ): Promise<IAuthUserEntityForResponse> {
     return lastValueFrom(
-      of(payload).pipe(
-        mergeMap((res) => {
-          /**
-           * Do not allow expired refreshToken to proceed.
-           */
-          if (moment().isAfter(moment(payload.exp * 1000).toDate())) {
-            return of(undefined)
-          }
-
-          return this.authRepository
-            .getAuthUserByUsername(res.username)
-            .pipe(map(hideRedactedFields(this.authDefinitions.redactedFields)))
-        })
-      )
+      this.authRepository
+        .getAuthUserByUsername(payload.username)
+        .pipe(map(hideRedactedFields(this.authDefinitions.redactedFields)))
     )
   }
 }
