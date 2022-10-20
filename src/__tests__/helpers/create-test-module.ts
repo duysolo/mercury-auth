@@ -53,10 +53,10 @@ export class UserLoggedInEventHandler implements IEventHandler {
 }
 
 export async function createTestAuthApplicationExpress(
-  defaultDefinitions: IAuthDefinitions
+  definitions: IAuthDefinitions
 ): Promise<INestApplication> {
   const moduleFixture = await createTestingModule(
-    defaultDefinitions,
+    definitions,
     {},
     {
       providers: [UserLoggedInEventHandler],
@@ -74,7 +74,9 @@ export async function createTestAuthApplicationExpress(
     [
       AuthTransferTokenMethod.BOTH,
       AuthTransferTokenMethod.COOKIE_ONLY,
-    ].includes(defaultDefinitions.transferTokenMethod)
+    ].includes(
+      definitions.transferTokenMethod as unknown as AuthTransferTokenMethod
+    )
   ) {
     app.use(cookieParser())
   }
@@ -106,7 +108,9 @@ export async function createTestAuthApplicationFastify(
     [
       AuthTransferTokenMethod.BOTH,
       AuthTransferTokenMethod.COOKIE_ONLY,
-    ].includes(defaultDefinitions.transferTokenMethod)
+    ].includes(
+      defaultDefinitions.transferTokenMethod as unknown as AuthTransferTokenMethod
+    )
   ) {
     app.getHttpAdapter().getInstance().register(FastifyCookie)
   }

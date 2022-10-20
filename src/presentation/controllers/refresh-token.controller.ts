@@ -15,17 +15,18 @@ import { CookieAuthInterceptor } from '../interceptors'
 @ShouldUseRefreshToken()
 @UseInterceptors(CookieAuthInterceptor)
 export class RefreshTokenController {
-  public constructor(private readonly _tokenService: TokenService) {}
+  public constructor(private readonly _tokenService: TokenService) {
+  }
 
   @ApiOperation({
     summary: 'Regenerate access token',
   })
   @Post('refresh-token')
-  public handle(
-    @CurrentUser() user: IAuthUserEntityForResponse
+  public index(
+    @CurrentUser() userData: IAuthUserEntityForResponse
   ): Observable<IRefreshTokenAuthResponse> {
     return this._tokenService
-      .generateTokenResponse(user)
-      .pipe(map((res) => ({ user, token: _.omit(['refreshToken'], res) })))
+      .generateTokenResponse(userData)
+      .pipe(map((res) => ({ userData, token: _.omit(['refreshToken'], res) })))
   }
 }

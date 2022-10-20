@@ -6,8 +6,9 @@ import { IAuthDefinitions, InjectAuthDefinitions } from '../../domain'
 export class BasicAuthMiddleware implements NestMiddleware {
   public constructor(
     @InjectAuthDefinitions()
-    protected readonly authDefinitions: IAuthDefinitions
-  ) {}
+    private readonly _authDefinitions: IAuthDefinitions
+  ) {
+  }
 
   public use(
     req: IncomingMessage,
@@ -17,7 +18,7 @@ export class BasicAuthMiddleware implements NestMiddleware {
     res.setHeader(
       'WWW-Authenticate',
       `Basic realm="${
-        this.authDefinitions?.basicAuth?.realm || 'Mercury Labs Authentication'
+        this._authDefinitions?.basicAuth?.realm || 'Mercury Labs Authentication'
       }", charset="UTF-8"`
     )
 

@@ -1,5 +1,5 @@
 import _ from 'lodash/fp'
-import { IAuthUserEntity, IAuthUserEntityForResponse } from '..'
+import { IAuthUserEntity, IAuthUserEntityForResponse } from '../index'
 
 export function hideRedactedFields(
   redactedFields?: string[]

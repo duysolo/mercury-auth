@@ -3,19 +3,19 @@ import {
   Logger,
   LoggerService,
   UnauthorizedException,
-  ValidationPipe,
 } from '@nestjs/common'
 import { EventBus } from '@nestjs/cqrs'
 import {
   asyncScheduler,
+  catchError,
   map,
   mergeMap,
   Observable,
   of,
   scheduled,
   tap,
+  throwError,
 } from 'rxjs'
-import { IAuthDefinitions } from '../../domain'
 import { InjectAuthDefinitions, InjectPasswordHasher } from '../decorators'
 import type {
   IAuthUserEntity,
@@ -23,7 +23,8 @@ import type {
 } from '../definitions'
 import { AuthDto } from '../dtos'
 import { UserLoggedInEvent } from '../events'
-import { hideRedactedFields } from '../helpers'
+import { hideRedactedFields, validateEntity } from '../helpers'
+import { IAuthDefinitions } from '../index'
 import { AuthRepository } from '../repositories'
 import { PasswordHasherService } from '../services'
 
@@ -42,21 +43,28 @@ export class LocalLoginAction {
   public constructor(
     @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
+    protected readonly authRepository: AuthRepository,
     @InjectPasswordHasher()
     protected readonly passwordHasherService: PasswordHasherService,
-    protected readonly authRepository: AuthRepository,
     protected readonly eventBus: EventBus
   ) {}
 
   public handle(dto: AuthDto): Observable<IAuthUserEntityForResponse> {
     return scheduled(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-      }).transform(dto, { type: 'body', metatype: AuthDto }),
+      validateEntity(
+        dto,
+        this.authDefinitions.requestPayload || AuthDto,
+        false
+      ),
       asyncScheduler
     ).pipe(
-      map((validatedDto: AuthDto) => this.verifyImpersonate(validatedDto)),
+      catchError((error) => throwError(() => error)),
+      map((validatedDto: AuthDto) => {
+        return {
+          ...this.verifyImpersonate(validatedDto),
+          validatedDto,
+        }
+      }),
       tap(({ username, impersonated }) => {
         if (impersonated) {
           this.loggerService.warn(
@@ -64,31 +72,34 @@ export class LocalLoginAction {
           )
         }
       }),
-      mergeMap(({ username, password, impersonated }) =>
+      mergeMap(({ username, impersonated, validatedDto }) =>
         this.authRepository
-          .getAuthUserByUsername(username)
-          .pipe(map((user) => ({ user, impersonated })))
+          .authenticate(username, validatedDto.password, impersonated)
+          .pipe(map((user) => ({ user, impersonated, validatedDto })))
       ),
-      mergeMap(({ user, impersonated }) =>
+      mergeMap(({ user, impersonated, ...rest }) =>
         user
           ? this.doLogin(dto, user, impersonated).pipe(
-              map((res) => ({ user: res, impersonated }))
+              map((res) => ({ ...rest, user: res, impersonated }))
             )
-          : of({ user: undefined, impersonated })
+          : of({ ...rest, user: undefined, impersonated })
       ),
-      map(({ user, impersonated }) => {
+      map(({ user, impersonated, ...rest }) => {
         if (!user) {
           throw new UnauthorizedException()
         }
 
         return {
+          ...rest,
           user: hideRedactedFields(this.authDefinitions.redactedFields)(user),
           impersonated,
         }
       }),
-      tap(({ user, impersonated }) => {
-        this.eventBus.publish(new UserLoggedInEvent(user, impersonated))
-      }),
+      tap(({ user, impersonated, validatedDto }) =>
+        this.eventBus.publish(
+          new UserLoggedInEvent(user, impersonated, validatedDto)
+        )
+      ),
       map(({ user }) => user)
     )
   }
@@ -113,19 +124,20 @@ export class LocalLoginAction {
     )
   }
 
-  protected verifyImpersonate({
-    username,
-    password,
-  }: AuthDto): IImpersonatedLoginRequest {
+  protected verifyImpersonate(dto: AuthDto): IImpersonatedLoginRequest {
+    const username = dto[this.authDefinitions?.usernameField || 'username']
+    const password = dto[this.authDefinitions?.usernameField || 'username']
+
     const impersonated =
       !!this.authDefinitions?.impersonate?.isEnabled &&
-      username.startsWith(this.authDefinitions.impersonate.cipher) &&
-      password === this.authDefinitions.impersonate.password
+      username?.startsWith(this.authDefinitions.impersonate.cipher) &&
+      password?.startsWith(this.authDefinitions.impersonate) ===
+        this.authDefinitions.impersonate.password
 
     return {
       impersonated,
       username: impersonated
-        ? username.substring(
+        ? username?.substring(
             (this.authDefinitions?.impersonate?.cipher as string).length
           )
         : username,

@@ -47,7 +47,7 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
         handle(): Observable<IAuthResponse> {
           return of({
             token: iJwtTokenResponse,
-            user: currentUserFixture,
+            userData: currentUserFixture,
           })
         },
       }
@@ -87,12 +87,12 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
                 httpAdaptorType,
               }),
               expect.objectContaining({
-                user: currentUserFixture,
+                userData: currentUserFixture,
               })
             )
             expect(spy).toReturnWith(
               expect.objectContaining({
-                user: currentUserFixture,
+                userData: currentUserFixture,
               })
             )
           })
@@ -129,7 +129,7 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
                     setCookie: expect.anything(),
                   }),
                   expect.objectContaining({
-                    user: currentUserFixture,
+                    userData: currentUserFixture,
                   })
                 )
               } else {
@@ -138,7 +138,7 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
                     cookie: expect.anything(),
                   }),
                   expect.objectContaining({
-                    user: currentUserFixture,
+                    userData: currentUserFixture,
                   })
                 )
               }

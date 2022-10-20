@@ -1,21 +1,21 @@
-import { HashTextService } from '@mercury-labs/hashing'
+import { HashTextService } from '@mercury-labs/nest-hashing'
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import _ from 'lodash/fp'
 import moment from 'moment'
 import { forkJoin, map, Observable, of } from 'rxjs'
 import type {
+  IAuthDefinitions,
   IAuthUserEntityForResponse,
   IJwtPayload,
   IJwtPayloadRawDecoded,
-} from '..'
-import type { IAuthDefinitions } from '../../domain'
+} from '../index'
 import { InjectAuthDefinitions } from '../decorators'
 
 export interface IJwtTokenResponse {
   accessToken: string
   refreshToken: string
-  expiryDate?: Date
+  expiryDate: Date
 }
 
 @Injectable()
@@ -58,7 +58,7 @@ export class TokenService {
     }).pipe(
       map((payload) =>
         this.jwtService.sign(payload, {
-          ...(this.authDefinitions.jwt.signOptions || {}),
+          ...(this.authDefinitions.jwt?.signOptions || {}),
           expiresIn,
         })
       )
@@ -68,6 +68,10 @@ export class TokenService {
   public generateAccessToken(
     userInfo: IAuthUserEntityForResponse
   ): Observable<string> {
+    if (!this.authDefinitions.jwt) {
+      return of('')
+    }
+
     return this.generateJwtToken(userInfo, this.authDefinitions.jwt.expiresIn)
   }
 
@@ -80,10 +84,10 @@ export class TokenService {
   public decodeAccessTokenFromRawDecoded(
     rawPayload: IJwtPayload
   ): IJwtPayload | undefined {
-    const username = this.hashTextService.decode(rawPayload.username)
+    const username = this.hashTextService.decode(rawPayload.username) || ''
     const sub = this.hashTextService.decode(rawPayload.sub)
 
-    if (username && sub) {
+    if (sub) {
       return {
         ...rawPayload,
         username,
@@ -97,9 +101,13 @@ export class TokenService {
   public generateRefreshToken(
     userInfo: IAuthUserEntityForResponse
   ): Observable<string> {
+    if (!this.authDefinitions.jwt) {
+      return of('')
+    }
+
     return this.generateJwtToken(
       userInfo,
-      this.authDefinitions.jwt.refreshTokenExpiresIn
+      this.authDefinitions.jwt?.refreshTokenExpiresIn
     ).pipe(map((res) => this.hashTextService.encode(res)))
   }
 

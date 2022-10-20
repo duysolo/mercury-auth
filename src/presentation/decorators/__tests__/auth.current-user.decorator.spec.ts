@@ -15,6 +15,9 @@ describe('CurrentUser', () => {
   }
 
   const mockContext: ExecutionContext = {
+    getType: () => {
+      return 'http'
+    },
     switchToHttp: () => {
       return {
         getRequest(): IWithUser {

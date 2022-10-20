@@ -1,7 +1,8 @@
 import { Controller, Post, UseGuards, UseInterceptors } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { map, Observable } from 'rxjs'
 import {
+  AuthDto,
   AuthLocalGuard,
   IAuthResponse,
   IAuthUserEntityForResponse,
@@ -21,12 +22,13 @@ export class LoginController {
   @ApiOperation({
     summary: 'Login',
   })
+  @ApiBody({ type: AuthDto })
   @Post('login')
   public handle(
-    @CurrentUser() user: IAuthUserEntityForResponse
+    @CurrentUser() userData: IAuthUserEntityForResponse
   ): Observable<IAuthResponse> {
     return this._tokenService
-      .generateTokenResponse(user)
-      .pipe(map((res) => ({ user, token: res })))
+      .generateTokenResponse(userData)
+      .pipe(map((res) => ({ userData, token: res })))
   }
 }

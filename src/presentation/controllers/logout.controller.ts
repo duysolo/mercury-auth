@@ -10,5 +10,6 @@ export class LogoutController {
     summary: 'Logout',
   })
   @Post('logout')
-  public handle(): void {}
+  public handle(): void {
+  }
 }

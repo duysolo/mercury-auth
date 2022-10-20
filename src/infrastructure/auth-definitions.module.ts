@@ -1,6 +1,10 @@
 import { DynamicModule, Module, ModuleMetadata, Provider } from '@nestjs/common'
-import { InjectionToken } from '@nestjs/common/interfaces/modules/injection-token.interface'
-import { OptionalFactoryDependency } from '@nestjs/common/interfaces/modules/optional-factory-dependency.interface'
+import {
+  InjectionToken
+} from '@nestjs/common/interfaces/modules/injection-token.interface'
+import {
+  OptionalFactoryDependency
+} from '@nestjs/common/interfaces/modules/optional-factory-dependency.interface'
 import { IAuthDefinitions } from '../domain'
 
 export type IAuthDefinitionsModuleOptions = Pick<ModuleMetadata, 'imports'> & {

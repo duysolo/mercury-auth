@@ -81,7 +81,7 @@ describe('LocalLoginAction', () => {
         tap((res) => {
           expect(spyEventBus).toHaveBeenCalledTimes(1)
           expect(spyEventBus).toHaveBeenCalledWith(
-            new UserLoggedInEvent(res, false)
+            new UserLoggedInEvent(res, false, correctUserInfo)
           )
         })
       )

@@ -1,4 +1,4 @@
-import { HashingModule } from '@mercury-labs/hashing'
+import { HashingModule } from '@mercury-labs/nest-hashing'
 import {
   DynamicModule,
   InjectionToken,
@@ -9,7 +9,7 @@ import {
   OptionalFactoryDependency,
   RequestMethod,
 } from '@nestjs/common'
-import { APP_GUARD } from '@nestjs/core'
+import { APP_GUARD, Reflector } from '@nestjs/core'
 import { CqrsModule } from '@nestjs/cqrs'
 import { JwtModule } from '@nestjs/jwt'
 import {
@@ -18,12 +18,13 @@ import {
   AuthGlobalGuard,
   AuthRefreshTokenGuard,
   AuthRepository,
-  BcryptPasswordHasherService,
+  GraphqlAuthJwtGuard, GraphqlAuthRefreshTokenGuard,
   IAuthDefinitions,
   JwtStrategy,
   LocalLoginAction,
   LocalStrategy,
   PasswordHasherService,
+  Pbkdf2PasswordHasherService,
   RefreshTokenStrategy,
   TokenService,
 } from './domain'
@@ -45,8 +46,11 @@ import { LogoutController } from './presentation/controllers/logout.controller'
 export interface IAuthModuleOptions
   extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   definitions: IAuthDefinitionsModuleOptions
-  authRepository: {
-    useFactory: (...args: any[]) => Promise<AuthRepository> | AuthRepository
+  useLocalAuth?: boolean
+  authRepository?: {
+    useFactory: (
+      ...args: any[]
+    ) => Promise<AuthRepository<any>> | AuthRepository<any>
     inject?: Array<InjectionToken | OptionalFactoryDependency>
   }
   passwordHasher?: {
@@ -60,6 +64,9 @@ export interface IAuthModuleOptions
 @Module({})
 export class AuthModule implements NestModule {
   public static forRootAsync(options: IAuthModuleOptions): DynamicModule {
+    const useLocalAuth =
+      typeof options.useLocalAuth === 'undefined' || options.useLocalAuth
+
     return {
       module: AuthModule,
       imports: [
@@ -70,6 +77,7 @@ export class AuthModule implements NestModule {
           useFactory: (definitions: IAuthDefinitions) => {
             return {
               secretKey: definitions.hashingSecretKey,
+              enabled: !!definitions.jwt && !!definitions.hashingSecretKey,
             }
           },
           inject: [AUTH_DEFINITIONS_MODULE_OPTIONS],
@@ -77,9 +85,9 @@ export class AuthModule implements NestModule {
         JwtModule.registerAsync({
           useFactory: (definitions: IAuthDefinitions) => {
             return {
-              secret: definitions.jwt.secret,
+              secret: definitions.jwt?.secret,
               signOptions: {
-                expiresIn: definitions.jwt.expiresIn,
+                expiresIn: definitions.jwt?.expiresIn,
               },
             }
           },
@@ -91,19 +99,16 @@ export class AuthModule implements NestModule {
           provide: AUTH_PASSWORD_HASHER,
           useFactory:
             options.passwordHasher?.useFactory ||
-            (() => new BcryptPasswordHasherService()),
+            (() => new Pbkdf2PasswordHasherService()),
           inject: options.passwordHasher?.inject,
         },
 
         {
           provide: AuthRepository,
-          useFactory: options.authRepository.useFactory,
-          inject: options.authRepository.inject || [],
-        },
-
-        {
-          provide: APP_GUARD,
-          useClass: AuthGlobalGuard,
+          useFactory: options.authRepository?.useFactory
+            ? options.authRepository.useFactory
+            : () => {},
+          inject: options.authRepository?.inject || [],
         },
 
         TokenService,
@@ -113,25 +118,60 @@ export class AuthModule implements NestModule {
         JwtStrategy,
         RefreshTokenStrategy,
 
-        AuthBasicGuard,
-        AuthRefreshTokenGuard,
-
         ClearAuthCookieInterceptor,
         CookieAuthInterceptor,
 
+        AuthBasicGuard,
+        AuthRefreshTokenGuard,
+        GraphqlAuthJwtGuard,
+        GraphqlAuthRefreshTokenGuard,
+
         BasicAuthMiddleware,
+
+        {
+          provide: APP_GUARD,
+          useFactory: (
+            reflector: Reflector,
+            basicAuthGuard: AuthBasicGuard,
+            refreshTokenGuard: AuthRefreshTokenGuard,
+            graphqlAuthJwtGuard: GraphqlAuthJwtGuard,
+            graphqlAuthRefreshTokenGuard: GraphqlAuthRefreshTokenGuard,
+            options: IAuthDefinitions
+          ) => {
+            return new AuthGlobalGuard(
+              reflector,
+              basicAuthGuard,
+              refreshTokenGuard,
+              graphqlAuthJwtGuard,
+              graphqlAuthRefreshTokenGuard,
+              options
+            )
+          },
+          inject: [
+            Reflector,
+            AuthBasicGuard,
+            AuthRefreshTokenGuard,
+            GraphqlAuthJwtGuard,
+            GraphqlAuthRefreshTokenGuard,
+            AUTH_DEFINITIONS_MODULE_OPTIONS,
+          ],
+        },
 
         ...(options.providers || []),
       ],
-      controllers: [
-        LoginController,
-        RefreshTokenController,
-        LogoutController,
-        ProfileController,
-      ],
+      controllers: useLocalAuth
+        ? [
+            LoginController,
+            RefreshTokenController,
+            LogoutController,
+            ProfileController,
+          ]
+        : [],
       exports: [
         AuthRepository,
         TokenService,
+
+        LocalLoginAction,
 
         AUTH_PASSWORD_HASHER,
 
