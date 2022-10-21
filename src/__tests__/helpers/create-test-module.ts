@@ -17,7 +17,7 @@ import {
   PasswordHasherService,
   UserLoggedInEvent,
 } from '../../domain'
-import { SampleAuthRepository } from '../../infrastructure'
+import { SampleAuthRepository } from './sample.auth.repository'
 
 export const defaultAuthDefinitionsFixture: (
   options?: Partial<IAuthDefinitions>

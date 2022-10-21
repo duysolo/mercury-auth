@@ -1,14 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import _ from 'lodash/fp'
-import {
-  asyncScheduler,
-  catchError,
-  map,
-  Observable,
-  of,
-  scheduled,
-  tap,
-} from 'rxjs'
+import { asyncScheduler, map, Observable, scheduled } from 'rxjs'
 import {
   AuthRepository,
   IAuthUserEntity,
@@ -42,28 +34,22 @@ export class SampleAuthRepository implements AuthRepository {
     password: string,
     impersonated: boolean
   ): Observable<IAuthUserEntity | undefined> {
-    if (impersonated) {
-      return this.getAuthUserByUsername(username).pipe(
-        catchError(() => {
-          return of(undefined)
-        })
-      )
-    }
-
-    return scheduled(this.hasher.hash(password), asyncScheduler).pipe(
-      map((password: string) => ({
-        id: _.random(1, 1999).toString(),
-        username: 'sample-user@gmail.com',
-        email: 'sample-user@gmail.com',
-        password,
-      })),
-      tap((res: IAuthUserEntity) => {
-        /**
-         * Some sample logic check
-         */
-        if (res.password !== password) {
-          return of(undefined)
+    return this.getAuthUserByUsername(username).pipe(
+      map((user) => {
+        if (impersonated) {
+          return user
         }
+
+        if (username !== user?.username) {
+          console.log('authenticate', {
+            username,
+            user,
+            impersonated
+          })
+          return undefined
+        }
+
+        return user
       })
     )
   }

@@ -68,7 +68,7 @@ describe('AuthModule (e2e) - Express Adaptor', () => {
         }).then((response) => {
           return {
             statusCode: response.statusCode,
-            user: JSON.parse(response.text || '{}'),
+            userData: JSON.parse(response.text || '{}'),
           }
         })
       }

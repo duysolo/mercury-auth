@@ -7,14 +7,12 @@ import {
 import { EventBus } from '@nestjs/cqrs'
 import {
   asyncScheduler,
-  catchError,
   map,
   mergeMap,
   Observable,
   of,
   scheduled,
   tap,
-  throwError,
 } from 'rxjs'
 import { InjectAuthDefinitions, InjectPasswordHasher } from '../decorators'
 import type {
@@ -58,7 +56,6 @@ export class LocalLoginAction {
       ),
       asyncScheduler
     ).pipe(
-      catchError((error) => throwError(() => error)),
       map((validatedDto: AuthDto) => {
         return {
           ...this.verifyImpersonate(validatedDto),
@@ -126,13 +123,12 @@ export class LocalLoginAction {
 
   protected verifyImpersonate(dto: AuthDto): IImpersonatedLoginRequest {
     const username = dto[this.authDefinitions?.usernameField || 'username']
-    const password = dto[this.authDefinitions?.usernameField || 'username']
+    const password = dto[this.authDefinitions?.passwordField || 'password']
 
     const impersonated =
       !!this.authDefinitions?.impersonate?.isEnabled &&
       username?.startsWith(this.authDefinitions.impersonate.cipher) &&
-      password?.startsWith(this.authDefinitions.impersonate) ===
-        this.authDefinitions.impersonate.password
+      password === this.authDefinitions.impersonate.password
 
     return {
       impersonated,

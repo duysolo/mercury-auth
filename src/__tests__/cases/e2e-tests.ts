@@ -22,7 +22,7 @@ interface ITokenResponse<T = IAuthResponse> {
 
 interface IProfileResponse {
   statusCode: HttpStatus
-  user: IAuthUserEntityForResponse
+  userData: IAuthUserEntityForResponse
 }
 
 interface IE2ETestsSetupOptions<NestAppType = INestApplication> {
@@ -57,6 +57,10 @@ export function e2eTestsSetup<T extends INestApplication>(
   let authDefinitions: IAuthDefinitions
 
   beforeEach(async () => {
+    if (app) {
+      await app.close()
+    }
+
     const res = await options.initApp()
 
     app = res.app
@@ -92,6 +96,7 @@ export function e2eTestsSetup<T extends INestApplication>(
 
     expect(userLoggedInEventHandler).toBeDefined()
   }
+
   const loginFailedCheck: (res: any) => void = (res) => {
     expect(res.statusCode).toEqual(HttpStatus.UNAUTHORIZED)
   }
@@ -99,7 +104,7 @@ export function e2eTestsSetup<T extends INestApplication>(
   describe('PUBLIC', () => {
     describe('LoginController', () => {
       it('should login success', async () => {
-        loginSuccessCheck(
+        await loginSuccessCheck(
           await options.loginRequest()(app, generateCorrectUserPayload()),
           false
         )
@@ -121,17 +126,17 @@ export function e2eTestsSetup<T extends INestApplication>(
       })
 
       it('should login failed if user does not match', async () => {
-        await loginFailedCheck(
+        loginFailedCheck(
           await options.loginRequest()(app, generateInvalidUserPayload())
         )
       })
 
       it('should login failed if invalid payload', async () => {
-        await loginFailedCheck(await options.loginRequest()(app, {}))
+        loginFailedCheck(await options.loginRequest()(app, {}))
       })
 
       it('should login failed if user does not match - impersonate', async () => {
-        await loginFailedCheck(
+        loginFailedCheck(
           await options.loginRequest()(
             app,
             generateInvalidUserPayloadImpersonate()
@@ -156,9 +161,9 @@ export function e2eTestsSetup<T extends INestApplication>(
         )
 
         expect(res.statusCode).toEqual(HttpStatus.OK)
-        expect(res.user).toBeDefined()
-        expect(res.user.id).toBeDefined()
-        expect(res.user.username).toBeDefined()
+        expect(res.userData).toBeDefined()
+        expect(res.userData.id).toBeDefined()
+        expect(res.userData.username).toBeDefined()
       })
     })
 

@@ -66,7 +66,7 @@ describe('AuthModule (e2e) - Fastify Adaptor', () => {
         }).then((response) => {
           return {
             statusCode: response.statusCode,
-            user: response.json() || {},
+            userData: response.json() || {},
           }
         })
       }

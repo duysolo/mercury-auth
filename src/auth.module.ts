@@ -18,13 +18,14 @@ import {
   AuthGlobalGuard,
   AuthRefreshTokenGuard,
   AuthRepository,
-  GraphqlAuthJwtGuard, GraphqlAuthRefreshTokenGuard,
+  BcryptPasswordHasherService,
+  GraphqlAuthJwtGuard,
+  GraphqlAuthRefreshTokenGuard,
   IAuthDefinitions,
   JwtStrategy,
   LocalLoginAction,
   LocalStrategy,
   PasswordHasherService,
-  Pbkdf2PasswordHasherService,
   RefreshTokenStrategy,
   TokenService,
 } from './domain'
@@ -99,7 +100,7 @@ export class AuthModule implements NestModule {
           provide: AUTH_PASSWORD_HASHER,
           useFactory:
             options.passwordHasher?.useFactory ||
-            (() => new Pbkdf2PasswordHasherService()),
+            (() => new BcryptPasswordHasherService()),
           inject: options.passwordHasher?.inject,
         },
 

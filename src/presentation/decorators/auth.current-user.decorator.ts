@@ -6,8 +6,6 @@ export function currentUserDecoratorFactory(
   data: unknown,
   context: ExecutionContext
 ): IAuthUserEntityForResponse {
-  console.log(context)
-
   if (`${context.getType()}` === 'graphql') {
     const gqlExecutionContext = GqlExecutionContext.create(context)
 
