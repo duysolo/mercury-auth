@@ -1,4 +1,5 @@
 import { ExecutionContext, Injectable } from '@nestjs/common'
+import { CanActivate } from '@nestjs/common/interfaces/features/can-activate.interface'
 import { Reflector } from '@nestjs/core'
 import { GqlContextType } from '@nestjs/graphql'
 import { catchError, forkJoin, map, Observable, of, throwError } from 'rxjs'
@@ -22,18 +23,17 @@ export const IS_PUBLIC_WITH_OPTIONAL_USER_KEY: string =
 export const IS_REFRESH_TOKEN_KEY: string = 'isRefreshToken'
 
 @Injectable()
-export class AuthGlobalGuard extends AuthJwtGuard {
+export class AuthGlobalGuard {
   public constructor(
     private readonly _reflector: Reflector,
+    private readonly _authJwtGuard: AuthJwtGuard,
     private readonly _basicAuthGuard: AuthBasicGuard,
     private readonly _refreshTokenGuard: AuthRefreshTokenGuard,
     private readonly _graphqlAuthJwtGuard: GraphqlAuthJwtGuard,
     private readonly _graphqlAuthRefreshTokenGuard: GraphqlAuthRefreshTokenGuard,
     @InjectAuthDefinitions()
     private readonly _options: IAuthDefinitions
-  ) {
-    super()
-  }
+  ) {}
 
   public canActivate(
     context: ExecutionContext
@@ -87,27 +87,25 @@ export class AuthGlobalGuard extends AuthJwtGuard {
 
     if (contextType === 'graphql') {
       return this.handleJwtRequestWithOptionalUser(
-        this._graphqlAuthJwtGuard.canActivate,
+        this._graphqlAuthJwtGuard,
         context,
         isPublicWithOptionalUser
       )
     }
 
     return this.handleJwtRequestWithOptionalUser(
-      super.canActivate,
+      this._authJwtGuard,
       context,
       isPublicWithOptionalUser
     )
   }
 
   protected handleJwtRequestWithOptionalUser(
-    handler: (
-      context: ExecutionContext
-    ) => boolean | Promise<boolean> | Observable<boolean>,
+    handler: CanActivate,
     context: ExecutionContext,
     isPublicWithOptionalUser: boolean
   ) {
-    return forkJoin([handler(context) as Promise<boolean>]).pipe(
+    return forkJoin([handler.canActivate(context) as Promise<boolean>]).pipe(
       map(([res]) => {
         return isPublicWithOptionalUser ? true : res
       }),

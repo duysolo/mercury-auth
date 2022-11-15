@@ -16,15 +16,18 @@ import {
   AUTH_PASSWORD_HASHER,
   AuthBasicGuard,
   AuthGlobalGuard,
+  AuthJwtGuard,
   AuthRefreshTokenGuard,
   AuthRepository,
-  BcryptPasswordHasherService, GetUserByJwtTokenAction,
+  BcryptPasswordHasherService,
+  GetUserByJwtTokenAction,
   GraphqlAuthJwtGuard,
   GraphqlAuthRefreshTokenGuard,
   IAuthDefinitions,
   JwtStrategy,
   LocalLoginAction,
-  LocalStrategy, ParseJwtTokenAction,
+  LocalStrategy,
+  ParseJwtTokenAction,
   PasswordHasherService,
   RefreshTokenStrategy,
   TokenService,
@@ -126,6 +129,7 @@ export class AuthModule implements NestModule {
         CookieAuthInterceptor,
 
         AuthBasicGuard,
+        AuthJwtGuard,
         AuthRefreshTokenGuard,
         GraphqlAuthJwtGuard,
         GraphqlAuthRefreshTokenGuard,
@@ -136,6 +140,7 @@ export class AuthModule implements NestModule {
           provide: APP_GUARD,
           useFactory: (
             reflector: Reflector,
+            authJwtGuard: AuthJwtGuard,
             basicAuthGuard: AuthBasicGuard,
             refreshTokenGuard: AuthRefreshTokenGuard,
             graphqlAuthJwtGuard: GraphqlAuthJwtGuard,
@@ -144,6 +149,7 @@ export class AuthModule implements NestModule {
           ) => {
             return new AuthGlobalGuard(
               reflector,
+              authJwtGuard,
               basicAuthGuard,
               refreshTokenGuard,
               graphqlAuthJwtGuard,
@@ -153,6 +159,7 @@ export class AuthModule implements NestModule {
           },
           inject: [
             Reflector,
+            AuthJwtGuard,
             AuthBasicGuard,
             AuthRefreshTokenGuard,
             GraphqlAuthJwtGuard,
@@ -175,7 +182,9 @@ export class AuthModule implements NestModule {
         AuthRepository,
         TokenService,
 
+        GetUserByJwtTokenAction,
         LocalLoginAction,
+        ParseJwtTokenAction,
 
         AUTH_PASSWORD_HASHER,
 
