@@ -1,6 +1,7 @@
 # Mercury Auth
 
 ### A NestJS module package for authentication.
+
 #### Support both `FasitfyAdaptor` and `ExpressAdaptor`.
 
 ## Install
@@ -8,16 +9,18 @@
 ```shell
 npm install --save @mercury-labs/nest-auth
 ```
-Learn more about the relevant package [@mercury-labs/hashing](https://www.npmjs.com/package/@mercury-labs/hashing)
+
+Learn more about the relevant
+package [@mercury-labs/hashing](https://www.npmjs.com/package/@mercury-labs/hashing)
 
 ## Define a database repository to get user info
 
 ```typescript
 import {
-    AUTH_PASSWORD_HASHER,
-    AuthRepository,
-    IAuthUserEntity,
-    PasswordHasherService
+  AUTH_PASSWORD_HASHER,
+  AuthRepository,
+  IAuthUserEntity,
+  PasswordHasherService
 } from '@mercury-labs/nest-auth'
 import { Injectable } from '@nestjs/common'
 import moment from 'moment'
@@ -25,42 +28,42 @@ import { map, Observable, scheduled } from 'rxjs'
 
 @Injectable()
 export class CmsAuthRepository implements AuthRepository {
-    public constructor(
-        @Inject(AUTH_PASSWORD_HASHER)
-        protected readonly hasher: PasswordHasherService
-    ) {
-    }
+  public constructor(
+    @Inject(AUTH_PASSWORD_HASHER)
+    protected readonly hasher: PasswordHasherService
+  ) {
+  }
 
-    public getAuthUserByUsername(
-        username: string
-    ): Observable<IAuthUserEntity | undefined> {
-        // Create sample hashed password for demo only
-        return scheduled(this.hasher.hash('some-password-phrase'))
-            .pipe(
-                // Sample user for demo only
-                map((password: string) => ({
-                    id: '123456',
-                    firstName: 'John Doe',
-                    lastName: '',
-                    email: 'sample-email+dev@gmail.com',
-                    password,
-                    createdAt: moment().toDate(),
-                    updatedAt: moment().toDate(),
-                })),
-                map((user) => {
-                    if (
-                        user.email !== username
-                    ) {
-                        return undefined
-                    }
+  public getAuthUserByUsername(
+    username: string
+  ): Observable<IAuthUserEntity | undefined> {
+    // Create sample hashed password for demo only
+    return scheduled(this.hasher.hash('some-password-phrase'))
+      .pipe(
+        // Sample user for demo only
+        map((password: string) => ({
+          id: '123456',
+          firstName: 'John Doe',
+          lastName: '',
+          email: 'sample-email+dev@gmail.com',
+          password,
+          createdAt: moment().toDate(),
+          updatedAt: moment().toDate(),
+        })),
+        map((user) => {
+          if (
+            user.email !== username
+          ) {
+            return undefined
+          }
 
-                    return {
-                        ...user,
-                        username: user.email,
-                    }
-                })
-            )
-    }
+          return {
+            ...user,
+            username: user.email,
+          }
+        })
+      )
+  }
 }
 ```
 
@@ -72,144 +75,145 @@ import { ConfigService } from '@nestjs/config'
 import { Module } from '@nestjs/common'
 
 @Module({
-    imports: [
-        AuthModule.forRootAsync({
-            definitions: {
-                useFactory: (config: ConfigService) => {
-                    return {
-                        basicAuth: {
-                            username: config.get('BASIC_AUTH_USER'),
-                            password: config.get('BASIC_AUTH_PASSWORD'),
-                        },
-                        impersonate: {
-                            isEnabled: config.get('AUTH_IMPERSONATE_ENABLED') === 'true',
-                            cipher: config.get('AUTH_IMPERSONATE_CIPHER'),
-                            password: config.get('AUTH_IMPERSONATE_PASSWORD'),
-                        },
-                        jwt: {
-                            secret: config.get('AUTH_JWT_SECRET'),
-                            expiresIn: config.get('AUTH_JWT_EXPIRES') || '1d',
-                        },
-                        transferTokenMethod: config.get<AuthTransferTokenMethod>(
-                                'AUTH_TRANSFER_TOKEN_METHOD'
-                        ),
-                        redactedFields: ['password'],
-                        hashingSecretKey: config.get('HASHING_SECRET_KEY') || '',
-                        usernameField: 'username',
-                        passwordField: 'password',
-                        httpAdaptorType: 'fastify'
-                    }
-                },
-                inject: [ConfigService],
+  imports: [
+    AuthModule.forRootAsync({
+      definitions: {
+        useFactory: (config: ConfigService) => {
+          return {
+            basicAuth: {
+              username: config.get('BASIC_AUTH_USER'),
+              password: config.get('BASIC_AUTH_PASSWORD'),
             },
-            authRepository: {
-              useFactory: (hasher: PasswordHasherService) => {
-                return new CmsAuthRepository(hasher)
-              },
-              inject: [AUTH_PASSWORD_HASHER]
-            }
-        }),
-    ]
+            impersonate: {
+              isEnabled: config.get('AUTH_IMPERSONATE_ENABLED') === 'true',
+              cipher: config.get('AUTH_IMPERSONATE_CIPHER'),
+              password: config.get('AUTH_IMPERSONATE_PASSWORD'),
+            },
+            jwt: {
+              secret: config.get('AUTH_JWT_SECRET'),
+              expiresIn: config.get('AUTH_JWT_EXPIRES') || '1d',
+            },
+            transferTokenMethod: config.get<AuthTransferTokenMethod>(
+              'AUTH_TRANSFER_TOKEN_METHOD'
+            ),
+            redactedFields: ['password'],
+            hashingSecretKey: config.get('HASHING_SECRET_KEY') || '',
+            usernameField: 'username',
+            passwordField: 'password',
+            httpAdaptorType: 'fastify'
+          }
+        },
+        inject: [ConfigService],
+      },
+      authRepository: {
+        useFactory: (hasher: PasswordHasherService) => {
+          return new CmsAuthRepository(hasher)
+        },
+        inject: [AUTH_PASSWORD_HASHER]
+      }
+    }),
+  ]
 })
-export class AppModule {}
+export class AppModule {
+}
 ```
 
 #### Notes:
 
 ```typescript
 interface IAuthDefinitions {
+  /**
+   * Configuration for basic auth
+   */
+  basicAuth: {
+    username: string
+    password: string
     /**
-     * Configuration for basic auth
+     * The realm name for WWW-Authenticate header
      */
-    basicAuth: {
-        username: string
-        password: string
-        /**
-         * The realm name for WWW-Authenticate header
-         */
-        realm?: string
-    }
+    realm?: string
+  }
 
+  /**
+   * Configuration for JWT
+   */
+  jwt: {
     /**
-     * Configuration for JWT
+     * Do not expose this key publicly.
+     * We have done so here to make it clear what the code is doing,
+     * but in a production system you must protect this key using appropriate measures,
+     * such as a secrets vault, environment variable, or configuration service.
      */
-    jwt: {
-        /**
-         * Do not expose this key publicly.
-         * We have done so here to make it clear what the code is doing,
-         * but in a production system you must protect this key using appropriate measures,
-         * such as a secrets vault, environment variable, or configuration service.
-         */
-        secret: string
-        /**
-         * Expressed in seconds or a string describing a time span zeit/ms.
-         * @see https://github.com/vercel/ms
-         * Eg: 60, “2 days”, “10h”, “7d”
-         */
-        expiresIn: string | number
-        refreshTokenExpiresIn: string | number
-    }
-
+    secret: string
     /**
-     * Configuration for impersonate login
-     * You can login to a user account without their password.
-     * Eg:
-     *   - username: {your_impersonate_cipher_key}username
-     *   - password: {your_impersonate_password}
+     * Expressed in seconds or a string describing a time span zeit/ms.
+     * @see https://github.com/vercel/ms
+     * Eg: 60, “2 days”, “10h”, “7d”
      */
-    impersonate?: {
-        isEnabled: boolean
-        cipher: string
-        password: string
-    }
+    expiresIn: string | number
+    refreshTokenExpiresIn: string | number
+  }
 
-    /**
-     * Hide some sentitive fields while getting user profile.
-     */
-    redactedFields?: string[]
+  /**
+   * Configuration for impersonate login
+   * You can login to a user account without their password.
+   * Eg:
+   *   - username: {your_impersonate_cipher_key}username
+   *   - password: {your_impersonate_password}
+   */
+  impersonate?: {
+    isEnabled: boolean
+    cipher: string
+    password: string
+  }
 
-    /**
-     * These routes will always be PUBLIC.
-     * No authentication required.
-     */
-    ignoredRoutes?: string[]
+  /**
+   * Hide some sentitive fields while getting user profile.
+   */
+  redactedFields?: string[]
 
-    /**
-     * Used to encode/decode the access/refresh token
-     * 32 characters string
-     */
-    hashingSecretKey: string
+  /**
+   * These routes will always be PUBLIC.
+   * No authentication required.
+   */
+  ignoredRoutes?: string[]
 
-    /**
-     * We accepted these 3 values: cookie|bearer|both
-     * - cookie: after user login, their accessToken and refreshToken will be sent using cookie
-     * - bearer: after user login, their accessToken and refreshToken will be sent to response body
-     * - both: mixed those 2 above values.
-     */
-    transferTokenMethod: AuthTransferTokenMethod,
+  /**
+   * Used to encode/decode the access/refresh token
+   * 32 characters string
+   */
+  hashingSecretKey: string
 
-    cookieOptions?: {
-        domain?: string
-        path?: string // Default '/'
-        sameSite?: boolean | 'lax' | 'strict' | 'none' // Default true
-        signed?: boolean
-        httpOnly?: boolean // Default true
-        secure?: boolean
-    },
+  /**
+   * We accepted these 3 values: cookie|bearer|both
+   * - cookie: after user login, their accessToken and refreshToken will be sent using cookie
+   * - bearer: after user login, their accessToken and refreshToken will be sent to response body
+   * - both: mixed those 2 above values.
+   */
+  transferTokenMethod: AuthTransferTokenMethod,
 
-    /**
-     * Username field when login
-     * Eg: email, username,...
-     */
-    usernameField?: string
+  cookieOptions?: {
+    domain?: string
+    path?: string // Default '/'
+    sameSite?: boolean | 'lax' | 'strict' | 'none' // Default true
+    signed?: boolean
+    httpOnly?: boolean // Default true
+    secure?: boolean
+  },
 
-    /**
-     * Password field when login
-     * Eg: password, pass...
-     */
-    passwordField?: string,
+  /**
+   * Username field when login
+   * Eg: email, username,...
+   */
+  usernameField?: string
 
-    httpAdaptorType: 'fastify' | 'express'
+  /**
+   * Password field when login
+   * Eg: password, pass...
+   */
+  passwordField?: string,
+
+  httpAdaptorType: 'fastify' | 'express'
 }
 ```
 
@@ -227,97 +231,101 @@ import { PasswordHasherService } from '@mercury-labs/nest-auth'
 import { Injectable } from '@nestjs/common'
 
 export interface IPbkdf2Hash {
-    hash: string
-    salt: string
+  hash: string
+  salt: string
 }
 
 @Injectable()
 export class Pbkdf2PasswordHasherService implements PasswordHasherService<IPbkdf2Hash> {
-    public async hash(password: string): Promise<IPbkdf2Hash> {
-        const salt = crypto.randomBytes(16).toString('hex')
+  public async hash(password: string): Promise<IPbkdf2Hash> {
+    const salt = crypto.randomBytes(16).toString('hex')
 
-        const hash = crypto.pbkdf2Sync(
-            password,
-            salt,
-            10000,
-            512,
-            'sha512'
-        ).toString('hex')
+    const hash = crypto.pbkdf2Sync(
+      password,
+      salt,
+      10000,
+      512,
+      'sha512'
+    ).toString('hex')
 
-        return { salt, hash }
-    }
+    return {salt, hash}
+  }
 
-    public async compare(password: string, hashedPassword: IPbkdf2Hash): Promise<boolean> {
-        const hashPassword = crypto.pbkdf2Sync(
-            password,
-            hashedPassword.salt,
-            10000,
-            512,
-            'sha512'
-        ).toString('hex')
+  public async compare(password: string, hashedPassword: IPbkdf2Hash): Promise<boolean> {
+    const hashPassword = crypto.pbkdf2Sync(
+      password,
+      hashedPassword.salt,
+      10000,
+      512,
+      'sha512'
+    ).toString('hex')
 
-        return hashedPassword.hash === hashPassword
-    }
+    return hashedPassword.hash === hashPassword
+  }
 }
 ```
 
 #### Register it to `AuthModule`
+
 ```typescript
 AuthModule.forRootAsync({
-    ...,
-    passwordHasher: {
-        useFactory: () => {
-            return new Pbkdf2PasswordHasherService()
-        },
-    }
+  ...,
+  passwordHasher: {
+    useFactory: () => {
+      return new Pbkdf2PasswordHasherService()
+    },
+  }
 })
 ```
 
 #### Sample updated `CmsAuthRepository`
+
 ```typescript
 @Injectable()
 export class CmsAuthRepository implements AuthRepository {
-    public constructor(
-        @Inject(AUTH_PASSWORD_HASHER)
-        protected readonly hasher: PasswordHasherService<IPbkdf2Hash>
-    ) {
-    }
+  public constructor(
+    @Inject(AUTH_PASSWORD_HASHER)
+    protected readonly hasher: PasswordHasherService<IPbkdf2Hash>
+  ) {
+  }
 
-    public getAuthUserByUsername(
-        username: string
-    ): Observable<IAuthUserEntity | undefined> {
-        // Create sample hashed password for demo only
-        return scheduled(this.hasher.hash('some-password-phrase'))
-            .pipe(
-                // Sample user for demo only
-                map((password: IPbkdf2Hash) => ({
-                    id: '123456',
-                    firstName: 'John Doe',
-                    lastName: '',
-                    email: 'sample-email+dev@gmail.com',
-                    password,
-                    createdAt: moment().toDate(),
-                    updatedAt: moment().toDate(),
-                })),
-                map((user) => {
-                    if (
-                        user.email !== username
-                    ) {
-                        return undefined
-                    }
+  public getAuthUserByUsername(
+    username: string
+  ): Observable<IAuthUserEntity | undefined> {
+    // Create sample hashed password for demo only
+    return scheduled(this.hasher.hash('some-password-phrase'))
+      .pipe(
+        // Sample user for demo only
+        map((password: IPbkdf2Hash) => ({
+          id: '123456',
+          firstName: 'John Doe',
+          lastName: '',
+          email: 'sample-email+dev@gmail.com',
+          password,
+          createdAt: moment().toDate(),
+          updatedAt: moment().toDate(),
+        })),
+        map((user) => {
+          if (
+            user.email !== username
+          ) {
+            return undefined
+          }
 
-                    return {
-                        ...user,
-                        username: user.email,
-                    }
-                })
-            )
-    }
+          return {
+            ...user,
+            username: user.email,
+          }
+        })
+      )
+  }
 }
 ```
 
 #### Access the login route
+
 curl
+
 ```
 curl --request POST \
   --url http://localhost:4005/auth/login \
@@ -329,7 +337,9 @@ curl --request POST \
 ```
 
 #### Refresh your access token
+
 curl
+
 ```
 curl --request POST \
   --url http://localhost:4005/auth/refresh-token \
@@ -337,7 +347,9 @@ curl --request POST \
 ```
 
 #### Get your logged in user profile
+
 curl
+
 ```
 curl --request GET \
   --url http://localhost:4005/auth/profile \
@@ -345,7 +357,9 @@ curl --request GET \
 ```
 
 #### Logout
+
 curl
+
 ```
 curl --request POST \
   --url http://localhost:4005/auth/logout
@@ -353,12 +367,18 @@ curl --request POST \
 ```
 
 ### Injection Decorators
-`@InjectAuthDefinitions()`: inject `IAuthDefinitions` to your injectable classes.
 
-`@InjectPasswordHasher()`: inject `PasswordHasherService` to your injectable classes.
+`@InjectAuthDefinitions()`: inject `IAuthDefinitions` to your injectable
+classes.
+
+`@InjectPasswordHasher()`: inject `PasswordHasherService` to your injectable
+classes.
 
 ### Controller Decorators
-`@Public()` This decorator will help your controller available for all users. No authentication required.
+
+`@Public()` This decorator will help your controller available for all users. No
+authentication required.
+
 ```typescript
 import { Public } from '@mercury-labs/nest-auth'
 import { Controller, Get } from '@nestjs/common'
@@ -382,10 +402,10 @@ import { Controller, Get } from '@nestjs/common'
 @Controller()
 @InternalOnly()
 export class AppController {
-    @Get()
-    public getHello(): string {
-        return 'Hello World!'
-    }
+  @Get()
+  public getHello(): string {
+    return 'Hello World!'
+  }
 }
 ```
 
@@ -394,37 +414,45 @@ By default, all another routes will be checked using JWT strategy guard.
 
 It means, you need to pass your access token into the request header.
 
-If you set the transfer method to `both` or `cookie`, you don't need to do anything. The `AccessToken` and `RefreshToken` already be sent via cookie.
+If you set the transfer method to `both` or `cookie`, you don't need to do
+anything. The `AccessToken` and `RefreshToken` already be sent via cookie.
 
-If you set the transfer method to `bearer`, you need to pass your access token to the `Authorization` header.
+If you set the transfer method to `bearer`, you need to pass your access token
+to the `Authorization` header.
 
 ```
-Authorization: Bearer {your_access_token}
-Refesh-Token: {your_refresh_token}
+Authorization: Bearer {yourAccessToken}
+Refesh-Token: {yourRefreshToken}
 ```
 
 `@CurrentUser()` This decorator will return the current logged-in user.
+
 ```typescript
 import { Controller, Get } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { IAuthUserEntityForResponse, CurrentUser } from '@mercury-labs/nest-auth'
+import {
+  IAuthUserEntityForResponse,
+  CurrentUser
+} from '@mercury-labs/nest-auth'
 
 @ApiTags('User details')
-@Controller({ path: 'users/-' })
+@Controller({path: 'users/-'})
 export class ProfileController {
-    @ApiOperation({
-        summary: 'Get profile',
-    })
-    @Get('profile')
-    public profile(
-        @CurrentUser() user: IAuthUserEntityForResponse
-    ): IAuthUserEntityForResponse {
-        return user
-    }
+  @ApiOperation({
+    summary: 'Get profile',
+  })
+  @Get('profile')
+  public profile(
+    @CurrentUser() user: IAuthUserEntityForResponse
+  ): IAuthUserEntityForResponse {
+    return user
+  }
 }
 ```
 
-`@PublicWithOptionalUser()` Same as `@Public()`, but we can get user info with `@CurrentUser()` if you pass your access token into the request header.
+`@PublicWithOptionalUser()` Same as `@Public()`, but we can get user info
+with `@CurrentUser()` if you pass your access token into the request header.
+
 ```typescript
 import { PublicWithOptionalUser } from '@mercury-labs/nest-auth'
 import { Controller, Get } from '@nestjs/common'
@@ -434,18 +462,27 @@ import { Controller, Get } from '@nestjs/common'
 export class AppController {
   @Get()
   public getHello(
-      @CurrentUser() user: IAuthUserEntityForResponse
+    @CurrentUser() user?: IAuthUserEntityForResponse | undefined
   ): string {
+    /**
+     * user is nullable
+     */
+    console.log({
+      userId: user?.id
+    })
     return 'Hello World!'
   }
 }
 ```
 
 ## Triggered Events
+
 ### `UserLoggedInEvent`
+
 Triggered when user logged in successfully.
 
 Sample usages
+
 ```typescript
 import { UserLoggedInEvent } from '@mercury-labs/nest-auth'
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs'
@@ -457,8 +494,8 @@ export class UserLoggedInEventHandler implements IEventHandler<UserLoggedInEvent
     await lastValueFrom(
       of(event).pipe(
         delay(1200),
-        tap(({ user, isImpersonated }) => {
-          console.log('UserLoggedInEvent', { user, isImpersonated })
+        tap(({user, isImpersonated}) => {
+          console.log('UserLoggedInEvent', {user, isImpersonated})
         })
       )
     )
@@ -467,7 +504,11 @@ export class UserLoggedInEventHandler implements IEventHandler<UserLoggedInEvent
 ```
 
 #### Notes:
-- You must install package [@nestjs/cqrs](https://www.npmjs.com/package/@nestjs/cqrs) to work with auth events.
+
+- You must install
+  package [@nestjs/cqrs](https://www.npmjs.com/package/@nestjs/cqrs) to work
+  with auth events.
 
 ## Next plan
+
 - Allow user to revoke `accessToken`, `refreshToken` of some user.
