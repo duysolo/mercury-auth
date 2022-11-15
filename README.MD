@@ -424,6 +424,23 @@ export class ProfileController {
 }
 ```
 
+`@PublicWithOptionalUser()` Same as `@Public()`, but we can get user info with `@CurrentUser()` if you pass your access token into the request header.
+```typescript
+import { PublicWithOptionalUser } from '@mercury-labs/nest-auth'
+import { Controller, Get } from '@nestjs/common'
+
+@Controller()
+@PublicWithOptionalUser()
+export class AppController {
+  @Get()
+  public getHello(
+      @CurrentUser() user: IAuthUserEntityForResponse
+  ): string {
+    return 'Hello World!'
+  }
+}
+```
+
 ## Triggered Events
 ### `UserLoggedInEvent`
 Triggered when user logged in successfully.
@@ -453,7 +470,4 @@ export class UserLoggedInEventHandler implements IEventHandler<UserLoggedInEvent
 - You must install package [@nestjs/cqrs](https://www.npmjs.com/package/@nestjs/cqrs) to work with auth events.
 
 ## Next plan
-I will implement some famous oauth methods
-- Login using google/facebook/github...
 - Allow user to revoke `accessToken`, `refreshToken` of some user.
-- E2E tests, more tests...

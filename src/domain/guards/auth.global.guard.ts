@@ -1,20 +1,23 @@
 import { ExecutionContext, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { Observable } from 'rxjs'
+import { GqlContextType } from '@nestjs/graphql'
+import { catchError, forkJoin, map, Observable, of, throwError } from 'rxjs'
+import { InjectAuthDefinitions } from '../decorators'
 import {
   GraphqlAuthJwtGuard,
   GraphqlAuthRefreshTokenGuard,
   IAuthDefinitions,
 } from '../index'
-import { InjectAuthDefinitions } from '../decorators'
 import { AuthBasicGuard } from './auth.basic.guard'
 import { AuthJwtGuard } from './auth.jwt.guard'
 import { AuthRefreshTokenGuard } from './auth.refresh-token.guard'
-import { GqlContextType } from '@nestjs/graphql'
 
 export const IS_INTERNAL_ONLY: string = 'isInternalOnly'
 
 export const IS_PUBLIC_KEY: string = 'isPublic'
+
+export const IS_PUBLIC_WITH_OPTIONAL_USER_KEY: string =
+  'isPublicWithOptionalUser'
 
 export const IS_REFRESH_TOKEN_KEY: string = 'isRefreshToken'
 
@@ -77,10 +80,44 @@ export class AuthGlobalGuard extends AuthJwtGuard {
       return this._refreshTokenGuard.canActivate(context)
     }
 
+    const isPublicWithOptionalUser = this._reflector.getAllAndOverride<boolean>(
+      IS_PUBLIC_WITH_OPTIONAL_USER_KEY,
+      [context.getHandler(), context.getClass()]
+    )
+
     if (contextType === 'graphql') {
-      return this._graphqlAuthJwtGuard.canActivate(context)
+      return this.handleJwtRequestWithOptionalUser(
+        this._graphqlAuthJwtGuard.canActivate,
+        context,
+        isPublicWithOptionalUser
+      )
     }
 
-    return super.canActivate(context)
+    return this.handleJwtRequestWithOptionalUser(
+      super.canActivate,
+      context,
+      isPublicWithOptionalUser
+    )
+  }
+
+  protected handleJwtRequestWithOptionalUser(
+    handler: (
+      context: ExecutionContext
+    ) => boolean | Promise<boolean> | Observable<boolean>,
+    context: ExecutionContext,
+    isPublicWithOptionalUser: boolean
+  ) {
+    return forkJoin([handler(context) as Promise<boolean>]).pipe(
+      map(([res]) => {
+        return isPublicWithOptionalUser ? true : res
+      }),
+      catchError((error) => {
+        if (isPublicWithOptionalUser) {
+          return of(true)
+        }
+
+        return throwError(() => error)
+      })
+    )
   }
 }

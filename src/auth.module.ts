@@ -18,13 +18,13 @@ import {
   AuthGlobalGuard,
   AuthRefreshTokenGuard,
   AuthRepository,
-  BcryptPasswordHasherService,
+  BcryptPasswordHasherService, GetUserByJwtTokenAction,
   GraphqlAuthJwtGuard,
   GraphqlAuthRefreshTokenGuard,
   IAuthDefinitions,
   JwtStrategy,
   LocalLoginAction,
-  LocalStrategy,
+  LocalStrategy, ParseJwtTokenAction,
   PasswordHasherService,
   RefreshTokenStrategy,
   TokenService,
@@ -113,7 +113,10 @@ export class AuthModule implements NestModule {
         },
 
         TokenService,
+
+        GetUserByJwtTokenAction,
         LocalLoginAction,
+        ParseJwtTokenAction,
 
         LocalStrategy,
         JwtStrategy,

@@ -22,9 +22,9 @@ export interface IJwtTokenResponse {
 export class TokenService {
   public constructor(
     @InjectAuthDefinitions()
-    protected readonly authDefinitions: IAuthDefinitions,
-    protected readonly jwtService: JwtService,
-    protected readonly hashTextService: HashTextService
+    public readonly authDefinitions: IAuthDefinitions,
+    public readonly jwtService: JwtService,
+    public readonly hashTextService: HashTextService
   ) {}
 
   public generateTokenResponse(

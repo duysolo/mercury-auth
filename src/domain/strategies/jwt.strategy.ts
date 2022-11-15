@@ -1,28 +1,13 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, JwtFromRequestFunction, Strategy } from 'passport-jwt'
-import {
-  asyncScheduler,
-  lastValueFrom,
-  map,
-  mergeMap,
-  of,
-  scheduled,
-} from 'rxjs'
+import { lastValueFrom } from 'rxjs'
 import { InjectAuthDefinitions } from '../decorators'
 import type { IAuthUserEntityForResponse } from '../definitions'
 import { AuthTransferTokenMethod } from '../definitions'
-import { IJwtPayload, JwtPayload } from '../entities'
-import {
-  getRequestCookie,
-  getRequestHeader,
-  hideRedactedFields,
-  IHttpRequest,
-  validateEntity,
-} from '../helpers'
-import { IAuthDefinitions } from '../index'
-import { AuthRepository } from '../repositories'
-import { TokenService } from '../services'
+import { IJwtPayload } from '../entities'
+import { getRequestCookie, getRequestHeader, IHttpRequest } from '../helpers'
+import { GetUserByJwtTokenAction, IAuthDefinitions } from '../index'
 
 export const JWT_STRATEGY_NAME: string = 'jwt'
 
@@ -67,8 +52,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
   public constructor(
     @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
-    protected readonly authRepository: AuthRepository,
-    protected readonly jwtService: TokenService
+    protected readonly getUserByJwtTokenAction: GetUserByJwtTokenAction
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -84,27 +68,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
     payload: IJwtPayload
   ): Promise<IAuthUserEntityForResponse | undefined> {
     try {
-      return lastValueFrom(
-        scheduled(
-          validateEntity(payload, JwtPayload, false),
-          asyncScheduler
-        ).pipe(
-          map((res) => {
-            return this.jwtService.decodeAccessTokenFromRawDecoded(res)
-          }),
-          mergeMap((validatedPayload) => {
-            if (!validatedPayload?.username) {
-              return of(undefined)
-            }
-
-            return this.authRepository
-              .getAuthUserByUsername(validatedPayload.username)
-              .pipe(
-                map(hideRedactedFields(this.authDefinitions.redactedFields))
-              )
-          })
-        )
-      )
+      return lastValueFrom(this.getUserByJwtTokenAction.handle(payload))
     } catch (error) {
       throw new UnauthorizedException()
     }
