@@ -30,7 +30,7 @@
     "build": "rm -rf ./dist && nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "increase-version": "node ./infrastructure/increase-version.js",
+    "increase-version": "node scripts/increase-version.js",
     "test": "jest --verbose=true",
     "test:watch": "jest --verbose=true --watch",
     "test:cov": "jest --coverage",
