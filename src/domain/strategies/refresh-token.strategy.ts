@@ -1,22 +1,17 @@
 import { HttpStatus, Injectable } from '@nestjs/common'
+import { QueryBus } from '@nestjs/cqrs'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
 import { Strategy } from 'passport-strategy'
-import { lastValueFrom, map } from 'rxjs'
+import { GetCurrentUserByRefreshTokenQuery } from '../../application/queries'
 import {
   AuthTransferTokenMethod,
   getRequestCookie,
   getRequestHeader,
-  hideRedactedFields,
-  IAuthUserEntityForResponse,
+  IAuthDefinitions,
   IHttpRequest,
-  IJwtPayload,
 } from '../index'
-
-import { IAuthDefinitions } from '../index'
 import { InjectAuthDefinitions } from '../decorators'
-import { AuthRepository } from '../repositories'
-import { TokenService } from '../services'
 
 export const REFRESH_TOKEN_STRATEGY_NAME: string = 'mercury-refresh-token'
 
@@ -58,8 +53,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
   public constructor(
     @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
-    protected readonly authRepository: AuthRepository,
-    protected readonly jwtService: TokenService
+    protected readonly queryBus: QueryBus
   ) {
     super()
 
@@ -72,26 +66,16 @@ export class RefreshTokenStrategy extends PassportStrategy(
   public async authenticate(req: any): Promise<void> {
     const token: string | any = this.jwtFromRequest(req)
 
-    const jwtPayload = token
-      ? this.jwtService.decodeRefreshToken(token)
+    const user = token
+      ? await this.queryBus.execute(
+          new GetCurrentUserByRefreshTokenQuery(token)
+        )
       : undefined
 
-    const user = jwtPayload ? await this.validate(jwtPayload) : undefined
-
-    if (!jwtPayload || !user) {
+    if (!user) {
       this.fail(HttpStatus.UNAUTHORIZED)
     } else {
       this.success(user)
     }
-  }
-
-  protected async validate(
-    payload: IJwtPayload
-  ): Promise<IAuthUserEntityForResponse> {
-    return lastValueFrom(
-      this.authRepository
-        .getAuthUserByUsername(payload.username)
-        .pipe(map(hideRedactedFields(this.authDefinitions.redactedFields)))
-    )
   }
 }

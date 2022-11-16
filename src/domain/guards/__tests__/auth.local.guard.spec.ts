@@ -1,7 +1,8 @@
 import { HttpStatus, UnauthorizedException } from '@nestjs/common'
+import { TestingModule } from '@nestjs/testing/testing-module'
 import {
   createTestingModule,
-  defaultAuthDefinitionsFixture
+  defaultAuthDefinitionsFixture,
 } from '../../../__tests__/helpers'
 import { AuthLocalGuard } from '../auth.local.guard'
 import { generateExecutionContextForLocalAuth } from './helpers/test-guard.helper'
@@ -14,12 +15,16 @@ describe('AuthLocalGuard', () => {
     password: 'testLogin@12345',
   }
 
+  let app: TestingModule
+
   beforeAll(async () => {
-    await createTestingModule(defaultAuthDefinitionsFixture())
+    app = await createTestingModule(defaultAuthDefinitionsFixture())
+
+    await app.init()
   })
 
-  it('should allow user to login when credentials is correct', async function() {
-    const guard = new AuthLocalGuard()
+  it('should allow user to login when credentials is correct', async function () {
+    const guard = app.get(AuthLocalGuard)
 
     expect(
       await guard.canActivate(
@@ -33,8 +38,8 @@ describe('AuthLocalGuard', () => {
     ).toBeTruthy()
   })
 
-  it('should not allow user to continue when accessToken is invalid', async function() {
-    const guard = new AuthLocalGuard()
+  it('should not allow user to continue when accessToken is invalid', async function () {
+    const guard = app.get(AuthLocalGuard)
 
     try {
       await guard.canActivate(

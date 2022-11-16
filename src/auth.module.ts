@@ -13,6 +13,11 @@ import { APP_GUARD, Reflector } from '@nestjs/core'
 import { CqrsModule } from '@nestjs/cqrs'
 import { JwtModule } from '@nestjs/jwt'
 import {
+  GetCurrentUserByAccessTokenQueryHandler,
+  GetCurrentUserByRefreshTokenQueryHandler,
+  LoginQueryHandler,
+} from './application/queries/handlers'
+import {
   AUTH_PASSWORD_HASHER,
   AuthBasicGuard,
   AuthGlobalGuard,
@@ -117,6 +122,10 @@ export class AuthModule implements NestModule {
 
         TokenService,
 
+        LoginQueryHandler,
+        GetCurrentUserByAccessTokenQueryHandler,
+        GetCurrentUserByRefreshTokenQueryHandler,
+
         GetUserByJwtTokenAction,
         LocalLoginAction,
         ParseJwtTokenAction,
@@ -190,9 +199,14 @@ export class AuthModule implements NestModule {
 
         ClearAuthCookieInterceptor,
         CookieAuthInterceptor,
+
         LocalStrategy,
         JwtStrategy,
         RefreshTokenStrategy,
+
+        LoginQueryHandler,
+        GetCurrentUserByAccessTokenQueryHandler,
+        GetCurrentUserByRefreshTokenQueryHandler,
 
         HashingModule,
       ],

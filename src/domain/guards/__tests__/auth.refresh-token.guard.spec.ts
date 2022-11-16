@@ -20,6 +20,8 @@ describe('AuthRefreshTokenGuard', () => {
 
     const app = await createTestingModule(defaultAuthDefinitionsFixture())
 
+    await app.init()
+
     const service = app.get(TokenService)
 
     correctRefreshToken = await lastValueFrom(

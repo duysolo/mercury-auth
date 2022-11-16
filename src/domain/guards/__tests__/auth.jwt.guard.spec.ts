@@ -1,4 +1,5 @@
 import { HttpStatus, UnauthorizedException } from '@nestjs/common'
+import { TestingModule } from '@nestjs/testing/testing-module'
 import { lastValueFrom, map } from 'rxjs'
 import {
   createTestingModule,
@@ -12,13 +13,17 @@ import { generateExecutionContextForJwtStrategy } from './helpers/test-guard.hel
 describe('AuthJwtGuard', () => {
   let correctAccessToken: string
 
+  let app: TestingModule
+
   beforeAll(async () => {
     const userInfo: IAuthUserEntityForResponse = {
       id: '123456',
       username: 'sample-user@gmail.com',
     }
 
-    const app = await createTestingModule(defaultAuthDefinitionsFixture())
+    app = await createTestingModule(defaultAuthDefinitionsFixture())
+
+    await app.init()
 
     const service = app.get(TokenService)
 
@@ -30,7 +35,7 @@ describe('AuthJwtGuard', () => {
   })
 
   it('should allow user to continue when accessToken is correct', async function () {
-    const guard = new AuthJwtGuard()
+    const guard = app.get(AuthJwtGuard)
 
     expect(
       await guard.canActivate(
@@ -40,7 +45,7 @@ describe('AuthJwtGuard', () => {
   })
 
   it('should not allow user to continue when accessToken is invalid', async function () {
-    const guard = new AuthJwtGuard()
+    const guard = app.get(AuthJwtGuard)
 
     try {
       await guard.canActivate(
