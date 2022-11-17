@@ -11,7 +11,7 @@ npm install --save @mercury-labs/nest-auth
 ```
 
 Learn more about the relevant
-package [@mercury-labs/hashing](https://www.npmjs.com/package/@mercury-labs/hashing)
+package [@mercury-labs/nest-hashing](https://www.npmjs.com/package/@mercury-labs/nest-hashing)
 
 ## Define a database repository to get user info
 
