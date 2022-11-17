@@ -98,8 +98,6 @@ import { Module } from '@nestjs/common'
             ),
             redactedFields: ['password'],
             hashingSecretKey: config.get('HASHING_SECRET_KEY') || '',
-            usernameField: 'username',
-            passwordField: 'password',
             httpAdaptorType: 'fastify'
           }
         },
