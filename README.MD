@@ -201,18 +201,6 @@ interface IAuthDefinitions {
     secure?: boolean
   },
 
-  /**
-   * Username field when login
-   * Eg: email, username,...
-   */
-  usernameField?: string
-
-  /**
-   * Password field when login
-   * Eg: password, pass...
-   */
-  passwordField?: string,
-
   httpAdaptorType: 'fastify' | 'express'
 }
 ```
