@@ -40,7 +40,7 @@ describe('LocalLoginAction', () => {
     expect(action).toBeDefined()
   })
 
-  it('should able to login using username/password', async function() {
+  it('should able to login using username/password', async function () {
     await lastValueFrom(
       action.handle(correctUserInfo).pipe(
         tap((res) => {
@@ -50,7 +50,7 @@ describe('LocalLoginAction', () => {
     )
   })
 
-  it('should able to login using impersonate', async function() {
+  it('should able to login using impersonate', async function () {
     await lastValueFrom(
       action.handle(correctUserInfoImpersonate).pipe(
         tap((res) => {
@@ -60,7 +60,7 @@ describe('LocalLoginAction', () => {
     )
   })
 
-  it('should throw error if invalid credentials', async function() {
+  it('should throw error if invalid credentials', async function () {
     await lastValueFrom(
       action.handle(invalidUserInfo).pipe(
         catchError((error) => {
@@ -71,7 +71,7 @@ describe('LocalLoginAction', () => {
     )
   })
 
-  it('should handle UserLoggedInEvent', async function() {
+  it('should handle UserLoggedInEvent', async function () {
     const eventBus: EventBus = action['eventBus']
 
     const spyEventBus = jest.spyOn(eventBus, 'publish')

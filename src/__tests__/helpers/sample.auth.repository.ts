@@ -13,8 +13,7 @@ export class SampleAuthRepository implements AuthRepository {
   public constructor(
     @InjectPasswordHasher()
     protected readonly hasher: PasswordHasherService
-  ) {
-  }
+  ) {}
 
   public getAuthUserByUsername(
     username: string
@@ -44,7 +43,7 @@ export class SampleAuthRepository implements AuthRepository {
           console.log('authenticate', {
             username,
             user,
-            impersonated
+            impersonated,
           })
           return undefined
         }

@@ -122,8 +122,7 @@ export class LocalLoginAction {
   }
 
   protected verifyImpersonate(dto: AuthDto): IImpersonatedLoginRequest {
-    const username = dto[this.authDefinitions?.usernameField || 'username']
-    const password = dto[this.authDefinitions?.passwordField || 'password']
+    const { username, password } = dto
 
     const impersonated =
       !!this.authDefinitions?.impersonate?.isEnabled &&
@@ -146,10 +145,7 @@ export class LocalLoginAction {
     authUser: IAuthUserEntity
   ): Observable<boolean> {
     return scheduled(
-      this.passwordHasherService.compare(
-        password,
-        authUser[this.authDefinitions.passwordField || 'password']
-      ),
+      this.passwordHasherService.compare(password, authUser.password),
       asyncScheduler
     )
   }

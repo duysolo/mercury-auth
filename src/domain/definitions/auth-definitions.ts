@@ -1,7 +1,7 @@
+import { Type } from '@nestjs/common'
 import { JwtSignOptions } from '@nestjs/jwt'
 import { ICookieSerializeOptions } from '../helpers'
 import { AuthTransferTokenMethod } from './auth-transfer-token-method.enum'
-import { Type } from '@nestjs/common'
 
 export interface IAuthDefinitions {
   basicAuth?: {
@@ -40,8 +40,6 @@ export interface IAuthDefinitions {
     'domain' | 'path' | 'sameSite' | 'signed' | 'httpOnly' | 'secure'
   >
 
-  usernameField?: string
-  passwordField?: string
   requestPayload?: Type
 
   httpAdaptorType: 'fastify' | 'express'

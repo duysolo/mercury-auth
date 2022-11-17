@@ -71,15 +71,13 @@ export function generateExecutionContextForBasicAuth(
 
 export function generateExecutionContextForLocalAuth(
   username: string,
-  password: string,
-  usernameField: string,
-  passwordField: string
+  password: string
 ) {
   const getRequest = () => {
     return {
       body: {
-        [usernameField]: username,
-        [passwordField]: password,
+        username,
+        password,
       },
     }
   }

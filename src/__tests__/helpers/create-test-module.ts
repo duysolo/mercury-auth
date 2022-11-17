@@ -40,8 +40,6 @@ export const defaultAuthDefinitionsFixture: (
     transferTokenMethod: AuthTransferTokenMethod.BOTH,
     redactedFields: ['password'],
     hashingSecretKey: 'LqeRsYk5d82mgYFKujl34e8DxvHMrB5T',
-    usernameField: 'username',
-    passwordField: 'password',
     httpAdaptorType: 'fastify',
     ...(options || {}),
   }

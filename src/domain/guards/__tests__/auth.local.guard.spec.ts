@@ -18,7 +18,7 @@ describe('AuthLocalGuard', () => {
   let app: TestingModule
 
   beforeAll(async () => {
-    app = await createTestingModule(defaultAuthDefinitionsFixture())
+    app = await createTestingModule(fixture)
 
     await app.init()
   })
@@ -30,9 +30,7 @@ describe('AuthLocalGuard', () => {
       await guard.canActivate(
         generateExecutionContextForLocalAuth(
           validUserInfo.username,
-          validUserInfo.password,
-          fixture.usernameField || 'username',
-          fixture.passwordField || 'password'
+          validUserInfo.password
         )
       )
     ).toBeTruthy()
@@ -45,9 +43,7 @@ describe('AuthLocalGuard', () => {
       await guard.canActivate(
         generateExecutionContextForLocalAuth(
           'invalid-user-name',
-          'invalid-password',
-          fixture.usernameField || 'username',
-          fixture.passwordField || 'password'
+          'invalid-password'
         )
       )
     } catch (error) {

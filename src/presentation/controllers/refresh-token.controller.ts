@@ -15,8 +15,7 @@ import { CookieAuthInterceptor } from '../interceptors'
 @ShouldUseRefreshToken()
 @UseInterceptors(CookieAuthInterceptor)
 export class RefreshTokenController {
-  public constructor(private readonly _tokenService: TokenService) {
-  }
+  public constructor(private readonly _tokenService: TokenService) {}
 
   @ApiOperation({
     summary: 'Regenerate access token',

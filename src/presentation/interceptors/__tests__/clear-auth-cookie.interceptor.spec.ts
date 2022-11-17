@@ -116,13 +116,13 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
               if (httpAdaptorType === 'fastify') {
                 expect(spy).toHaveBeenCalledWith(
                   expect.not.objectContaining({
-                    setCookie: expect.anything()
+                    setCookie: expect.anything(),
                   })
                 )
               } else {
                 expect(spy).toHaveBeenCalledWith(
                   expect.not.objectContaining({
-                    cookie: expect.anything()
+                    cookie: expect.anything(),
                   })
                 )
               }

@@ -3,8 +3,8 @@ import { QueryBus } from '@nestjs/cqrs'
 import { PassportStrategy } from '@nestjs/passport'
 import { Strategy } from 'passport-local'
 import { LoginQuery } from '../../application/queries'
-import type { IAuthUserEntityForResponse } from '../definitions'
 import { InjectAuthDefinitions } from '../decorators'
+import type { IAuthUserEntityForResponse } from '../definitions'
 import { IAuthDefinitions } from '../index'
 
 export const LOCAL_STRATEGY_NAME: string = 'local'
@@ -17,8 +17,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     protected readonly queryBus: QueryBus
   ) {
     super({
-      usernameField: authDefinitions.usernameField || 'username',
-      passwordField: authDefinitions.passwordField || 'password',
+      usernameField: 'username',
+      passwordField: 'password',
       passReqToCallback: true,
     })
   }

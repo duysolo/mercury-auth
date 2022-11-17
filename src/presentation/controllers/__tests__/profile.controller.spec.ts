@@ -23,7 +23,7 @@ describe('ProfileController', () => {
     expect(controller).toBeInstanceOf(ProfileController)
   })
 
-  it('should able to show user profile', async function() {
+  it('should able to show user profile', async function () {
     const currentUser = {
       id: 'sample-user-id',
       username: 'sample-user@gmail.com',

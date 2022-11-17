@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
-import { IAuthDefinitions } from '../index'
 import { InjectAuthDefinitions } from '../decorators'
 import { getRequestFromContext, getRequestHeader } from '../helpers'
+import { IAuthDefinitions } from '../index'
 
 export interface IBasicAuthCredentials {
   username: string

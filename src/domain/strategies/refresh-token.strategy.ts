@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
 import { Strategy } from 'passport-strategy'
 import { GetCurrentUserByRefreshTokenQuery } from '../../application/queries'
+import { InjectAuthDefinitions } from '../decorators'
 import {
   AuthTransferTokenMethod,
   getRequestCookie,
@@ -11,7 +12,6 @@ import {
   IAuthDefinitions,
   IHttpRequest,
 } from '../index'
-import { InjectAuthDefinitions } from '../decorators'
 
 export const REFRESH_TOKEN_STRATEGY_NAME: string = 'mercury-refresh-token'
 

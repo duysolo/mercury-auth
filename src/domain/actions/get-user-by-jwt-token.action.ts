@@ -1,9 +1,9 @@
-import { IAuthDefinitions, IAuthUserEntityForResponse } from '../definitions'
 import { Injectable } from '@nestjs/common'
-import { IJwtPayload, JwtPayload } from '../entities'
 import { asyncScheduler, map, mergeMap, Observable, of, scheduled } from 'rxjs'
-import { hideRedactedFields, validateEntity } from '../helpers'
 import { InjectAuthDefinitions } from '../decorators'
+import { IAuthDefinitions, IAuthUserEntityForResponse } from '../definitions'
+import { IJwtPayload, JwtPayload } from '../entities'
+import { hideRedactedFields, validateEntity } from '../helpers'
 import { AuthRepository } from '../repositories'
 import { TokenService } from '../services'
 
