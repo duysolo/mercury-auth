@@ -100,6 +100,7 @@ import { Module } from '@nestjs/common'
             hashingSecretKey: config.get('HASHING_SECRET_KEY') || '',
             usernameField: 'username',
             passwordField: 'password',
+            useLocalAuth: true,
             httpAdaptorType: 'fastify'
           }
         },
@@ -212,6 +213,12 @@ interface IAuthDefinitions {
    * Eg: password, pass...
    */
   passwordField?: string,
+
+  /**
+   * Use default local auth or not.
+   * true by default
+   */
+  useLocalAuth?: boolean,
 
   httpAdaptorType: 'fastify' | 'express'
 }
