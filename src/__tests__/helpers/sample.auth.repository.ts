@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import _ from 'lodash/fp'
 import { asyncScheduler, map, Observable, scheduled } from 'rxjs'
 import {
+  AuthDto,
   AuthRepository,
   IAuthUserEntity,
   InjectPasswordHasher,
@@ -9,7 +10,7 @@ import {
 } from '../../domain'
 
 @Injectable()
-export class SampleAuthRepository implements AuthRepository {
+export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
   public constructor(
     @InjectPasswordHasher()
     protected readonly hasher: PasswordHasherService
@@ -31,7 +32,7 @@ export class SampleAuthRepository implements AuthRepository {
 
   public authenticate(
     username: string,
-    password: string,
+    request: AuthDto,
     impersonated: boolean
   ): Observable<IAuthUserEntity | undefined> {
     return this.getAuthUserByUsername(username).pipe(
@@ -40,14 +41,9 @@ export class SampleAuthRepository implements AuthRepository {
           return user
         }
 
-        if (username !== user?.username) {
-          console.log('authenticate', {
-            username,
-            user,
-            impersonated
-          })
-          return undefined
-        }
+        /**
+         * Do some additional logics
+         */
 
         return user
       })

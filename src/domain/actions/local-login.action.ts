@@ -71,7 +71,7 @@ export class LocalLoginAction {
       }),
       mergeMap(({ username, impersonated, validatedDto }) =>
         this.authRepository
-          .authenticate(username, validatedDto.password, impersonated)
+          .authenticate(username, validatedDto, impersonated)
           .pipe(map((user) => ({ user, impersonated, validatedDto })))
       ),
       mergeMap(({ user, impersonated, ...rest }) =>

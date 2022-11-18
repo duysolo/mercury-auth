@@ -288,43 +288,67 @@ AuthModule.forRootAsync({
 #### Sample updated `CmsAuthRepository`
 
 ```typescript
+import { Injectable } from '@nestjs/common'
+import { ModuleRef } from '@nestjs/core'
+import _ from 'lodash/fp'
+import { asyncScheduler, map, mergeMap, Observable, scheduled } from 'rxjs'
+import {
+  AuthDto,
+  AuthRepository,
+  IAuthUserEntity,
+  InjectPasswordHasher,
+  PasswordHasherService,
+} from '@mercury-labs/nest-auth'
+
 @Injectable()
-export class CmsAuthRepository implements AuthRepository {
+export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
+  /**
+   * Your own throttle service
+   * Sample demo
+   */
+  private _throttleAuthService: ThrottleAuthService
+
   public constructor(
-    @Inject(AUTH_PASSWORD_HASHER)
-    protected readonly hasher: PasswordHasherService<IPbkdf2Hash>
-  ) {
+    @InjectPasswordHasher()
+    protected readonly hasher: PasswordHasherService,
+    protected readonly moduleRef: ModuleRef
+  ) {}
+
+  public onModuleInit(): void {
+    this._throttleAuthService = this.moduleRef.get(ThrottleAuthService)
   }
 
   public getAuthUserByUsername(
     username: string
   ): Observable<IAuthUserEntity | undefined> {
-    // Create sample hashed password for demo only
-    return scheduled(this.hasher.hash('some-password-phrase'))
-      .pipe(
-        // Sample user for demo only
-        map((password: IPbkdf2Hash) => ({
-          id: '123456',
-          firstName: 'John Doe',
-          lastName: '',
-          email: 'sample-email+dev@gmail.com',
-          password,
-          createdAt: moment().toDate(),
-          updatedAt: moment().toDate(),
-        })),
-        map((user) => {
-          if (
-            user.email !== username
-          ) {
-            return undefined
-          }
+    return scheduled(this.hasher.hash('testLogin@12345'), asyncScheduler).pipe(
+      map((password: string) => ({
+        id: _.random(1, 1999).toString(),
+        username: 'sample-user@gmail.com',
+        email: 'sample-user@gmail.com',
+        password,
+      }))
+    )
+  }
 
-          return {
-            ...user,
-            username: user.email,
-          }
-        })
-      )
+  public authenticate(
+    username: string,
+    request: AuthDto,
+    impersonated: boolean
+  ): Observable<IAuthUserEntity | undefined> {
+    /**
+     * Ignore the other checks if impersonated
+     */
+    if (impersonated) {
+      return this.getAuthUserByUsername(username)
+    }
+
+    /**
+     * Do some additional logics
+     */
+    return this._throttleAuthService.checkAlreadyBlockedAccount(username).pipe(
+      mergeMap(() => this.getAuthUserByUsername(username))
+    )
   }
 }
 ```
