@@ -77,6 +77,11 @@ import { Module } from '@nestjs/common'
 @Module({
   imports: [
     AuthModule.forRootAsync({
+      /**
+       * Use default local auth or not?
+       * For example, you're using GraphQL and want to disable default HTTP auth
+       */
+      useLocalAuth: true,
       definitions: {
         useFactory: (config: ConfigService) => {
           return {
@@ -100,7 +105,6 @@ import { Module } from '@nestjs/common'
             hashingSecretKey: config.get('HASHING_SECRET_KEY') || '',
             usernameField: 'username',
             passwordField: 'password',
-            useLocalAuth: true,
             httpAdaptorType: 'fastify'
           }
         },
@@ -213,12 +217,6 @@ interface IAuthDefinitions {
    * Eg: password, pass...
    */
   passwordField?: string,
-
-  /**
-   * Use default local auth or not.
-   * true by default
-   */
-  useLocalAuth?: boolean,
 
   httpAdaptorType: 'fastify' | 'express'
 }
