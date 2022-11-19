@@ -6,9 +6,10 @@ import { GetCurrentUserByAccessTokenQuery } from '../get-current-user-by-access-
 
 @QueryHandler(GetCurrentUserByAccessTokenQuery)
 export class GetCurrentUserByAccessTokenQueryHandler
-  implements IQueryHandler<GetCurrentUserByAccessTokenQuery, IAuthResponse | undefined> {
-  public constructor(protected readonly action: GetUserByJwtTokenAction) {
-  }
+  implements
+    IQueryHandler<GetCurrentUserByAccessTokenQuery, IAuthResponse | undefined>
+{
+  public constructor(protected readonly action: GetUserByJwtTokenAction) {}
 
   public async execute(query: GetCurrentUserByAccessTokenQuery) {
     try {

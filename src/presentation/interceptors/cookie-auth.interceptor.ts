@@ -106,7 +106,10 @@ export class CookieAuthInterceptor implements NestInterceptor {
       )
   }
 
-  public setCookieToken(res: IHttpResponse, tokenResponse: IAuthWithTokenResponse): any {
+  public setCookieToken(
+    res: IHttpResponse,
+    tokenResponse: IAuthWithTokenResponse
+  ): any {
     if (
       (res.httpAdaptorType === 'fastify' && !res.setCookie) ||
       (res.httpAdaptorType === 'express' && !res.cookie) ||

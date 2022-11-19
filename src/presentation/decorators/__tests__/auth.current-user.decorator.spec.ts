@@ -15,7 +15,7 @@ describe('CurrentUser', () => {
     userData: {
       id: 'some-user-id',
       username: 'some-user-username',
-    }
+    },
   }
 
   const mockContext: ExecutionContext = {

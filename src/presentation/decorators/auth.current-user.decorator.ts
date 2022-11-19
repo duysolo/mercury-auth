@@ -1,10 +1,10 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common'
+import { GqlExecutionContext } from '@nestjs/graphql'
 import type {
   IAuthResponse,
   IAuthUserEntityForResponse,
   IRequestWithUser,
 } from '../../domain'
-import { GqlExecutionContext } from '@nestjs/graphql'
 
 export function currentUserDecoratorFactory(
   data: unknown,

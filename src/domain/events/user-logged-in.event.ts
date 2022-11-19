@@ -7,6 +7,5 @@ export class UserLoggedInEvent<TRequestPayload = Record<string, any>> {
     public readonly isImpersonated: boolean,
     public readonly requestPayload: TRequestPayload,
     public readonly token: IJwtTokenResponse
-  ) {
-  }
+  ) {}
 }

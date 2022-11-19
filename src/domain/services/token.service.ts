@@ -4,13 +4,13 @@ import { JwtService } from '@nestjs/jwt'
 import _ from 'lodash/fp'
 import moment from 'moment'
 import { forkJoin, map, Observable, of } from 'rxjs'
+import { InjectAuthDefinitions } from '../decorators'
 import type {
   IAuthDefinitions,
   IAuthUserEntityForResponse,
   IJwtPayload,
   IJwtPayloadRawDecoded,
 } from '../index'
-import { InjectAuthDefinitions } from '../decorators'
 
 export interface IJwtTokenResponse {
   accessToken: string
