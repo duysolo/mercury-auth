@@ -7,6 +7,7 @@ import {
 import { EventBus } from '@nestjs/cqrs'
 import {
   asyncScheduler,
+  forkJoin,
   map,
   mergeMap,
   Observable,
@@ -68,9 +69,16 @@ export class LocalLoginAction {
         }
       }),
       mergeMap(({ username, impersonated, validatedDto }) =>
-        this.authRepository
-          .authenticate(username, validatedDto, impersonated)
-          .pipe(map((user) => ({ user, impersonated, validatedDto })))
+        forkJoin([
+          this.authRepository.authenticate(
+            username,
+            validatedDto,
+            impersonated
+          ),
+        ]).pipe(
+          map(([res]) => res),
+          map((user) => ({ user, impersonated, validatedDto }))
+        )
       ),
       mergeMap(({ user, impersonated, ...rest }) =>
         user

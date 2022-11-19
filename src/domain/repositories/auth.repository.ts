@@ -10,21 +10,29 @@ export abstract class AuthRepository<
 > {
   public abstract getAuthUserByUsername(
     username: string
-  ): Observable<IAuthUserEntity<T> | undefined>
+  ):
+    | Observable<IAuthUserEntity<T> | undefined>
+    | Promise<IAuthUserEntity<T> | undefined>
 
   public abstract authenticate(
     username: string,
     request: TRequest,
     impersonated: boolean
-  ): Observable<IAuthUserEntity<T> | undefined>
+  ):
+    | Observable<IAuthUserEntity<T> | undefined>
+    | Promise<IAuthUserEntity<T> | undefined>
 
   public abstract getAuthUserByAccessToken(
     accessToken: string,
     jwtPayload: IJwtPayload
-  ): Observable<IAuthUserEntity<T> | undefined>
+  ):
+    | Observable<IAuthUserEntity<T> | undefined>
+    | Promise<IAuthUserEntity<T> | undefined>
 
   public abstract getAuthUserByRefreshToken(
     refreshToken: string,
     jwtPayload: IJwtPayload
-  ): Observable<IAuthUserEntity<T> | undefined>
+  ):
+    | Observable<IAuthUserEntity<T> | undefined>
+    | Promise<IAuthUserEntity<T> | undefined>
 }

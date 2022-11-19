@@ -1,4 +1,5 @@
 export * from './create-test-module'
 export * from './sample.auth.repository'
+export * from './sample-auth-promise.repository'
 export * from './test-request'
 export * from './user-fixture'

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { EventBus } from '@nestjs/cqrs'
-import { map, mergeMap, Observable, of, tap } from 'rxjs'
+import { forkJoin, map, mergeMap, Observable, of, tap } from 'rxjs'
 import { InjectAuthDefinitions } from '../decorators'
 import { IAuthDefinitions, IAuthResponse } from '../definitions'
 import { AccessTokenGeneratedFromRefreshTokenEvent } from '../events'
@@ -36,37 +36,38 @@ export class GetUserByRefreshTokenAction {
       return of(undefined)
     }
 
-    return this.authRepository
-      .getAuthUserByRefreshToken(refreshToken, jwtPayload)
-      .pipe(
-        map(hideRedactedFields(this.authDefinitions.redactedFields)),
-        mergeMap((userData) => {
-          if (!userData) {
-            return of(undefined)
-          }
+    return forkJoin([
+      this.authRepository.getAuthUserByRefreshToken(refreshToken, jwtPayload),
+    ]).pipe(
+      map(([res]) => res),
+      map(hideRedactedFields(this.authDefinitions.redactedFields)),
+      mergeMap((userData) => {
+        if (!userData) {
+          return of(undefined)
+        }
 
-          return this.tokenService.generateTokenResponse(userData).pipe(
-            map((token) => {
-              return {
+        return this.tokenService.generateTokenResponse(userData).pipe(
+          map((token) => {
+            return {
+              userData,
+              token: {
+                accessToken: token.accessToken,
+                expiryDate: token.expiryDate,
+                refreshToken,
+              },
+            }
+          }),
+          tap(({ userData, token }) => {
+            this.eventBus.publish(
+              new AccessTokenGeneratedFromRefreshTokenEvent(
+                refreshToken,
                 userData,
-                token: {
-                  accessToken: token.accessToken,
-                  expiryDate: token.expiryDate,
-                  refreshToken,
-                },
-              }
-            }),
-            tap(({ userData, token }) => {
-              this.eventBus.publish(
-                new AccessTokenGeneratedFromRefreshTokenEvent(
-                  refreshToken,
-                  userData,
-                  token
-                )
+                token
               )
-            })
-          )
-        })
-      )
+            )
+          })
+        )
+      })
+    )
   }
 }

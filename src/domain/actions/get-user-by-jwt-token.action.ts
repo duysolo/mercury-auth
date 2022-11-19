@@ -1,5 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { asyncScheduler, map, mergeMap, Observable, of, scheduled } from 'rxjs'
+import {
+  asyncScheduler,
+  forkJoin,
+  map,
+  mergeMap,
+  Observable,
+  of,
+  scheduled,
+} from 'rxjs'
 import { InjectAuthDefinitions } from '../decorators'
 import { IAuthDefinitions, IAuthResponse } from '../definitions'
 import { IJwtPayload, JwtPayload } from '../entities'
@@ -37,9 +45,15 @@ export class GetUserByJwtTokenAction {
           return of(undefined)
         }
 
-        return this.authRepository
-          .getAuthUserByAccessToken(accessToken, validatedPayload)
-          .pipe(map(hideRedactedFields(this.authDefinitions.redactedFields)))
+        return forkJoin([
+          this.authRepository.getAuthUserByAccessToken(
+            accessToken,
+            validatedPayload
+          ),
+        ]).pipe(
+          map(([res]) => res),
+          map(hideRedactedFields(this.authDefinitions.redactedFields))
+        )
       }),
       map((userData) => {
         if (!userData) {
