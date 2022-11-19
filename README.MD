@@ -522,7 +522,20 @@ curl --request POST \
 classes.
 
 `@InjectPasswordHasher()`: inject `PasswordHasherService` to your injectable
-classes.
+classes. This is an alias for the statement below:
+
+```typescript
+import { Inject, Injectable } from '@nestjs/common'
+import { AUTH_PASSWORD_HASHER } from '@mercury-labs/nest-auth'
+
+@Injectable()
+export class SampleService {
+  public constructor(
+    @Inject(AUTH_PASSWORD_HASHER)
+    protected readonly hasher: PasswordHasherService
+  ) {}
+}
+```
 
 ### Controller Decorators
 
