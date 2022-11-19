@@ -1,4 +1,4 @@
-import { IAuthResponse, IRefreshTokenAuthResponse } from '../domain'
+import { IAuthWithTokenResponse, IRefreshTokenAuthResponse } from '../domain'
 import { e2eTestsSetup } from './cases/e2e-tests'
 import {
   createTestAuthApplicationExpress,
@@ -24,7 +24,7 @@ describe('AuthModule (e2e) - Express Adaptor', () => {
           path: '/auth/login',
           body,
         }).then((response) => {
-          const parsedResponseBody: IAuthResponse = JSON.parse(
+          const parsedResponseBody: IAuthWithTokenResponse = JSON.parse(
             response.text || '{}'
           )
 

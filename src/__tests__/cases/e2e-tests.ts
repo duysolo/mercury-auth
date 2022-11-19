@@ -1,8 +1,8 @@
 import { HttpStatus, INestApplication } from '@nestjs/common'
 import {
   IAuthDefinitions,
-  IAuthResponse,
   IAuthUserEntityForResponse,
+  IAuthWithTokenResponse,
   IRefreshTokenAuthResponse,
 } from '../../domain'
 import {
@@ -13,7 +13,7 @@ import {
   UserLoggedInEventHandler,
 } from '../helpers'
 
-interface ITokenResponse<T = IAuthResponse> {
+interface ITokenResponse<T = IAuthWithTokenResponse> {
   statusCode: HttpStatus
   authResponse: T
   headers: Record<string, any>

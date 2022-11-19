@@ -4,7 +4,7 @@ import {
   createTestingModule,
   defaultAuthDefinitionsFixture,
 } from '../../../__tests__/helpers'
-import { IAuthResponse, TokenService } from '../../../domain'
+import { IAuthWithTokenResponse, TokenService } from '../../../domain'
 import { CookieAuthInterceptor } from '../cookie-auth.interceptor'
 
 describe('CookieAuthInterceptor', () => {
@@ -44,7 +44,7 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
       )
 
       mockCallHandler = {
-        handle(): Observable<IAuthResponse> {
+        handle(): Observable<IAuthWithTokenResponse> {
           return of({
             token: iJwtTokenResponse,
             userData: currentUserFixture,

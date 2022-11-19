@@ -74,6 +74,28 @@ export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
       mergeMap(() => this.getAuthUserByUsername(username))
     )
   }
+
+  public getAuthUserByAccessToken(
+    accessToken: string,
+    jwtPayload: IJwtPayload
+  ): Observable<IAuthUserEntity | undefined> {
+    /**
+     * You can check the token if it's stored in database.
+     */
+
+    return this.getAuthUserByUsername(jwtPayload.username)
+  }
+
+  public getAuthUserByRefreshToken(
+    refreshToken: string,
+    jwtPayload: IJwtPayload
+  ): Observable<IAuthUserEntity | undefined> {
+    /**
+     * You can check the token if it's stored in database.
+     */
+
+    return this.getAuthUserByUsername(jwtPayload.username)
+  }
 }
 ```
 
@@ -360,6 +382,28 @@ export class SampleAuthRepository implements AuthRepository<IPbkdf2Hash, AuthDto
       mergeMap(() => this.getAuthUserByUsername(username))
     )
   }
+
+  public getAuthUserByAccessToken(
+    accessToken: string,
+    jwtPayload: IJwtPayload
+  ): Observable<IAuthUserEntity<IPbkdf2Hash> | undefined> {
+    /**
+     * You can check the token if it's stored in database.
+     */
+
+    return this.getAuthUserByUsername(jwtPayload.username)
+  }
+
+  public getAuthUserByRefreshToken(
+    refreshToken: string,
+    jwtPayload: IJwtPayload
+  ): Observable<IAuthUserEntity<IPbkdf2Hash> | undefined> {
+    /**
+     * You can check the token if it's stored in database.
+     */
+
+    return this.getAuthUserByUsername(jwtPayload.username)
+  }
 }
 ```
 
@@ -522,7 +566,9 @@ export class AppController {
 
 Triggered when user logged in successfully.
 
-Sample usages
+You can store the relevant access/refresh tokens in database using this event.
+
+#### Sample usages
 
 ```typescript
 import { UserLoggedInEvent } from '@mercury-labs/nest-auth'
@@ -540,6 +586,27 @@ export class UserLoggedInEventHandler implements IEventHandler<UserLoggedInEvent
         })
       )
     )
+  }
+}
+```
+
+### `AccessTokenGeneratedFromRefreshTokenEvent`
+
+Triggered when an new access token is generated from refresh token.
+
+You can store the relevant new access token in database using this event.
+
+#### Sample usages
+
+```typescript
+import { AccessTokenGeneratedFromRefreshTokenEvent } from '@mercury-labs/nest-auth'
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs'
+import { delay, lastValueFrom, of, tap } from 'rxjs'
+
+@EventsHandler(AccessTokenGeneratedFromRefreshTokenEvent)
+export class UserLoggedInEventHandler implements IEventHandler<AccessTokenGeneratedFromRefreshTokenEvent> {
+  public async handle(event: AccessTokenGeneratedFromRefreshTokenEvent): Promise<void> {
+    console.log('AccessTokenGeneratedFromRefreshTokenEvent', event)
   }
 }
 ```

@@ -50,24 +50,37 @@ const accessTokenHeaderExtractor: (
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
+  private readonly jwtFromRequest: JwtFromRequestFunction
+
   public constructor(
     @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
     protected readonly queryBus: QueryBus
   ) {
+    const jwtFromRequest = ExtractJwt.fromExtractors([
+      cookieExtractor(authDefinitions.transferTokenMethod),
+      accessTokenHeaderExtractor(authDefinitions.transferTokenMethod),
+    ])
+
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        cookieExtractor(authDefinitions.transferTokenMethod),
-        accessTokenHeaderExtractor(authDefinitions.transferTokenMethod),
-      ]),
+      jwtFromRequest,
       ignoreExpiration: false,
       secretOrKey: authDefinitions.jwt?.secret || 'NOT_DEFINED',
+      passReqToCallback: true,
     })
+
+    this.jwtFromRequest = jwtFromRequest
   }
 
   public async validate(
+    request: any,
     payload: IJwtPayload
   ): Promise<IAuthUserEntityForResponse | undefined> {
-    return this.queryBus.execute(new GetCurrentUserByAccessTokenQuery(payload))
+    return this.queryBus.execute(
+      new GetCurrentUserByAccessTokenQuery(
+        this.jwtFromRequest(request) || '',
+        payload
+      )
+    )
   }
 }

@@ -40,27 +40,27 @@ describe('LocalLoginAction', () => {
     expect(action).toBeDefined()
   })
 
-  it('should able to login using username/password', async function() {
+  it('should able to login using username/password', async function () {
     await lastValueFrom(
       action.handle(correctUserInfo).pipe(
-        tap((res) => {
-          expect(res.username).toEqual(correctUserInfo.username)
+        tap(({ userData }) => {
+          expect(userData.username).toEqual(correctUserInfo.username)
         })
       )
     )
   })
 
-  it('should able to login using impersonate', async function() {
+  it('should able to login using impersonate', async function () {
     await lastValueFrom(
       action.handle(correctUserInfoImpersonate).pipe(
-        tap((res) => {
-          expect(res.username).toEqual(correctUserInfo.username)
+        tap(({ userData }) => {
+          expect(userData.username).toEqual(correctUserInfo.username)
         })
       )
     )
   })
 
-  it('should throw error if invalid credentials', async function() {
+  it('should throw error if invalid credentials', async function () {
     await lastValueFrom(
       action.handle(invalidUserInfo).pipe(
         catchError((error) => {
@@ -71,7 +71,7 @@ describe('LocalLoginAction', () => {
     )
   })
 
-  it('should handle UserLoggedInEvent', async function() {
+  it('should handle UserLoggedInEvent', async function () {
     const eventBus: EventBus = action['eventBus']
 
     const spyEventBus = jest.spyOn(eventBus, 'publish')
@@ -81,7 +81,12 @@ describe('LocalLoginAction', () => {
         tap((res) => {
           expect(spyEventBus).toHaveBeenCalledTimes(1)
           expect(spyEventBus).toHaveBeenCalledWith(
-            new UserLoggedInEvent(res, false, correctUserInfo)
+            new UserLoggedInEvent(
+              res.userData,
+              false,
+              correctUserInfo,
+              res.token
+            )
           )
         })
       )

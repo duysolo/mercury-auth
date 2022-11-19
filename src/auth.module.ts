@@ -25,7 +25,7 @@ import {
   AuthRefreshTokenGuard,
   AuthRepository,
   BcryptPasswordHasherService,
-  GetUserByJwtTokenAction,
+  GetUserByJwtTokenAction, GetUserByRefreshTokenAction,
   GraphqlAuthJwtGuard,
   GraphqlAuthRefreshTokenGuard,
   IAuthDefinitions,
@@ -127,6 +127,7 @@ export class AuthModule implements NestModule {
         GetCurrentUserByRefreshTokenQueryHandler,
 
         GetUserByJwtTokenAction,
+        GetUserByRefreshTokenAction,
         LocalLoginAction,
         ParseJwtTokenAction,
 
@@ -192,6 +193,7 @@ export class AuthModule implements NestModule {
         TokenService,
 
         GetUserByJwtTokenAction,
+        GetUserByRefreshTokenAction,
         LocalLoginAction,
         ParseJwtTokenAction,
 

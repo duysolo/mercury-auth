@@ -15,16 +15,13 @@ import {
   tap,
 } from 'rxjs'
 import { InjectAuthDefinitions, InjectPasswordHasher } from '../decorators'
-import type {
-  IAuthUserEntity,
-  IAuthUserEntityForResponse,
-} from '../definitions'
+import type { IAuthUserEntity, IAuthWithTokenResponse } from '../definitions'
 import { AuthDto } from '../dtos'
 import { UserLoggedInEvent } from '../events'
 import { hideRedactedFields, validateEntity } from '../helpers'
 import { IAuthDefinitions } from '../index'
 import { AuthRepository } from '../repositories'
-import { PasswordHasherService } from '../services'
+import { PasswordHasherService, TokenService } from '../services'
 
 export interface IImpersonatedLoginRequest {
   impersonated: boolean
@@ -44,10 +41,11 @@ export class LocalLoginAction {
     protected readonly authRepository: AuthRepository,
     @InjectPasswordHasher()
     protected readonly passwordHasherService: PasswordHasherService,
+    protected readonly tokenService: TokenService,
     protected readonly eventBus: EventBus
   ) {}
 
-  public handle(dto: AuthDto): Observable<IAuthUserEntityForResponse> {
+  public handle(dto: AuthDto): Observable<IAuthWithTokenResponse> {
     return scheduled(
       validateEntity(
         dto,
@@ -92,12 +90,17 @@ export class LocalLoginAction {
           impersonated,
         }
       }),
-      tap(({ user, impersonated, validatedDto }) =>
+      mergeMap((res) => {
+        return this.tokenService
+          .generateTokenResponse(res.user)
+          .pipe(map((token) => ({ ...res, token })))
+      }),
+      tap(({ user, impersonated, validatedDto, token }) =>
         this.eventBus.publish(
-          new UserLoggedInEvent(user, impersonated, validatedDto)
+          new UserLoggedInEvent(user, impersonated, validatedDto, token)
         )
       ),
-      map(({ user }) => user)
+      map(({ user: userData, token }) => ({ userData, token }))
     )
   }
 

@@ -4,7 +4,7 @@ import { asyncScheduler, map, Observable, scheduled } from 'rxjs'
 import {
   AuthDto,
   AuthRepository,
-  IAuthUserEntity,
+  IAuthUserEntity, IJwtPayload,
   InjectPasswordHasher,
   PasswordHasherService,
 } from '../../domain'
@@ -14,8 +14,7 @@ export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
   public constructor(
     @InjectPasswordHasher()
     protected readonly hasher: PasswordHasherService
-  ) {
-  }
+  ) {}
 
   public getAuthUserByUsername(
     username: string
@@ -48,5 +47,27 @@ export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
         return user
       })
     )
+  }
+
+  public getAuthUserByAccessToken(
+    accessToken: string,
+    jwtPayload: IJwtPayload
+  ): Observable<IAuthUserEntity | undefined> {
+    /**
+     * You can check the token if it's stored in database.
+     */
+
+    return this.getAuthUserByUsername(jwtPayload.username)
+  }
+
+  public getAuthUserByRefreshToken(
+    refreshToken: string,
+    jwtPayload: IJwtPayload
+  ): Observable<IAuthUserEntity | undefined> {
+    /**
+     * You can check the token if it's stored in database.
+     */
+
+    return this.getAuthUserByUsername(jwtPayload.username)
   }
 }

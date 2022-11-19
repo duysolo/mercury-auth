@@ -3,15 +3,19 @@ import { currentUserDecoratorFactory } from '../auth.current-user.decorator'
 
 interface IWithUser {
   user: {
-    id: string
-    username: string
+    userData: {
+      id: string
+      username: string
+    }
   }
 }
 
 describe('CurrentUser', () => {
   const user = {
-    id: 'some-user-id',
-    username: 'some-user-username',
+    userData: {
+      id: 'some-user-id',
+      username: 'some-user-username',
+    }
   }
 
   const mockContext: ExecutionContext = {
@@ -30,10 +34,10 @@ describe('CurrentUser', () => {
   } as any
 
   it('should show user info', () => {
-    const res = currentUserDecoratorFactory({}, mockContext)
+    const { userData } = currentUserDecoratorFactory({}, mockContext)
 
-    expect(res.id).toEqual(user.id)
-    expect(res.username).toEqual(user.username)
+    expect(userData.id).toEqual(user.userData.id)
+    expect(userData.username).toEqual(user.userData.username)
   })
 
   it('should not show user if not exists', () => {

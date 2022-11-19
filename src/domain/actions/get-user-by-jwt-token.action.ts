@@ -1,11 +1,16 @@
-import { IAuthDefinitions, IAuthUserEntityForResponse } from '../definitions'
 import { Injectable } from '@nestjs/common'
-import { IJwtPayload, JwtPayload } from '../entities'
 import { asyncScheduler, map, mergeMap, Observable, of, scheduled } from 'rxjs'
-import { hideRedactedFields, validateEntity } from '../helpers'
 import { InjectAuthDefinitions } from '../decorators'
+import { IAuthDefinitions, IAuthResponse } from '../definitions'
+import { IJwtPayload, JwtPayload } from '../entities'
+import { hideRedactedFields, validateEntity } from '../helpers'
 import { AuthRepository } from '../repositories'
 import { TokenService } from '../services'
+
+export interface IGetUserByJwtTokenActionOptions {
+  jwtPayload: IJwtPayload
+  accessToken: string
+}
 
 @Injectable()
 export class GetUserByJwtTokenAction {
@@ -16,11 +21,12 @@ export class GetUserByJwtTokenAction {
     public readonly jwtService: TokenService
   ) {}
 
-  public handle(
-    dto: IJwtPayload
-  ): Observable<IAuthUserEntityForResponse | undefined> {
+  public handle({
+    jwtPayload,
+    accessToken,
+  }: IGetUserByJwtTokenActionOptions): Observable<IAuthResponse | undefined> {
     return scheduled(
-      validateEntity(dto, JwtPayload, false),
+      validateEntity(jwtPayload, JwtPayload, false),
       asyncScheduler
     ).pipe(
       map((res) => {
@@ -32,8 +38,15 @@ export class GetUserByJwtTokenAction {
         }
 
         return this.authRepository
-          .getAuthUserByUsername(validatedPayload.username)
+          .getAuthUserByAccessToken(accessToken, validatedPayload)
           .pipe(map(hideRedactedFields(this.authDefinitions.redactedFields)))
+      }),
+      map((userData) => {
+        if (!userData) {
+          return undefined
+        }
+
+        return { userData, token: { accessToken } }
       })
     )
   }

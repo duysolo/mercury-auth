@@ -9,7 +9,7 @@ import {
   AuthTransferTokenMethod,
   getResponseFromContext,
   IAuthDefinitions,
-  IAuthResponse,
+  IAuthWithTokenResponse,
   ICookieSerializeOptions,
   IHttpResponse,
   IJwtTokenResponse,
@@ -24,7 +24,7 @@ const transferFromResponseToCookie: (
   response: IHttpResponse,
   definitions: IAuthDefinitions
 ) => (
-  authResponse: IAuthResponse,
+  authResponse: IAuthWithTokenResponse,
   mapKeys: IMapKeys<IJwtTokenResponse>
 ) => Record<string, any> =
   (response, definitions) => (authResponse, mapKeys) => {
@@ -100,13 +100,13 @@ export class CookieAuthInterceptor implements NestInterceptor {
     return next
       .handle()
       .pipe(
-        map((tokenResponse: IAuthResponse) =>
+        map((tokenResponse: IAuthWithTokenResponse) =>
           this.setCookieToken(res, tokenResponse)
         )
       )
   }
 
-  public setCookieToken(res: IHttpResponse, tokenResponse: IAuthResponse): any {
+  public setCookieToken(res: IHttpResponse, tokenResponse: IAuthWithTokenResponse): any {
     if (
       (res.httpAdaptorType === 'fastify' && !res.setCookie) ||
       (res.httpAdaptorType === 'express' && !res.cookie) ||

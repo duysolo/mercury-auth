@@ -30,29 +30,26 @@ describe('RefreshTokenController', () => {
     expect(controller).toBeInstanceOf(RefreshTokenController)
   })
 
-  it('the token service should be called', async () => {
-    const spy = jest.spyOn(controller['_tokenService'], 'generateTokenResponse')
-
-    await lastValueFrom(
-      controller.index(currentUserFixture).pipe(
-        tap(() => {
-          expect(spy).toHaveBeenCalledWith(currentUserFixture)
-        })
-      )
-    )
-  })
-
   it('should able to show token response', async function () {
     await lastValueFrom(
-      controller.index(currentUserFixture).pipe(
-        tap((res) => {
-          expect(res.userData).toMatchObject(currentUserFixture)
-
-          expect(res.token?.accessToken).toBeDefined()
-          expect(res.token?.['refreshToken']).toBeUndefined()
-          expect(res.token?.expiryDate).toBeDefined()
+      controller
+        .index({
+          userData: currentUserFixture,
+          token: {
+            accessToken: 'some-access-token',
+            refreshToken: 'some-refresh-token',
+            expiryDate: new Date(),
+          },
         })
-      )
+        .pipe(
+          tap((res) => {
+            expect(res.userData).toMatchObject(currentUserFixture)
+
+            expect(res.token?.accessToken).toBeDefined()
+            expect(res.token?.['refreshToken']).toBeUndefined()
+            expect(res.token?.expiryDate).toBeDefined()
+          })
+        )
     )
   })
 })
