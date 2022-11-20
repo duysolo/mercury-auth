@@ -15,7 +15,7 @@ import { JwtModule } from '@nestjs/jwt'
 import {
   GetCurrentUserByAccessTokenQueryHandler,
   GetCurrentUserByRefreshTokenQueryHandler,
-  LoginQueryHandler,
+  LoginQueryHandler, UserLogoutQueryHandler,
 } from './application/queries/handlers'
 import {
   AUTH_PASSWORD_HASHER,
@@ -31,7 +31,7 @@ import {
   IAuthDefinitions,
   JwtStrategy,
   LocalLoginAction,
-  LocalStrategy,
+  LocalStrategy, LogoutAction,
   ParseJwtTokenAction,
   PasswordHasherService,
   RefreshTokenStrategy,
@@ -44,7 +44,7 @@ import {
 } from './infrastructure'
 import {
   BasicAuthMiddleware,
-  ClearAuthCookieInterceptor,
+  UserLogoutInterceptor,
   CookieAuthInterceptor,
   LoginController,
   ProfileController,
@@ -125,17 +125,19 @@ export class AuthModule implements NestModule {
         LoginQueryHandler,
         GetCurrentUserByAccessTokenQueryHandler,
         GetCurrentUserByRefreshTokenQueryHandler,
+        UserLogoutQueryHandler,
 
         GetUserByJwtTokenAction,
         GetUserByRefreshTokenAction,
         LocalLoginAction,
         ParseJwtTokenAction,
+        LogoutAction,
 
         LocalStrategy,
         JwtStrategy,
         RefreshTokenStrategy,
 
-        ClearAuthCookieInterceptor,
+        UserLogoutInterceptor,
         CookieAuthInterceptor,
 
         AuthBasicGuard,
@@ -196,10 +198,11 @@ export class AuthModule implements NestModule {
         GetUserByRefreshTokenAction,
         LocalLoginAction,
         ParseJwtTokenAction,
+        LogoutAction,
 
         AUTH_PASSWORD_HASHER,
 
-        ClearAuthCookieInterceptor,
+        UserLogoutInterceptor,
         CookieAuthInterceptor,
 
         LocalStrategy,

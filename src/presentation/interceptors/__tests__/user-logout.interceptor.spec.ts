@@ -4,9 +4,9 @@ import {
   createTestingModule,
   defaultAuthDefinitionsFixture,
 } from '../../../__tests__/helpers'
-import { TokenService } from '../../../domain'
+import { LogoutAction, TokenService } from '../../../domain'
 import { generateExecutionContextForJwtStrategy } from '../../../domain/guards/__tests__/helpers/test-guard.helper'
-import { ClearAuthCookieInterceptor } from '../clear-auth-cookie.interceptor'
+import { UserLogoutInterceptor } from '../user-logout.interceptor'
 
 describe('ClearAuthCookieInterceptor', () => {
   applyTests('fastify')
@@ -17,7 +17,8 @@ describe('ClearAuthCookieInterceptor', () => {
 function applyTests(httpAdaptorType: 'fastify' | 'express') {
   let executionContext: ExecutionContext
 
-  let interceptor: ClearAuthCookieInterceptor
+  let interceptor: UserLogoutInterceptor
+  let logoutAction: LogoutAction
 
   const fixture = defaultAuthDefinitionsFixture()
 
@@ -40,9 +41,13 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
         httpAdaptorType,
       })
 
+      await testModule.init()
+
       const tokenService = testModule.get(TokenService)
 
-      interceptor = testModule.get(ClearAuthCookieInterceptor)
+      interceptor = testModule.get(UserLogoutInterceptor)
+
+      logoutAction = testModule.get(LogoutAction)
 
       const accessToken = await lastValueFrom(
         tokenService.generateAccessToken(currentUserFixture)
@@ -50,6 +55,7 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
 
       executionContext = {
         ...generateExecutionContextForJwtStrategy(accessToken),
+        getType: () => 'http' as any,
         switchToHttp: (): any => {
           return {
             getResponse: () => {
@@ -63,6 +69,13 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
                 cookie: () => undefined,
               }
             },
+            getRequest: () => {
+              return {
+                user: {
+                  userData: currentUserFixture,
+                },
+              }
+            },
           }
         },
       }
@@ -72,8 +85,12 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
       expect(interceptor).toBeDefined()
     })
 
+    it('the logoutAction should be defined', async () => {
+      expect(logoutAction).toBeDefined()
+    })
+
     it('clearAuthCookies function should be called', async () => {
-      const spy = jest.spyOn(interceptor, 'clearAuthCookies')
+      const spy = jest.spyOn(logoutAction, 'clearAuthCookies')
 
       await lastValueFrom(
         interceptor.intercept(executionContext, mockCallHandler).pipe(
@@ -91,7 +108,7 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
     })
 
     it('should ignore handling if cookie not available', async () => {
-      const spy = jest.spyOn(interceptor, 'clearAuthCookies')
+      const spy = jest.spyOn(logoutAction, 'clearAuthCookies')
 
       const executionContextWithoutCookie = {
         ...executionContext,
@@ -103,6 +120,13 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
               }
 
               return {}
+            },
+            getRequest: () => {
+              return {
+                user: {
+                  userData: currentUserFixture,
+                },
+              }
             },
           }
         },

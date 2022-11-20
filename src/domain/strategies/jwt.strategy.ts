@@ -7,7 +7,12 @@ import { InjectAuthDefinitions } from '../decorators'
 import type { IAuthUserEntityForResponse } from '../definitions'
 import { AuthTransferTokenMethod } from '../definitions'
 import { IJwtPayload } from '../entities'
-import { getRequestCookie, getRequestHeader, IHttpRequest } from '../helpers'
+import {
+  getRequestCookie,
+  getRequestHeader,
+  IHttpRequest,
+  removeBearerFromToken,
+} from '../helpers'
 import { IAuthDefinitions } from '../index'
 
 export const JWT_STRATEGY_NAME: string = 'jwt'
@@ -22,7 +27,9 @@ const cookieExtractor: (
     }
 
     return (
-      (getRequestCookie(request, 'AccessToken') as unknown as string) || null
+      removeBearerFromToken(
+        getRequestCookie(request, 'AccessToken') as unknown as string
+      ) || null
     )
   }
 
@@ -41,11 +48,7 @@ const accessTokenHeaderExtractor: (
       return null
     }
 
-    if (authHeader.toLowerCase().startsWith('bearer ')) {
-      return authHeader.substring('bearer '.length)
-    }
-
-    return authHeader
+    return removeBearerFromToken(authHeader)
   }
 
 @Injectable()

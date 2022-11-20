@@ -670,7 +670,7 @@ export class UserLoggedInEventHandler implements IEventHandler<UserLoggedInEvent
 
 ### `AccessTokenGeneratedFromRefreshTokenEvent`
 
-Triggered when an new access token is generated from refresh token.
+Triggered when a new access token is generated from refresh token.
 
 You can store the relevant new access token in database using this event.
 
@@ -682,9 +682,29 @@ import { EventsHandler, IEventHandler } from '@nestjs/cqrs'
 import { delay, lastValueFrom, of, tap } from 'rxjs'
 
 @EventsHandler(AccessTokenGeneratedFromRefreshTokenEvent)
-export class UserLoggedInEventHandler implements IEventHandler<AccessTokenGeneratedFromRefreshTokenEvent> {
+export class AccessTokenGeneratedFromRefreshTokenEventHandler
+  implements IEventHandler<AccessTokenGeneratedFromRefreshTokenEvent> {
   public async handle(event: AccessTokenGeneratedFromRefreshTokenEvent): Promise<void> {
     console.log('AccessTokenGeneratedFromRefreshTokenEvent', event)
+  }
+}
+```
+
+### `UserLoggedOutEvent`
+
+Triggered when user logged out.
+
+#### Sample usages
+
+```typescript
+import { UserLoggedOutEvent } from '@mercury-labs/nest-auth'
+import { EventsHandler, IEventHandler } from '@nestjs/cqrs'
+import { delay, lastValueFrom, of, tap } from 'rxjs'
+
+@EventsHandler(UserLoggedOutEvent)
+export class UserLoggedOutEventHandler implements IEventHandler<UserLoggedOutEvent> {
+  public async handle(event: UserLoggedOutEvent): Promise<void> {
+    console.log('UserLoggedOutEvent', event)
   }
 }
 ```

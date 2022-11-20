@@ -1,10 +1,10 @@
 import { Controller, Post, UseInterceptors } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { ClearAuthCookieInterceptor } from '../interceptors'
+import { UserLogoutInterceptor } from '../interceptors'
 
 @ApiTags('Authentication')
 @Controller({ path: 'auth' })
-@UseInterceptors(ClearAuthCookieInterceptor)
+@UseInterceptors(UserLogoutInterceptor)
 export class LogoutController {
   @ApiOperation({
     summary: 'Logout',

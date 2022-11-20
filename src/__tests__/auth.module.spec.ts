@@ -14,7 +14,7 @@ import {
   TokenService,
 } from '../domain'
 import {
-  ClearAuthCookieInterceptor,
+  UserLogoutInterceptor,
   CookieAuthInterceptor,
   LoginController,
   ProfileController,
@@ -76,7 +76,7 @@ describe('AuthModule', () => {
       AuthBasicGuard,
       AuthRefreshTokenGuard,
 
-      ClearAuthCookieInterceptor,
+      UserLogoutInterceptor,
       CookieAuthInterceptor,
     ]
 

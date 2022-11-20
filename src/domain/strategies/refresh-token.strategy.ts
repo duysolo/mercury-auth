@@ -11,6 +11,7 @@ import {
   getRequestHeader,
   IAuthDefinitions,
   IHttpRequest,
+  removeBearerFromToken,
 } from '../index'
 
 export const REFRESH_TOKEN_STRATEGY_NAME: string = 'mercury-refresh-token'
@@ -25,7 +26,9 @@ const cookieExtractor: (
     }
 
     return (
-      (getRequestCookie(request, 'RefreshToken') as unknown as string) || null
+      removeBearerFromToken(
+        getRequestCookie(request, 'RefreshToken') as unknown as string
+      ) || null
     )
   }
 
@@ -39,7 +42,9 @@ const refreshTokenHeaderExtractor: (
     }
 
     return (
-      (getRequestHeader(request, 'refresh-token') as unknown as string) || null
+      removeBearerFromToken(
+        getRequestHeader(request, 'refresh-token') as unknown as string
+      ) || null
     )
   }
 

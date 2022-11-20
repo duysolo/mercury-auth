@@ -7,7 +7,7 @@ import {
   fastifyRequest,
 } from './helpers'
 
-describe('AuthModule (e2e) - Fastify Adaptor', () => {
+describe.skip('AuthModule (e2e) - Fastify Adaptor', () => {
   e2eTestsSetup<NestFastifyApplication>({
     initApp: async () => {
       const definitions = defaultAuthDefinitionsFixture({

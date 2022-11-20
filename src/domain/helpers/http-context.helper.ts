@@ -50,9 +50,11 @@ export function getRequestHeader(
   request: IHttpRequest,
   key?: string
 ): string | IHttpRequest['headers'] | undefined {
-  const res = key ? request.headers[key] : request.headers
+  if (request.headers) {
+    return key ? request.headers[key] : request.headers
+  }
 
-  return res || undefined
+  return undefined
 }
 
 export function getRequestCookie(
