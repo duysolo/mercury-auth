@@ -13,6 +13,10 @@ npm install --save @mercury-labs/nest-auth
 Learn more about the relevant
 package [@mercury-labs/nest-hashing](https://www.npmjs.com/package/@mercury-labs/nest-hashing)
 
+## Sample usages for Fastify and Express
+
+Checkout this repository [https://github.com/duysolo/mercury-auth-samples](https://github.com/duysolo/mercury-auth-samples)
+
 ## Define a database repository to get user info
 
 ```typescript
