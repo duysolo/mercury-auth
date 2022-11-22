@@ -1,4 +1,5 @@
 import { ExecutionContext } from '@nestjs/common'
+import { GqlContextType, GqlExecutionContext } from '@nestjs/graphql'
 
 export interface ICookieSerializeOptions {
   domain?: string
@@ -37,12 +38,28 @@ export type IHttpResponse =
     }
 
 export function getRequestFromContext(context: ExecutionContext): IHttpRequest {
+  const contextType: GqlContextType = context.getType<GqlContextType>()
+
+  if (contextType === 'graphql') {
+    const ctx = GqlExecutionContext.create(context)
+
+    return ctx.getContext().req
+  }
+
   return context.switchToHttp().getRequest()
 }
 
 export function getResponseFromContext(
   context: ExecutionContext
 ): IHttpResponse {
+  const contextType: GqlContextType = context.getType<GqlContextType>()
+
+  if (contextType === 'graphql') {
+    const ctx = GqlExecutionContext.create(context)
+
+    return ctx.getContext().res
+  }
+
   return context.switchToHttp().getResponse()
 }
 

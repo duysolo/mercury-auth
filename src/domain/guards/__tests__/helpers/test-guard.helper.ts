@@ -66,6 +66,7 @@ export function generateExecutionContextForBasicAuth(
     },
     getRequest,
     getResponse: () => ({}),
+    getType: () => 'http'
   } as unknown as ExecutionContext
 }
 

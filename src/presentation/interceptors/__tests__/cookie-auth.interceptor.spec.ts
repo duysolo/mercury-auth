@@ -68,6 +68,7 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
             },
           }
         },
+        getType: () => 'http',
       } as any
     })
 
