@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { EventBus } from '@nestjs/cqrs'
 import { forkJoin, map, mergeMap, Observable, of, tap } from 'rxjs'
 import { InjectAuthDefinitions } from '../decorators'
-import { IAuthDefinitions, IAuthResponse } from '../definitions'
+import { IAuthDefinitions, IRefreshTokenAuthResponse } from '../definitions'
 import { AccessTokenGeneratedFromRefreshTokenEvent } from '../events'
 import { hideRedactedFields } from '../helpers'
 import { AuthRepository } from '../repositories'
@@ -23,11 +23,9 @@ export class GetUserByRefreshTokenAction {
     protected readonly eventBus: EventBus
   ) {}
 
-  public handle({
+  public handle<T extends IRefreshTokenAuthResponse>({
     refreshToken,
-  }: IGetUserByRefreshTokenActionOptions): Observable<
-    IAuthResponse | undefined
-  > {
+  }: IGetUserByRefreshTokenActionOptions): Observable<T | undefined> {
     const jwtPayload = refreshToken
       ? this.jwtService.decodeRefreshToken(refreshToken)
       : undefined
@@ -53,9 +51,8 @@ export class GetUserByRefreshTokenAction {
               token: {
                 accessToken: token.accessToken,
                 expiryDate: token.expiryDate,
-                refreshToken,
               },
-            }
+            } as unknown as T
           }),
           tap(({ userData, token }) => {
             this.eventBus.publish(

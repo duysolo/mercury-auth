@@ -29,7 +29,7 @@ export class GetUserByJwtTokenAction {
     public readonly jwtService: TokenService
   ) {}
 
-  public handle({
+  public handle<T = IAuthResponse>({
     jwtPayload,
     accessToken,
   }: IGetUserByJwtTokenActionOptions): Observable<IAuthResponse | undefined> {
@@ -60,7 +60,7 @@ export class GetUserByJwtTokenAction {
           return undefined
         }
 
-        return { userData, token: { accessToken } }
+        return { userData }
       })
     )
   }

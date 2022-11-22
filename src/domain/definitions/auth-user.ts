@@ -3,7 +3,7 @@ export type IAuthUserEntity<
   T = Record<string, any>
 > = T & {
   id: string
-  username?: string
+  username: string
   password?: HashedPasswordType
 }
 

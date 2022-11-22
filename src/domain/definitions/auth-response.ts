@@ -1,14 +1,19 @@
 import { IJwtTokenResponse } from '../services'
 import { IAuthUserEntityForResponse } from './auth-user'
 
-export interface IAuthWithTokenResponse {
-  userData: IAuthUserEntityForResponse
+export interface IAuthWithTokenResponse<
+  UserDataType = IAuthUserEntityForResponse
+> {
+  userData: UserDataType
   token: IJwtTokenResponse
 }
 
-export interface IRefreshTokenAuthResponse {
-  userData: IAuthUserEntityForResponse
+export interface IRefreshTokenAuthResponse<
+  UserDataType = IAuthUserEntityForResponse
+> {
+  userData: UserDataType
   token: Omit<IJwtTokenResponse, 'refreshToken'>
 }
 
-export interface IAuthResponse extends Omit<IAuthWithTokenResponse, 'token'> {}
+export interface IAuthResponse<UserDataType = IAuthUserEntityForResponse>
+  extends Omit<IAuthWithTokenResponse<UserDataType>, 'token'> {}

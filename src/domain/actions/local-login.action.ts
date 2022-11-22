@@ -46,7 +46,7 @@ export class LocalLoginAction {
     protected readonly eventBus: EventBus
   ) {}
 
-  public handle(dto: AuthDto): Observable<IAuthWithTokenResponse> {
+  public handle<T extends IAuthWithTokenResponse>(dto: AuthDto): Observable<T> {
     return scheduled(
       validateEntity(
         dto,
@@ -108,7 +108,7 @@ export class LocalLoginAction {
           new UserLoggedInEvent(user, impersonated, validatedDto, token)
         )
       ),
-      map(({ user: userData, token }) => ({ userData, token }))
+      map(({ user: userData, token }) => ({ userData, token } as T))
     )
   }
 
