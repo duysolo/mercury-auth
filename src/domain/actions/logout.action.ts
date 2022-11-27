@@ -43,13 +43,13 @@ export class LogoutAction {
 
     let currentToken = getRequestCookie(
       request,
-      'authorization'
+      'AccessToken'
     ) as unknown as string
 
     if (!currentToken) {
       currentToken = getRequestHeader(
         request,
-        'AccessToken'
+        'authorization'
       ) as unknown as string
     }
 
