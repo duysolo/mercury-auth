@@ -32,10 +32,9 @@ export class LogoutAction {
   ) {}
 
   public handle({ context }: ILogoutActionOptions): Observable<void> {
-    const res: IHttpResponse = {
-      ...getResponseFromContext(context),
-      httpAdaptorType: this.definitions.httpAdaptorType,
-    }
+    const res = getResponseFromContext(context)
+
+    res.httpAdaptorType = this.definitions.httpAdaptorType
 
     const request = getRequestFromContext(context)
 
