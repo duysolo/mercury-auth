@@ -10,6 +10,7 @@ import {
 } from '../definitions'
 import { UserLoggedOutEvent } from '../events'
 import {
+  getRequestCookie,
   getRequestFromContext,
   getRequestHeader,
   getResponseFromContext,
@@ -40,9 +41,19 @@ export class LogoutAction {
 
     const user = getUserFromContext(context)
 
-    const accessToken = removeBearerFromToken(
-      getRequestHeader(request, 'authorization') as unknown as string
-    )
+    let currentToken = getRequestCookie(
+      request,
+      'authorization'
+    ) as unknown as string
+
+    if (!currentToken) {
+      currentToken = getRequestHeader(
+        request,
+        'AccessToken'
+      ) as unknown as string
+    }
+
+    const accessToken = removeBearerFromToken(currentToken)
 
     this.clearAuthCookies(res)
 
