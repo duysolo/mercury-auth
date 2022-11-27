@@ -1,8 +1,7 @@
 import { ExecutionContext, Injectable } from '@nestjs/common'
 import { EventBus } from '@nestjs/cqrs'
 import { GqlExecutionContext } from '@nestjs/graphql'
-import moment from 'moment/moment'
-import { map, Observable, of, tap } from 'rxjs'
+import { Observable, of } from 'rxjs'
 import { InjectAuthDefinitions } from '../decorators'
 import {
   IAuthDefinitions,
@@ -45,14 +44,11 @@ export class LogoutAction {
       getRequestHeader(request, 'authorization') as unknown as string
     )
 
-    return of(res).pipe(
-      tap(() => {
-        this.clearAuthCookies(res)
+    this.clearAuthCookies(res)
 
-        this.eventBus.publish(new UserLoggedOutEvent(accessToken, user))
-      }),
-      map(() => undefined)
-    )
+    this.eventBus.publish(new UserLoggedOutEvent(accessToken, user))
+
+    return of(undefined)
   }
 
   public clearAuthCookies(res: IHttpResponse): void {
@@ -71,7 +67,7 @@ export class LogoutAction {
 
       ...this.definitions.cookieOptions,
 
-      expires: moment().toDate(),
+      expires: new Date(),
     }
 
     if (res.httpAdaptorType === 'fastify' && res.setCookie) {
@@ -86,7 +82,9 @@ export class LogoutAction {
   }
 }
 
-function getUserFromContext(context: ExecutionContext): IAuthUserEntityForResponse {
+function getUserFromContext(
+  context: ExecutionContext
+): IAuthUserEntityForResponse {
   if (`${context.getType()}` === 'graphql') {
     const gqlExecutionContext = GqlExecutionContext.create(context)
 

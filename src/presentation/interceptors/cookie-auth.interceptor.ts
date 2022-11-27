@@ -10,77 +10,10 @@ import {
   getResponseFromContext,
   IAuthDefinitions,
   IAuthWithTokenResponse,
-  ICookieSerializeOptions,
   IHttpResponse,
-  IJwtTokenResponse,
   InjectAuthDefinitions,
 } from '../../domain'
-
-type IMapKeys<T> = Partial<{
-  [responseKey in keyof T]: string
-}>
-
-const transferFromResponseToCookie: (
-  response: IHttpResponse,
-  definitions: IAuthDefinitions
-) => (
-  authResponse: IAuthWithTokenResponse,
-  mapKeys: IMapKeys<IJwtTokenResponse>
-) => Record<string, any> =
-  (response, definitions) => (authResponse, mapKeys) => {
-    if (
-      (response.httpAdaptorType === 'fastify' && !response.setCookie) ||
-      (response.httpAdaptorType === 'express' && !response.cookie) ||
-      !definitions.transferTokenMethod ||
-      ![
-        AuthTransferTokenMethod.COOKIE_ONLY,
-        AuthTransferTokenMethod.BOTH,
-      ].includes(definitions.transferTokenMethod)
-    ) {
-      return authResponse
-    }
-
-    const token: IJwtTokenResponse = authResponse.token
-
-    for (const responseKey in mapKeys) {
-      if (token[responseKey]) {
-        const cookieOptions: ICookieSerializeOptions = {
-          path: '/',
-          httpOnly: true,
-          sameSite: 'none',
-          secure: process.env.NODE_ENV !== 'local',
-          ...definitions.cookieOptions,
-
-          expires: token.expiryDate,
-        }
-
-        if (response.httpAdaptorType === 'fastify' && response.setCookie) {
-          response.setCookie(
-            mapKeys[responseKey],
-            token[responseKey],
-            cookieOptions
-          )
-        }
-
-        if (response.httpAdaptorType === 'express' && response.cookie) {
-          response.cookie(
-            mapKeys[responseKey],
-            token[responseKey],
-            cookieOptions
-          )
-        }
-
-        if (
-          definitions.transferTokenMethod ===
-          AuthTransferTokenMethod.COOKIE_ONLY
-        ) {
-          delete token[responseKey]
-        }
-      }
-    }
-
-    return { ...authResponse, token }
-  }
+import { transferTokenFromResponseToCookie } from './helpers'
 
 @Injectable()
 export class CookieAuthInterceptor implements NestInterceptor {
@@ -120,7 +53,10 @@ export class CookieAuthInterceptor implements NestInterceptor {
       return tokenResponse
     }
 
-    const transferFunction = transferFromResponseToCookie(res, this.definitions)
+    const transferFunction = transferTokenFromResponseToCookie(
+      res,
+      this.definitions
+    )
 
     return transferFunction(tokenResponse, {
       accessToken: 'AccessToken',
