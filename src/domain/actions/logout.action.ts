@@ -55,9 +55,9 @@ export class LogoutAction {
 
     const accessToken = removeBearerFromToken(currentToken)
 
-    this.clearAuthCookies(res)
-
     this.eventBus.publish(new UserLoggedOutEvent(accessToken, user))
+
+    this.clearAuthCookies(res)
 
     return of(undefined)
   }
