@@ -16,6 +16,7 @@ export interface IJwtTokenResponse {
   accessToken: string
   refreshToken: string
   expiryDate: Date
+  refreshTokenExpiryDate: Date
 }
 
 @Injectable()
@@ -37,10 +38,17 @@ export class TokenService {
       map(([accessToken, refreshToken]) => {
         const jwtPayload = this.decodeAccessToken(accessToken) as IJwtPayload
 
+        const refreshTokenJwtPayload = this.decodeRefreshToken(
+          refreshToken
+        ) as IJwtPayload
+
         return {
           accessToken,
           refreshToken,
           expiryDate: moment(_.toInteger(jwtPayload.exp) * 1000).toDate(),
+          refreshTokenExpiryDate: moment(
+            _.toInteger(refreshTokenJwtPayload.exp) * 1000
+          ).toDate(),
         }
       })
     )
@@ -76,12 +84,12 @@ export class TokenService {
   }
 
   public decodeAccessToken(token: string): IJwtPayload | undefined {
-    return this.decodeAccessTokenFromRawDecoded(
+    return this.decodeTokenFromRawDecoded(
       this.jwtService.decode(token) as unknown as IJwtPayload
     )
   }
 
-  public decodeAccessTokenFromRawDecoded(
+  public decodeTokenFromRawDecoded(
     rawPayload: IJwtPayload
   ): IJwtPayload | undefined {
     const username = this.hashTextService.decode(rawPayload.username) || ''
@@ -125,7 +133,7 @@ export class TokenService {
         ),
         transform<IJwtPayload | undefined>(
           (value: IJwtPayloadRawDecoded | undefined) =>
-            value ? this.decodeAccessTokenFromRawDecoded(value) : undefined
+            value ? this.decodeTokenFromRawDecoded(value) : undefined
         ),
         transform<IJwtPayload | undefined>((value: IJwtPayload | undefined) => {
           if (value?.exp && value.exp < moment().unix()) {

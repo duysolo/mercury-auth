@@ -22,7 +22,7 @@ export class RefreshTokenController {
 
     return of({
       userData,
-      token: _.omit(['refreshToken'], token),
+      token: _.omit(['refreshToken', 'refreshTokenExpiryDate'], token),
     })
   }
 }
