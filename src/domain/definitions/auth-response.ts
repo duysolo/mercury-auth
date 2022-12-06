@@ -12,7 +12,7 @@ export interface IRefreshTokenAuthResponse<
   UserDataType = IAuthUserEntityForResponse
 > {
   userData: UserDataType
-  token: Omit<IJwtTokenResponse, 'refreshToken'>
+  token: Omit<IJwtTokenResponse, 'refreshToken' | 'refreshTokenExpiryDate'>
 }
 
 export interface IAuthResponse<UserDataType = IAuthUserEntityForResponse>

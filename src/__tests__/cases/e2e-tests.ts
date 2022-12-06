@@ -84,6 +84,7 @@ export function e2eTestsSetup<T extends INestApplication>(
     expect(res.authResponse.token.accessToken).toBeDefined()
     expect(res.authResponse.token.refreshToken).toBeDefined()
     expect(res.authResponse.token.expiryDate).toBeDefined()
+    expect(res.authResponse.token.refreshTokenExpiryDate).toBeDefined()
 
     expect(res.headers['www-authenticate']).toBeDefined()
     expect(res.headers['www-authenticate']).toEqual(
@@ -178,6 +179,7 @@ export function e2eTestsSetup<T extends INestApplication>(
         expect(res.authResponse.token.accessToken).toBeDefined()
         expect(res.authResponse.token['refreshToken']).toBeUndefined()
         expect(res.authResponse.token.expiryDate).toBeDefined()
+        expect(res.authResponse.token['refreshTokenExpiryDate']).toBeUndefined()
       })
     })
 

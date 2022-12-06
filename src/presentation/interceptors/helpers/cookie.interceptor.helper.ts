@@ -45,7 +45,10 @@ export const transferTokenFromResponseToCookie: (
           secure: process.env.NODE_ENV !== 'local',
           ...definitions.cookieOptions,
 
-          expires: token.expiryDate,
+          expires:
+            responseKey === 'refreshToken'
+              ? token.refreshTokenExpiryDate
+              : token.expiryDate,
         }
 
         if (response.httpAdaptorType === 'fastify' && response.setCookie) {

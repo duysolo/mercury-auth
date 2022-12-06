@@ -38,7 +38,7 @@ export class GetUserByJwtTokenAction {
       asyncScheduler
     ).pipe(
       map((res) => {
-        return this.jwtService.decodeAccessTokenFromRawDecoded(res)
+        return this.jwtService.decodeTokenFromRawDecoded(res)
       }),
       mergeMap((validatedPayload) => {
         if (!validatedPayload?.username) {

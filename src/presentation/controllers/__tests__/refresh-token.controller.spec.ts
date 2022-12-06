@@ -39,6 +39,7 @@ describe('RefreshTokenController', () => {
             accessToken: 'some-access-token',
             refreshToken: 'some-refresh-token',
             expiryDate: new Date(),
+            refreshTokenExpiryDate: new Date(),
           },
         })
         .pipe(
@@ -48,6 +49,7 @@ describe('RefreshTokenController', () => {
             expect(res.token?.accessToken).toBeDefined()
             expect(res.token?.['refreshToken']).toBeUndefined()
             expect(res.token?.expiryDate).toBeDefined()
+            expect(res.token?.['refreshTokenExpiryDate']).toBeUndefined()
           })
         )
     )

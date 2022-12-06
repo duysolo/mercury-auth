@@ -26,6 +26,7 @@ describe('TokenService', () => {
       service.generateTokenResponse(userInfo).pipe(
         tap((res) => {
           expect(res.expiryDate).toBeInstanceOf(Date)
+          expect(res.refreshTokenExpiryDate).toBeInstanceOf(Date)
 
           expect(res.accessToken).toBeDefined()
           expect(res.refreshToken).toBeDefined()
