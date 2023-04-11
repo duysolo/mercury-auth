@@ -1,6 +1,5 @@
 import { Controller, Post, UseInterceptors } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import _ from 'lodash/fp'
 import { Observable, of } from 'rxjs'
 import { IAuthWithTokenResponse, IRefreshTokenAuthResponse } from '../../domain'
 import { CurrentUserWithToken, ShouldUseRefreshToken } from '../decorators'
@@ -20,9 +19,13 @@ export class RefreshTokenController {
   ): Observable<IRefreshTokenAuthResponse> {
     const { userData, token } = user
 
+    const omittedFields = ['refreshToken', 'refreshTokenExpiryDate']
+
     return of({
       userData,
-      token: _.omit(['refreshToken', 'refreshTokenExpiryDate'], token),
+      token: Object.fromEntries(
+        Object.entries(token).filter(([key]) => !omittedFields.includes(key))
+      ) as IRefreshTokenAuthResponse['token'],
     })
   }
 }

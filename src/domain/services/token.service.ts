@@ -1,7 +1,6 @@
 import { HashTextService } from '@mercury-labs/nest-hashing'
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import _ from 'lodash/fp'
 import moment from 'moment'
 import { forkJoin, map, Observable, of } from 'rxjs'
 import { InjectAuthDefinitions } from '../decorators'
@@ -45,9 +44,9 @@ export class TokenService {
         return {
           accessToken,
           refreshToken,
-          expiryDate: moment(_.toInteger(jwtPayload.exp) * 1000).toDate(),
+          expiryDate: moment(parseInt(`${jwtPayload.exp}`) * 1000).toDate(),
           refreshTokenExpiryDate: moment(
-            _.toInteger(refreshTokenJwtPayload.exp) * 1000
+            parseInt(`${refreshTokenJwtPayload.exp}`) * 1000
           ).toDate(),
         }
       })
@@ -121,7 +120,7 @@ export class TokenService {
 
   public decodeRefreshToken(refreshToken: string): IJwtPayload | undefined {
     try {
-      return _.pipe([
+      return pipe([
         transform<string | undefined>((token) =>
           this.hashTextService.decode(token)
         ),
@@ -153,4 +152,8 @@ function transform<Output>(
   iteratee: (input: any) => Output
 ): (value: any) => Output {
   return (value) => iteratee(value) as unknown as Output
+}
+
+function pipe(funcs: Function[]) {
+  return (input) => funcs.reduce((acc, func) => func(acc), input)
 }

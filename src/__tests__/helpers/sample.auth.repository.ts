@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
-import _ from 'lodash/fp'
 import { asyncScheduler, map, Observable, scheduled } from 'rxjs'
 import {
   AuthDto,
   AuthRepository,
-  IAuthUserEntity, IJwtPayload,
+  IAuthUserEntity,
+  IJwtPayload,
   InjectPasswordHasher,
   PasswordHasherService,
 } from '../../domain'
@@ -21,7 +21,7 @@ export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
   ): Observable<IAuthUserEntity | undefined> {
     return scheduled(this.hasher.hash('testLogin@12345'), asyncScheduler).pipe(
       map((password: string) => ({
-        id: _.random(1, 1999).toString(),
+        id: (Math.floor(Math.random() * 1999) + 1).toString(),
         username: 'sample-user@gmail.com',
         email: 'sample-user@gmail.com',
         password,
