@@ -15,7 +15,8 @@ import { JwtModule } from '@nestjs/jwt'
 import {
   GetCurrentUserByAccessTokenQueryHandler,
   GetCurrentUserByRefreshTokenQueryHandler,
-  LoginQueryHandler, UserLogoutQueryHandler,
+  LoginQueryHandler,
+  UserLogoutQueryHandler,
 } from './application/queries/handlers'
 import {
   AUTH_PASSWORD_HASHER,
@@ -24,16 +25,18 @@ import {
   AuthJwtGuard,
   AuthRefreshTokenGuard,
   AuthRepository,
-  BcryptPasswordHasherService,
-  GetUserByJwtTokenAction, GetUserByRefreshTokenAction,
+  GetUserByJwtTokenAction,
+  GetUserByRefreshTokenAction,
   GraphqlAuthJwtGuard,
   GraphqlAuthRefreshTokenGuard,
   IAuthDefinitions,
   JwtStrategy,
   LocalLoginAction,
-  LocalStrategy, LogoutAction,
+  LocalStrategy,
+  LogoutAction,
   ParseJwtTokenAction,
   PasswordHasherService,
+  Pbkdf2PasswordHasherService,
   RefreshTokenStrategy,
   TokenService,
 } from './domain'
@@ -108,7 +111,7 @@ export class AuthModule implements NestModule {
           provide: AUTH_PASSWORD_HASHER,
           useFactory:
             options.passwordHasher?.useFactory ||
-            (() => new BcryptPasswordHasherService()),
+            (() => new Pbkdf2PasswordHasherService()),
           inject: options.passwordHasher?.inject,
         },
 

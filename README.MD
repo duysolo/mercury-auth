@@ -327,48 +327,32 @@ interface IAuthDefinitions {
 
 ### Customize your hasher method
 
-By default, I use `bcrypt` to encode and compare password hash.
+By default, I use `pbkdf2` to encode and compare password hash.
 In some case, you might need to change the way or algorithm to hash the
 password.
 
 #### Create new hasher class
 
-```typescript
-import crypto from 'crypto'
-import { PasswordHasherService } from '@mercury-labs/nest-auth'
-import { Injectable } from '@nestjs/common'
+This example uses `bcrypt` to hash and compare password phrase.
 
-export interface IPbkdf2Hash {
-  hash: string
-  salt: string
-}
+```typescript
+import { Injectable } from '@nestjs/common'
+import { compare, hash } from 'bcrypt'
+import { PasswordHasherService } from './password-hasher.service'
 
 @Injectable()
-export class Pbkdf2PasswordHasherService implements PasswordHasherService<IPbkdf2Hash> {
-  public async hash(password: string): Promise<IPbkdf2Hash> {
-    const salt = crypto.randomBytes(16).toString('hex')
-
-    const hash = crypto.pbkdf2Sync(
-      password,
-      salt,
-      10000,
-      512,
-      'sha512'
-    ).toString('hex')
-
-    return {salt, hash}
+export class BcryptPasswordHasherService
+  implements PasswordHasherService<string>
+{
+  public async hash(password: string): Promise<string> {
+    return hash(password, 10)
   }
 
-  public async compare(password: string, hashedPassword: IPbkdf2Hash): Promise<boolean> {
-    const hashPassword = crypto.pbkdf2Sync(
-      password,
-      hashedPassword.salt,
-      10000,
-      512,
-      'sha512'
-    ).toString('hex')
-
-    return hashedPassword.hash === hashPassword
+  public async compare(
+    password: string,
+    hashedPassword: string
+  ): Promise<boolean> {
+    return compare(password, hashedPassword)
   }
 }
 ```
@@ -380,7 +364,7 @@ AuthModule.forRootAsync({
   ...,
   passwordHasher: {
     useFactory: () => {
-      return new Pbkdf2PasswordHasherService()
+      return new BcryptPasswordHasherService()
     },
   }
 })

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import _ from 'lodash/fp'
 import {
   AuthDto,
   AuthRepository,
@@ -10,7 +9,9 @@ import {
 } from '../../domain'
 
 @Injectable()
-export class SampleAuthPromiseRepository implements AuthRepository<string, AuthDto> {
+export class SampleAuthPromiseRepository
+  implements AuthRepository<string, AuthDto>
+{
   public constructor(
     @InjectPasswordHasher()
     protected readonly hasher: PasswordHasherService
@@ -20,7 +21,7 @@ export class SampleAuthPromiseRepository implements AuthRepository<string, AuthD
     username: string
   ): Promise<IAuthUserEntity | undefined> {
     return {
-      id: _.random(1, 1999).toString(),
+      id: (Math.floor(Math.random() * 1999) + 1).toString(),
       username: 'sample-user@gmail.com',
       email: 'sample-user@gmail.com',
       password: await this.hasher.hash('testLogin@12345'),
