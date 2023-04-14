@@ -71,6 +71,7 @@ export interface IAuthModuleOptions
     ) => Promise<PasswordHasherService> | PasswordHasherService
     inject?: Array<InjectionToken | OptionalFactoryDependency>
   }
+  global?: boolean
 }
 
 @Module({})
@@ -218,6 +219,7 @@ export class AuthModule implements NestModule {
 
         HashingModule,
       ],
+      global: options.global || false,
     }
   }
 
