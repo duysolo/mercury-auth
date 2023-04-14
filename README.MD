@@ -54,7 +54,7 @@ export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
     username: string
   ): Observable<IAuthUserEntity | undefined> {
     return of({
-      id: _.random(1, 1999).toString(),
+      id: 'some-random-id',
       username: 'sample-user@gmail.com',
       email: 'sample-user@gmail.com',
       password: 'some-password-hash',
@@ -185,6 +185,7 @@ import { Module } from '@nestjs/common'
        * For example, you're using GraphQL and want to disable default HTTP auth
        */
       useLocalAuth: true,
+      global: true,
       definitions: {
         useFactory: (config: ConfigService) => {
           return {
@@ -375,7 +376,6 @@ AuthModule.forRootAsync({
 ```typescript
 import { Injectable } from '@nestjs/common'
 import { ModuleRef } from '@nestjs/core'
-import _ from 'lodash/fp'
 import { mergeMap, Observable, of } from 'rxjs'
 import {
   AuthDto,
