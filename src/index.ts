@@ -1,8 +1,5 @@
-import { HashTextService } from '@mercury-labs/nest-hashing'
-
-export { HashTextService }
-
 export * from './auth.module'
+export * from './hashing.module'
 
 export * from './domain'
 export * from './infrastructure'

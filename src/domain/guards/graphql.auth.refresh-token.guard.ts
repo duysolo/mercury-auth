@@ -5,7 +5,7 @@ import { AuthRefreshTokenGuard } from './auth.refresh-token.guard'
 
 @Injectable()
 export class GraphqlAuthRefreshTokenGuard extends AuthRefreshTokenGuard {
-  public getRequest(context: ExecutionContext): IncomingMessage {
+  public getRequest<T = IncomingMessage>(context: ExecutionContext): T {
     const ctx = GqlExecutionContext.create(context)
 
     return ctx.getContext().req

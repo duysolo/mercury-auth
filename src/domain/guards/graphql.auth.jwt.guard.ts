@@ -5,7 +5,7 @@ import { AuthJwtGuard } from './auth.jwt.guard'
 
 @Injectable()
 export class GraphqlAuthJwtGuard extends AuthJwtGuard {
-  public getRequest(context: ExecutionContext): IncomingMessage {
+  public getRequest<T = IncomingMessage>(context: ExecutionContext): T {
     const ctx = GqlExecutionContext.create(context)
 
     return ctx.getContext().req
