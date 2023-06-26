@@ -1,4 +1,3 @@
-import { HashingModule } from '@mercury-labs/nest-hashing'
 import {
   DynamicModule,
   InjectionToken,
@@ -54,6 +53,7 @@ import {
   RefreshTokenController,
 } from './presentation'
 import { LogoutController } from './presentation/controllers/logout.controller'
+import { HashingModule } from './hashing.module'
 
 export interface IAuthModuleOptions
   extends Pick<ModuleMetadata, 'imports' | 'providers'> {

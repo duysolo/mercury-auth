@@ -1,4 +1,3 @@
-import { HashTextService } from '@mercury-labs/nest-hashing'
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import moment from 'moment'
@@ -10,6 +9,7 @@ import type {
   IJwtPayload,
   IJwtPayloadRawDecoded,
 } from '../index'
+import { HashTextService } from './hash-text.service'
 
 export interface IJwtTokenResponse {
   accessToken: string
