@@ -153,6 +153,8 @@ dist
 
 src/
 test/
+scripts/
 .github/
-infrastructure/
 package-lock.json
+tsconfig.json
+tsconfig.build.json
