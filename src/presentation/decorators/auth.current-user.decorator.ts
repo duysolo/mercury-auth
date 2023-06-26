@@ -7,7 +7,7 @@ import type {
 } from '../../domain'
 
 export function currentUserDecoratorFactory(
-  data: unknown,
+  __: unknown,
   context: ExecutionContext
 ): IAuthResponse {
   if (`${context.getType()}` === 'graphql') {

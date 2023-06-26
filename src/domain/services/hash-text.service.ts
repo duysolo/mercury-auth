@@ -23,9 +23,9 @@ export class HashTextService {
     }
   }
 
-  public encode(text: string): string {
-    if (!text || !this._options.enabled || !this._options.secretKey) {
-      return ''
+  public encode(textToEncode: string): string {
+    if (!textToEncode || !this._options.enabled || !this._options.secretKey) {
+      return textToEncode
     }
 
     const iv = crypto.randomBytes(16)
@@ -36,7 +36,10 @@ export class HashTextService {
       iv
     )
 
-    const encrypted = Buffer.concat([cipher.update(text), cipher.final()])
+    const encrypted = Buffer.concat([
+      cipher.update(textToEncode),
+      cipher.final(),
+    ])
 
     return Buffer.from(
       JSON.stringify({
@@ -48,7 +51,7 @@ export class HashTextService {
 
   public decode(hashedText: string): string | undefined {
     if (!hashedText || !this._options.enabled || !this._options.secretKey) {
-      return ''
+      return hashedText
     }
 
     try {
