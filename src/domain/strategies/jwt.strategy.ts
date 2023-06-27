@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, JwtFromRequestFunction, Strategy } from 'passport-jwt'
 import { GetCurrentUserByAccessTokenQuery } from '../../application/queries'
 import { InjectAuthDefinitions } from '../decorators'
-import type { IAuthUserEntityForResponse } from '../definitions'
+import type { IAuthResponse } from '../definitions'
 import { AuthTransferTokenMethod } from '../definitions'
 import { IJwtPayload } from '../entities'
 import {
@@ -68,7 +68,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
     super({
       jwtFromRequest,
       ignoreExpiration: false,
-      secretOrKey: authDefinitions.jwt?.secret || 'NOT_DEFINED',
+      secretOrKey: authDefinitions.jwt?.secret,
       passReqToCallback: true,
     })
 
@@ -78,7 +78,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
   public async validate(
     request: any,
     payload: IJwtPayload
-  ): Promise<IAuthUserEntityForResponse | undefined> {
+  ): Promise<IAuthResponse | undefined> {
     return this.queryBus.execute(
       new GetCurrentUserByAccessTokenQuery(
         this.jwtFromRequest(request) || '',
