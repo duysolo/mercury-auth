@@ -68,7 +68,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
     super({
       jwtFromRequest,
       ignoreExpiration: false,
-      secretOrKey: authDefinitions.jwt?.secret,
+      secretOrKey: authDefinitions.jwt?.secret || 'NOT_DEFINED',
       passReqToCallback: true,
     })
 
