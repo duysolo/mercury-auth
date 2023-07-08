@@ -214,6 +214,11 @@ import { Module } from '@nestjs/common'
         },
         inject: [ConfigService],
       },
+      /**
+       * In case you want to register some providers inside AuthModule
+       * These providers will be also exported from AuthModule
+       */
+      otherProviders: [],
       authRepository: {
         useFactory: (hasher: PasswordHasherService) => {
           return new CmsAuthRepository(hasher)
