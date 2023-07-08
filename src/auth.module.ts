@@ -6,6 +6,7 @@ import {
   ModuleMetadata,
   NestModule,
   OptionalFactoryDependency,
+  Provider,
   RequestMethod,
 } from '@nestjs/common'
 import { APP_GUARD, Reflector } from '@nestjs/core'
@@ -65,6 +66,7 @@ export interface IAuthModuleOptions
     ) => Promise<AuthRepository<any>> | AuthRepository<any>
     inject?: Array<InjectionToken | OptionalFactoryDependency>
   }
+  otherProviders?: Provider[]
   passwordHasher?: {
     useFactory: (
       ...args: any[]
@@ -108,6 +110,8 @@ export class AuthModule implements NestModule {
         }),
       ],
       providers: [
+        ...(options.otherProviders || []),
+
         {
           provide: AUTH_PASSWORD_HASHER,
           useFactory:
@@ -218,6 +222,8 @@ export class AuthModule implements NestModule {
         GetCurrentUserByRefreshTokenQueryHandler,
 
         HashingModule,
+
+        ...(options.otherProviders || []),
       ],
       global: options.global || false,
     }

@@ -10,10 +10,6 @@ module.exports = {
     // @see https://www.npmjs.com/package/@rushstack/eslint-plugin-packlets
     // @rushstack/eslint-plugin-packlets
   ],
-  parserOptions: {
-    project: 'tsconfig.json',
-    sourceType: 'module',
-  },
   root: true,
   env: {
     node: true,
@@ -21,8 +17,12 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    '@typescript-eslint/typedef': ['off'],
+    'no-extra-boolean-cast': ['off'],
+    '@rushstack/typedef-var': ['off'],
     '@typescript-eslint/no-explicit-any': 'off',
-    // '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/parameter-properties': 'off',
     '@typescript-eslint/no-parameter-properties': [
       'error',
       { allows: ['public readonly', 'protected readonly', 'private readonly'] },

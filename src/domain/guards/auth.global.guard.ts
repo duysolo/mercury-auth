@@ -105,8 +105,8 @@ export class AuthGlobalGuard {
     context: ExecutionContext,
     isPublicWithOptionalUser: boolean
   ) {
-    return forkJoin([handler.canActivate(context) as Promise<boolean>]).pipe(
-      map(([res]) => {
+    return handleJwtRequest(handler, context).pipe(
+      map((res) => {
         return isPublicWithOptionalUser ? true : res
       }),
       catchError((error) => {
@@ -118,4 +118,13 @@ export class AuthGlobalGuard {
       })
     )
   }
+}
+
+function handleJwtRequest(
+  handler: CanActivate,
+  context: ExecutionContext
+): Observable<boolean> {
+  return forkJoin([handler.canActivate(context) as Promise<boolean>]).pipe(
+    map(([res]) => res)
+  )
 }
