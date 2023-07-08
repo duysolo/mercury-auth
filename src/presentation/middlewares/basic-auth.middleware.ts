@@ -9,11 +9,7 @@ export class BasicAuthMiddleware implements NestMiddleware {
     private readonly _authDefinitions: IAuthDefinitions
   ) {}
 
-  public use(
-    req: IncomingMessage,
-    res: ServerResponse,
-    next: () => void
-  ): void {
+  public use(__: IncomingMessage, res: ServerResponse, next: () => void): void {
     res.setHeader(
       'WWW-Authenticate',
       `Basic realm="${
