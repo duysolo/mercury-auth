@@ -112,7 +112,7 @@ export async function createTestAuthApplicationFastify(
       defaultDefinitions.transferTokenMethod as unknown as AuthTransferTokenMethod
     )
   ) {
-    app.getHttpAdapter().getInstance().register(FastifyCookie)
+    await app.getHttpAdapter().getInstance().register(FastifyCookie)
   }
 
   return app

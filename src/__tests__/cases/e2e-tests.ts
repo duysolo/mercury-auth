@@ -63,6 +63,7 @@ export function e2eTestsSetup<T extends INestApplication>(
 
     const res = await options.initApp()
 
+    // eslint-disable-next-line require-atomic-updates
     app = res.app
 
     await app.init()

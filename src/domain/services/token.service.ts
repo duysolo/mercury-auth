@@ -92,8 +92,14 @@ export class TokenService {
   public decodeTokenFromRawDecoded(
     rawPayload: IJwtPayload
   ): IJwtPayload | undefined {
-    const username = this.hashTextService.decode(rawPayload.username) || ''
-    const sub = this.hashTextService.decode(rawPayload.sub)
+    const isSelfSigned = rawPayload.iss === 'self-signed'
+
+    const username = isSelfSigned
+      ? this.hashTextService.decode(rawPayload.username!) || ''
+      : undefined
+    const sub = isSelfSigned
+      ? this.hashTextService.decode(rawPayload.sub)
+      : rawPayload.sub
 
     if (sub) {
       return {

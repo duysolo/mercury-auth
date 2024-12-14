@@ -1,39 +1,44 @@
-import { IsInt, IsNotEmpty, IsString } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
+import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export interface IJwtPayload<T = string> {
   iat: number
   exp: number
-  username: string
   iss: string
   sub: T
+  username?: string
 }
 
 export interface IJwtPayloadRawDecoded {
   iat: number
   exp: number
-  username: string
   iss: string
   sub: string
+  username?: string
 }
 
 export class JwtPayload implements IJwtPayload {
+  @ApiProperty()
   @IsNotEmpty()
   @IsInt()
   public iat: number // Issued date unix timestamp
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsInt()
   public exp: number // Expiry date unix timestamp
 
-  @IsNotEmpty()
-  @IsString()
-  public username: string
-
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   public iss: string
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   public sub: string // Should be the ID in database
+
+  @ApiProperty()
+  @IsOptional()
+  public username: string // Only available for self-signed JWT
 }

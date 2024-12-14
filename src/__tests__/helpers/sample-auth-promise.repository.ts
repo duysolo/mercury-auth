@@ -54,7 +54,7 @@ export class SampleAuthPromiseRepository
      * You can check the token if it's stored in database.
      */
 
-    return this.getAuthUserByUsername(jwtPayload.username)
+    return this.getAuthUserByUsername(jwtPayload.username!)
   }
 
   public async getAuthUserByRefreshToken(
@@ -65,6 +65,6 @@ export class SampleAuthPromiseRepository
      * You can check the token if it's stored in database.
      */
 
-    return this.getAuthUserByUsername(jwtPayload.username)
+    return this.getAuthUserByUsername(jwtPayload.username!)
   }
 }

@@ -26,7 +26,7 @@ export class GetUserByJwtTokenAction {
     @InjectAuthDefinitions()
     public readonly authDefinitions: IAuthDefinitions,
     public readonly authRepository: AuthRepository,
-    public readonly jwtService: TokenService
+    public readonly tokenService: TokenService
   ) {}
 
   public handle({
@@ -38,7 +38,7 @@ export class GetUserByJwtTokenAction {
       asyncScheduler
     ).pipe(
       map((res) => {
-        return this.jwtService.decodeTokenFromRawDecoded(res)
+        return this.tokenService.decodeTokenFromRawDecoded(res)
       }),
       mergeMap((validatedPayload) => {
         if (!validatedPayload) {

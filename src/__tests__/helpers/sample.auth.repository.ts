@@ -57,7 +57,7 @@ export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
      * You can check the token if it's stored in database.
      */
 
-    return this.getAuthUserByUsername(jwtPayload.username)
+    return this.getAuthUserByUsername(jwtPayload.username!)
   }
 
   public getAuthUserByRefreshToken(
@@ -68,6 +68,6 @@ export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
      * You can check the token if it's stored in database.
      */
 
-    return this.getAuthUserByUsername(jwtPayload.username)
+    return this.getAuthUserByUsername(jwtPayload.username!)
   }
 }

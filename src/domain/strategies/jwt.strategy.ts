@@ -1,12 +1,11 @@
-import { Injectable } from '@nestjs/common'
+import { HttpStatus, Injectable } from '@nestjs/common'
 import { QueryBus } from '@nestjs/cqrs'
 import { PassportStrategy } from '@nestjs/passport'
-import { ExtractJwt, JwtFromRequestFunction, Strategy } from 'passport-jwt'
+import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
+import { Strategy } from 'passport-strategy'
 import { GetCurrentUserByAccessTokenQuery } from '../../application/queries'
 import { InjectAuthDefinitions } from '../decorators'
-import type { IAuthResponse } from '../definitions'
 import { AuthTransferTokenMethod } from '../definitions'
-import { IJwtPayload } from '../entities'
 import {
   getRequestCookie,
   getRequestHeader,
@@ -53,37 +52,32 @@ export const accessTokenHeaderExtractor: (
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
-  private readonly _jwtFromRequest: JwtFromRequestFunction
+  private readonly _extractor: JwtFromRequestFunction
 
   public constructor(
     @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
     protected readonly queryBus: QueryBus
   ) {
-    const jwtFromRequest = ExtractJwt.fromExtractors([
+    super()
+
+    this._extractor = ExtractJwt.fromExtractors([
       cookieExtractor(authDefinitions.transferTokenMethod),
       accessTokenHeaderExtractor(authDefinitions.transferTokenMethod),
     ])
-
-    super({
-      jwtFromRequest,
-      ignoreExpiration: false,
-      secretOrKey: authDefinitions.jwt?.secret || 'NOT_DEFINED',
-      passReqToCallback: true,
-    })
-
-    this._jwtFromRequest = jwtFromRequest
   }
 
-  public async validate(
-    request: any,
-    payload: IJwtPayload
-  ): Promise<IAuthResponse | undefined> {
-    return this.queryBus.execute(
-      new GetCurrentUserByAccessTokenQuery(
-        this._jwtFromRequest(request) || '',
-        payload
-      )
+  public async authenticate(request: any): Promise<void> {
+    const token = this._extractor(request)
+
+    const user = await this.queryBus.execute(
+      new GetCurrentUserByAccessTokenQuery(token || '')
     )
+
+    if (user) {
+      this.success(user)
+    } else {
+      this.fail(HttpStatus.UNAUTHORIZED)
+    }
   }
 }
