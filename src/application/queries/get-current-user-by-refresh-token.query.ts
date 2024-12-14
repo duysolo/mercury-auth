@@ -1,3 +1,3 @@
 export class GetCurrentUserByRefreshTokenQuery {
-  public constructor(public refreshToken: string) {}
+  public constructor(public readonly refreshToken: string) {}
 }

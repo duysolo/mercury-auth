@@ -1,4 +1,3 @@
-import { UnauthorizedException } from '@nestjs/common'
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { lastValueFrom } from 'rxjs'
 import {
@@ -12,7 +11,7 @@ import { JwtService } from '@nestjs/jwt'
 @QueryHandler(GetCurrentUserByAccessTokenQuery)
 export class GetCurrentUserByAccessTokenQueryHandler
   implements
-    IQueryHandler<GetCurrentUserByAccessTokenQuery, IAuthResponse | undefined>
+    IQueryHandler<GetCurrentUserByAccessTokenQuery, IAuthResponse | null>
 {
   public constructor(
     protected readonly action: GetUserByJwtTokenAction,
@@ -23,11 +22,17 @@ export class GetCurrentUserByAccessTokenQueryHandler
     try {
       const decoded = this.jwt.decode(query.accessToken) as IJwtPayload
 
-      return lastValueFrom(
+      if (!decoded) {
+        return null
+      }
+
+      const res = await lastValueFrom(
         this.action.handle({ ...query, jwtPayload: decoded })
       )
+
+      return res || null
     } catch (error) {
-      throw new UnauthorizedException()
+      return null
     }
   }
 }

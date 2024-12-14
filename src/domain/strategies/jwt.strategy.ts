@@ -70,13 +70,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
   public async authenticate(request: any): Promise<void> {
     const token = this._extractor(request)
 
-    const user = await this.queryBus.execute(
-      new GetCurrentUserByAccessTokenQuery(token || '')
-    )
+    try {
+      const user = await this.queryBus.execute(
+        new GetCurrentUserByAccessTokenQuery(token || '')
+      )
 
-    if (user) {
-      this.success(user)
-    } else {
+      if (user) {
+        this.success(user)
+      } else {
+        this.fail(HttpStatus.UNAUTHORIZED)
+      }
+    } catch (error) {
       this.fail(HttpStatus.UNAUTHORIZED)
     }
   }
