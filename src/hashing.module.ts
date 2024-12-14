@@ -1,6 +1,6 @@
 import { DynamicModule, Module, Provider } from '@nestjs/common'
 import { ModuleMetadata } from '@nestjs/common/interfaces'
-import { HashTextService } from './index'
+import { HashTextService, NoHashTextService } from './index'
 
 const HASHING_MODULE_OPTIONS: symbol = Symbol('HASHING_MODULE_OPTIONS')
 
@@ -24,14 +24,14 @@ export class HashingModule {
 
     return {
       module: HashingModule,
-      providers: enabled
-        ? [
-          {
-            provide: HashTextService,
-            useValue: new HashTextService({ ...options, enabled }),
-          },
-        ]
-        : [],
+      providers: [
+        {
+          provide: HashTextService,
+          useValue: enabled
+            ? new HashTextService({ ...options, enabled })
+            : new NoHashTextService(),
+        },
+      ],
       exports: [HashTextService],
       global: options.global || false,
     }
@@ -51,10 +51,12 @@ export class HashingModule {
       useFactory: (options: IHashingOptions) => {
         const { enabled = true } = options
 
-        return enabled ? new HashTextService({
-          ...options,
-          enabled
-        }) : undefined
+        return enabled
+          ? new HashTextService({
+              ...options,
+              enabled,
+            })
+          : new NoHashTextService()
       },
       inject: [HASHING_MODULE_OPTIONS],
     }
