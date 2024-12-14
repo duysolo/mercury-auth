@@ -17,7 +17,7 @@ import { IAuthDefinitions } from '../index'
 
 export const JWT_STRATEGY_NAME: string = 'jwt'
 
-const cookieExtractor: (
+export const cookieExtractor: (
   transferTokenMethod: AuthTransferTokenMethod | undefined
 ) => JwtFromRequestFunction =
   (transferTokenMethod) =>
@@ -33,7 +33,7 @@ const cookieExtractor: (
     )
   }
 
-const accessTokenHeaderExtractor: (
+export const accessTokenHeaderExtractor: (
   transferTokenMethod: AuthTransferTokenMethod | undefined
 ) => JwtFromRequestFunction =
   (transferTokenMethod) =>
@@ -53,7 +53,7 @@ const accessTokenHeaderExtractor: (
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
-  private readonly jwtFromRequest: JwtFromRequestFunction
+  private readonly _jwtFromRequest: JwtFromRequestFunction
 
   public constructor(
     @InjectAuthDefinitions()
@@ -72,7 +72,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
       passReqToCallback: true,
     })
 
-    this.jwtFromRequest = jwtFromRequest
+    this._jwtFromRequest = jwtFromRequest
   }
 
   public async validate(
@@ -81,7 +81,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
   ): Promise<IAuthResponse | undefined> {
     return this.queryBus.execute(
       new GetCurrentUserByAccessTokenQuery(
-        this.jwtFromRequest(request) || '',
+        this._jwtFromRequest(request) || '',
         payload
       )
     )

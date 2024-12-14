@@ -62,6 +62,7 @@ export class TokenService {
         userInfo[this.authDefinitions.usernameField || 'username']
       ),
       sub: this.hashTextService.encode(userInfo.id),
+      iss: 'self-signed',
     }).pipe(
       map((payload) =>
         this.jwtService.sign(payload, {

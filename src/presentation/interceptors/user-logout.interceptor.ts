@@ -4,13 +4,13 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common'
-import { QueryBus } from '@nestjs/cqrs'
+import { CommandBus } from '@nestjs/cqrs'
 import { asyncScheduler, map, mergeMap, Observable, scheduled } from 'rxjs'
-import { UserLogoutQuery } from '../../application/queries'
+import { UserLogoutCommand } from '../../application/actions'
 
 @Injectable()
 export class UserLogoutInterceptor implements NestInterceptor {
-  public constructor(protected readonly queryBus: QueryBus) {}
+  public constructor(protected readonly _bus: CommandBus) {}
 
   public intercept(
     context: ExecutionContext,
@@ -19,7 +19,7 @@ export class UserLogoutInterceptor implements NestInterceptor {
     return next.handle().pipe(
       mergeMap((res) => {
         return scheduled(
-          this.queryBus.execute(new UserLogoutQuery(context)),
+          this._bus.execute(new UserLogoutCommand(context)),
           asyncScheduler
         ).pipe(map(() => res))
       })

@@ -15,8 +15,6 @@ import { JwtModule } from '@nestjs/jwt'
 import {
   GetCurrentUserByAccessTokenQueryHandler,
   GetCurrentUserByRefreshTokenQueryHandler,
-  LoginQueryHandler,
-  UserLogoutQueryHandler,
 } from './application/queries/handlers'
 import {
   AUTH_PASSWORD_HASHER,
@@ -55,6 +53,10 @@ import {
 } from './presentation'
 import { LogoutController } from './presentation/controllers/logout.controller'
 import { HashingModule } from './hashing.module'
+import {
+  LoginCommandHandler,
+  UserLogoutCommandHandler,
+} from './application/actions/handlers'
 
 export interface IAuthModuleOptions
   extends Pick<ModuleMetadata, 'imports' | 'providers'> {
@@ -92,7 +94,7 @@ export class AuthModule implements NestModule {
           useFactory: (definitions: IAuthDefinitions) => {
             return {
               secretKey: definitions.hashingSecretKey,
-              enabled: !!definitions.jwt && !!definitions.hashingSecretKey,
+              enabled: definitions.enableHashingToken,
             }
           },
           inject: [AUTH_DEFINITIONS_MODULE_OPTIONS],
@@ -130,10 +132,10 @@ export class AuthModule implements NestModule {
 
         TokenService,
 
-        LoginQueryHandler,
+        LoginCommandHandler,
         GetCurrentUserByAccessTokenQueryHandler,
         GetCurrentUserByRefreshTokenQueryHandler,
-        UserLogoutQueryHandler,
+        UserLogoutCommandHandler,
 
         GetUserByJwtTokenAction,
         GetUserByRefreshTokenAction,
@@ -217,7 +219,8 @@ export class AuthModule implements NestModule {
         JwtStrategy,
         RefreshTokenStrategy,
 
-        LoginQueryHandler,
+        LoginCommandHandler,
+        UserLogoutCommandHandler,
         GetCurrentUserByAccessTokenQueryHandler,
         GetCurrentUserByRefreshTokenQueryHandler,
 

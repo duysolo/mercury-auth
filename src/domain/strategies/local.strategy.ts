@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common'
-import { QueryBus } from '@nestjs/cqrs'
+import { CommandBus } from '@nestjs/cqrs'
 import { PassportStrategy } from '@nestjs/passport'
 import { Strategy } from 'passport-local'
-import { LoginQuery } from '../../application/queries'
 import { InjectAuthDefinitions } from '../decorators'
 import type { IAuthUserEntityForResponse } from '../definitions'
 import { IAuthDefinitions } from '../index'
+import { LoginCommand } from '../../application/actions'
 
 export const LOCAL_STRATEGY_NAME: string = 'local'
 
@@ -14,7 +14,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   public constructor(
     @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
-    protected readonly queryBus: QueryBus
+    protected readonly bus: CommandBus
   ) {
     super({
       usernameField: authDefinitions.usernameField || 'username',
@@ -28,8 +28,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     username: string,
     password: string
   ): Promise<IAuthUserEntityForResponse> {
-    return this.queryBus.execute(
-      new LoginQuery({
+    return this.bus.execute(
+      new LoginCommand({
         ...request.body,
         username,
         password,

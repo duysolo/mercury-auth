@@ -200,7 +200,8 @@ import { Module } from '@nestjs/common'
             },
             jwt: {
               secret: config.get('AUTH_JWT_SECRET'),
-              expiresIn: config.get('AUTH_JWT_EXPIRES') || '1d',
+              expiresIn: envRequired('AUTH_JWT_EXPIRES') || '1h',
+              refreshTokenExpiresIn: envRequired('AUTH_JWT_REFRESH_EXPIRES') || '7d',
             },
             transferTokenMethod: config.get<AuthTransferTokenMethod>(
               'AUTH_TRANSFER_TOKEN_METHOD'

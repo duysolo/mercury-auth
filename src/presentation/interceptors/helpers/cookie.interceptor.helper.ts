@@ -33,6 +33,7 @@ export const transferTokenFromResponseToCookie: (
 
     const token: IJwtTokenResponse = authResponse.token
 
+    // eslint-disable-next-line guard-for-in
     for (const responseKey in mapKeys) {
       const currentToken = token[responseKey]
       const currentKey = mapKeys[responseKey]

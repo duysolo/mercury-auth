@@ -31,6 +31,7 @@ export interface IAuthDefinitions {
   redactedFields?: string[]
   ignoredRoutes?: string[]
 
+  enableHashingToken?: boolean
   hashingSecretKey?: string
 
   transferTokenMethod?: AuthTransferTokenMethod

@@ -39,9 +39,9 @@ export class LocalLoginAction {
   public constructor(
     @InjectAuthDefinitions()
     protected readonly authDefinitions: IAuthDefinitions,
-    protected readonly authRepository: AuthRepository,
     @InjectPasswordHasher()
     protected readonly passwordHasherService: PasswordHasherService,
+    protected readonly authRepository: AuthRepository,
     protected readonly tokenService: TokenService,
     protected readonly eventBus: EventBus
   ) {}
@@ -108,7 +108,7 @@ export class LocalLoginAction {
           new UserLoggedInEvent(user, impersonated, validatedDto, token)
         )
       ),
-      map(({ user: userData, token }) => ({ userData, token } as T))
+      map(({ user: userData, token }) => ({ userData, token }) as T)
     )
   }
 
