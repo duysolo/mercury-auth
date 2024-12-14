@@ -293,11 +293,12 @@ interface IAuthDefinitions {
    */
   ignoredRoutes?: string[]
 
+  enableHashingToken?: boolean
   /**
    * Used to encode/decode the access/refresh token
    * 32 characters string
    */
-  hashingSecretKey: string
+  hashingSecretKey?: string
 
   /**
    * We accepted these 3 values: cookie|bearer|both
