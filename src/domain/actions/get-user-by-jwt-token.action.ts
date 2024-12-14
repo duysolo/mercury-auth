@@ -29,7 +29,7 @@ export class GetUserByJwtTokenAction {
     public readonly jwtService: TokenService
   ) {}
 
-  public handle<T = IAuthResponse>({
+  public handle({
     jwtPayload,
     accessToken,
   }: IGetUserByJwtTokenActionOptions): Observable<IAuthResponse | undefined> {
@@ -41,7 +41,7 @@ export class GetUserByJwtTokenAction {
         return this.jwtService.decodeTokenFromRawDecoded(res)
       }),
       mergeMap((validatedPayload) => {
-        if (!validatedPayload?.username) {
+        if (!validatedPayload) {
           return of(undefined)
         }
 
