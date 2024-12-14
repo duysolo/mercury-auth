@@ -4,6 +4,7 @@ export interface IJwtPayload<T = string> {
   iat: number
   exp: number
   username: string
+  iss: string
   sub: T
 }
 
@@ -22,6 +23,10 @@ export class JwtPayload implements IJwtPayload {
   @IsNotEmpty()
   @IsInt()
   public exp: number // Expiry date unix timestamp
+
+  @IsNotEmpty()
+  @IsString()
+  public iss: string
 
   @IsNotEmpty()
   @IsString()
