@@ -12,6 +12,7 @@ export interface IJwtPayloadRawDecoded {
   iat: number
   exp: number
   username: string
+  iss: string
   sub: string
 }
 
@@ -26,11 +27,11 @@ export class JwtPayload implements IJwtPayload {
 
   @IsNotEmpty()
   @IsString()
-  public iss: string
+  public username: string
 
   @IsNotEmpty()
   @IsString()
-  public username: string
+  public iss: string
 
   @IsNotEmpty()
   @IsString()
