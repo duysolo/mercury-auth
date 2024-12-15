@@ -42,5 +42,9 @@ export class JwtPayload implements IJwtPayload {
 
   @ApiProperty()
   @IsOptional()
-  public username: string // Only available for self-signed JWT
+  public username?: string // Only available for self-signed JWT
+
+  @ApiProperty()
+  @IsOptional()
+  public uuid?: string // Only available for self-signed JWT
 }
