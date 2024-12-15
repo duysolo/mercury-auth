@@ -6,6 +6,7 @@ export interface IJwtPayload<T = string> {
   exp: number
   iss: string
   sub: T
+  uuid?: string
   username?: string
 }
 
@@ -14,6 +15,7 @@ export interface IJwtPayloadRawDecoded {
   exp: number
   iss: string
   sub: string
+  uuid?: string
   username?: string
 }
 

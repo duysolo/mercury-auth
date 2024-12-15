@@ -166,6 +166,7 @@ export function e2eTestsSetup<T extends INestApplication>(
         expect(res.userData).toBeDefined()
         expect(res.userData.id).toBeDefined()
         expect(res.userData.username).toBeDefined()
+        expect(res.userData.uuid).toBeDefined()
       })
     })
 

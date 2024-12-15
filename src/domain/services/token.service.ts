@@ -10,6 +10,7 @@ import type {
   IJwtPayloadRawDecoded,
 } from '../index'
 import { HashTextService } from './hash-text.service'
+import { v6 as uuidV6 } from 'uuid'
 
 export interface IJwtTokenResponse {
   accessToken: string
@@ -63,6 +64,7 @@ export class TokenService {
       ),
       sub: this.hashTextService.encode(userInfo.id),
       iss: 'self-signed',
+      uuid: uuidV6(),
     }).pipe(
       map((payload) =>
         this.jwtService.sign(payload, {

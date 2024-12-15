@@ -24,6 +24,7 @@ export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
         id: (Math.floor(Math.random() * 1999) + 1).toString(),
         username: 'sample-user@gmail.com',
         email: 'sample-user@gmail.com',
+        uuid: 'sample-user-uuid',
         password,
       }))
     )
