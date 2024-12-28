@@ -41,6 +41,9 @@ interface IE2ETestsSetupOptions<NestAppType = INestApplication> {
   getProfileRequest: (
     useCookie?: boolean
   ) => (app: NestAppType, accessToken: string) => Promise<IProfileResponse>
+  getProfileByApiKeyRequest: (
+    useCookie?: boolean
+  ) => (app: NestAppType, apiKey: string) => Promise<IProfileResponse>
   logoutRequest: (
     useCookie?: boolean
   ) => (
@@ -193,6 +196,23 @@ export function e2eTestsSetup<T extends INestApplication>(
         )
 
         expect(res.statusCode).toEqual(HttpStatus.CREATED)
+      })
+    })
+  })
+
+  describe('ApiKey Strategy', () => {
+    describe('ApiKeyController', () => {
+      it('should show user profile', async () => {
+        const res = await options.getProfileByApiKeyRequest()(
+          app,
+          '01940cb7-c669-709e-9ac1-b9f407257091'
+        )
+
+        expect(res.statusCode).toEqual(HttpStatus.OK)
+        expect(res.userData).toBeDefined()
+        expect(res.userData.id).toBeDefined()
+        expect(res.userData.username).toBeDefined()
+        expect(res.userData.uuid).toBeDefined()
       })
     })
   })

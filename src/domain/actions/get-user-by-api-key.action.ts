@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common'
 import { EventBus } from '@nestjs/cqrs'
 import { forkJoin, map, Observable, of } from 'rxjs'
 import { InjectAuthDefinitions } from '../decorators'
-import { IAuthDefinitions, IAuthUserEntityForResponse } from '../definitions'
+import {
+  IAuthDefinitions,
+  IAuthResponse,
+  IAuthUserEntityForResponse,
+} from '../definitions'
 import { hideRedactedFields } from '../helpers'
 import { AuthRepository } from '../repositories'
 import { TokenService } from '../services'
@@ -24,7 +28,7 @@ export class GetUserByApiKeyAction {
 
   public handle<T extends IAuthUserEntityForResponse>({
     apiKey,
-  }: IGetUserByApiKeyActionOptions): Observable<T | undefined> {
+  }: IGetUserByApiKeyActionOptions): Observable<IAuthResponse<T> | undefined> {
     if (!apiKey) {
       return of(undefined)
     }
@@ -32,7 +36,7 @@ export class GetUserByApiKeyAction {
     return forkJoin([this.authRepository.getAuthUserByApiKey(apiKey)]).pipe(
       map(([res]) => res),
       map(hideRedactedFields(this.authDefinitions.redactedFields)),
-      map((user) => user as T)
+      map((user) => ({ userData: user }) as IAuthResponse<T>)
     )
   }
 }

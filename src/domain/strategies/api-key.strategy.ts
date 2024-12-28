@@ -3,15 +3,10 @@ import { QueryBus } from '@nestjs/cqrs'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
 import { Strategy } from 'passport-strategy'
-import {
-  GetCurrentUserByApiKeyQuery
-} from '../../application/queries'
+import { GetCurrentUserByApiKeyQuery } from '../../application/queries'
 import { InjectAuthDefinitions } from '../decorators'
 import { IAuthDefinitions } from '../definitions'
-import {
-  cookieExtractorForApiKey,
-  headerExtractorForApiKey
-} from '../helpers'
+import { cookieExtractorForApiKey, headerExtractorForApiKey } from '../helpers'
 
 export const API_KEY_STRATEGY_NAME: string = 'mercury-api-key'
 

@@ -54,6 +54,7 @@ import {
   IAuthDefinitionsModuleOptions,
 } from './infrastructure'
 import {
+  ApiKeyController,
   BasicAuthMiddleware,
   CookieAuthInterceptor,
   LoginController,
@@ -211,6 +212,7 @@ export class AuthModule implements NestModule {
             RefreshTokenController,
             LogoutController,
             ProfileController,
+            ApiKeyController,
           ]
         : [],
       exports: [

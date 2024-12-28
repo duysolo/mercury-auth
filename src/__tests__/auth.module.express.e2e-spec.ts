@@ -73,6 +73,22 @@ describe('AuthModule (e2e) - Express Adaptor', () => {
         })
       }
     },
+    getProfileByApiKeyRequest: () => {
+      return (app, apiKey) => {
+        return expressRequest(app, {
+          method: 'GET',
+          path: '/auth/profile/api-key',
+          headers: {
+            ApiKey: `${apiKey}`,
+          },
+        }).then((response) => {
+          return {
+            statusCode: response.statusCode,
+            userData: JSON.parse(response.text || '{}'),
+          }
+        })
+      }
+    },
     logoutRequest: () => {
       return (app, accessToken) =>
         expressRequest(app, {

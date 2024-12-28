@@ -42,7 +42,7 @@ describe('AuthModule (e2e) - Fastify Adaptor', () => {
           method: 'POST',
           path: '/auth/refresh-token',
           headers: {
-            'RefreshToken': `${refreshToken}`,
+            RefreshToken: `${refreshToken}`,
           },
         }).then((response) => {
           const parsedResponseBody: IRefreshTokenAuthResponse =
@@ -63,6 +63,22 @@ describe('AuthModule (e2e) - Fastify Adaptor', () => {
           path: '/auth/profile',
           headers: {
             Authorization: `Bearer ${accessToken}`,
+          },
+        }).then((response) => {
+          return {
+            statusCode: response.statusCode,
+            userData: response.json() || {},
+          }
+        })
+      }
+    },
+    getProfileByApiKeyRequest: () => {
+      return (app, apiKey) => {
+        return fastifyRequest(app, {
+          method: 'GET',
+          path: '/auth/profile/api-key',
+          headers: {
+            ApiKey: `${apiKey}`,
           },
         }).then((response) => {
           return {
@@ -125,7 +141,7 @@ describe('AuthModule (e2e) - Fastify Adaptor - Without hashing token', () => {
           method: 'POST',
           path: '/auth/refresh-token',
           headers: {
-            'RefreshToken': `${refreshToken}`,
+            RefreshToken: `${refreshToken}`,
           },
         }).then((response) => {
           const parsedResponseBody: IRefreshTokenAuthResponse =
@@ -146,6 +162,22 @@ describe('AuthModule (e2e) - Fastify Adaptor - Without hashing token', () => {
           path: '/auth/profile',
           headers: {
             Authorization: `Bearer ${accessToken}`,
+          },
+        }).then((response) => {
+          return {
+            statusCode: response.statusCode,
+            userData: response.json() || {},
+          }
+        })
+      }
+    },
+    getProfileByApiKeyRequest: () => {
+      return (app, apiKey) => {
+        return fastifyRequest(app, {
+          method: 'GET',
+          path: '/auth/profile/api-key',
+          headers: {
+            ApiKey: `${apiKey}`,
           },
         }).then((response) => {
           return {
