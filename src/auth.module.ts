@@ -22,6 +22,7 @@ import {
   GetCurrentUserByRefreshTokenQueryHandler,
 } from './application/queries/handlers'
 import {
+  ApiKeyStrategy,
   AUTH_PASSWORD_HASHER,
   AuthApiKeyGuard,
   AuthBasicGuard,
@@ -150,6 +151,7 @@ export class AuthModule implements NestModule {
         LogoutAction,
 
         LocalStrategy,
+        ApiKeyStrategy,
         JwtStrategy,
         RefreshTokenStrategy,
 
