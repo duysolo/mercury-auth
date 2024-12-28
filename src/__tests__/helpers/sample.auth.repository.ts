@@ -16,8 +16,8 @@ export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
     protected readonly hasher: PasswordHasherService
   ) {}
 
-  public getAuthUserByUsername(
-    username: string
+  protected getAuthUserByUsername(
+    username?: string
   ): Observable<IAuthUserEntity | undefined> {
     return scheduled(this.hasher.hash('testLogin@12345'), asyncScheduler).pipe(
       map((password: string) => ({
@@ -70,5 +70,15 @@ export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
      */
 
     return this.getAuthUserByUsername(jwtPayload.username!)
+  }
+
+  public getAuthUserByApiKey(
+    apiKey: string
+  ): Observable<IAuthUserEntity | undefined> {
+    /**
+     * You can check the apiKey if it's stored in database.
+     */
+
+    return this.getAuthUserByUsername()
   }
 }

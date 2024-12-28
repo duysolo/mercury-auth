@@ -42,7 +42,7 @@ export class LogoutAction {
 
     let currentToken = getRequestCookie(
       request,
-      'AccessToken'
+      'Authorization'
     ) as unknown as string
 
     if (!currentToken) {
@@ -81,12 +81,12 @@ export class LogoutAction {
     }
 
     if (res.httpAdaptorType === 'fastify' && res.setCookie) {
-      res.setCookie('AccessToken', '', cookieOptions)
+      res.setCookie('Authorization', '', cookieOptions)
       res.setCookie('RefreshToken', '', cookieOptions)
     }
 
     if (res.httpAdaptorType === 'express' && res.cookie) {
-      res.cookie('AccessToken', '', cookieOptions)
+      res.cookie('Authorization', '', cookieOptions)
       res.cookie('RefreshToken', '', cookieOptions)
     }
   }

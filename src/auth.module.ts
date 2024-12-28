@@ -13,18 +13,26 @@ import { APP_GUARD, Reflector } from '@nestjs/core'
 import { CqrsModule } from '@nestjs/cqrs'
 import { JwtModule } from '@nestjs/jwt'
 import {
+  LoginCommandHandler,
+  UserLogoutCommandHandler,
+} from './application/actions/handlers'
+import {
   GetCurrentUserByAccessTokenQueryHandler,
+  GetCurrentUserByApiKeyQueryHandler,
   GetCurrentUserByRefreshTokenQueryHandler,
 } from './application/queries/handlers'
 import {
   AUTH_PASSWORD_HASHER,
+  AuthApiKeyGuard,
   AuthBasicGuard,
   AuthGlobalGuard,
   AuthJwtGuard,
   AuthRefreshTokenGuard,
   AuthRepository,
+  GetUserByApiKeyAction,
   GetUserByJwtTokenAction,
   GetUserByRefreshTokenAction,
+  GraphqlAuthApiKeyGuard,
   GraphqlAuthJwtGuard,
   GraphqlAuthRefreshTokenGuard,
   IAuthDefinitions,
@@ -38,6 +46,7 @@ import {
   RefreshTokenStrategy,
   TokenService,
 } from './domain'
+import { HashingModule } from './hashing.module'
 import {
   AUTH_DEFINITIONS_MODULE_OPTIONS,
   AuthDefinitionsModule,
@@ -45,18 +54,13 @@ import {
 } from './infrastructure'
 import {
   BasicAuthMiddleware,
-  UserLogoutInterceptor,
   CookieAuthInterceptor,
   LoginController,
+  LogoutController,
   ProfileController,
   RefreshTokenController,
+  UserLogoutInterceptor,
 } from './presentation'
-import { LogoutController } from './presentation/controllers/logout.controller'
-import { HashingModule } from './hashing.module'
-import {
-  LoginCommandHandler,
-  UserLogoutCommandHandler,
-} from './application/actions/handlers'
 
 export interface IAuthModuleOptions
   extends Pick<ModuleMetadata, 'imports' | 'providers'> {
@@ -134,10 +138,12 @@ export class AuthModule implements NestModule {
 
         LoginCommandHandler,
         GetCurrentUserByAccessTokenQueryHandler,
+        GetCurrentUserByApiKeyQueryHandler,
         GetCurrentUserByRefreshTokenQueryHandler,
         UserLogoutCommandHandler,
 
         GetUserByJwtTokenAction,
+        GetUserByApiKeyAction,
         GetUserByRefreshTokenAction,
         LocalLoginAction,
         ParseJwtTokenAction,
@@ -151,10 +157,12 @@ export class AuthModule implements NestModule {
         CookieAuthInterceptor,
 
         AuthBasicGuard,
+        AuthApiKeyGuard,
         AuthJwtGuard,
         AuthRefreshTokenGuard,
         GraphqlAuthJwtGuard,
         GraphqlAuthRefreshTokenGuard,
+        GraphqlAuthApiKeyGuard,
 
         BasicAuthMiddleware,
 
@@ -164,6 +172,7 @@ export class AuthModule implements NestModule {
             reflector: Reflector,
             authJwtGuard: AuthJwtGuard,
             basicAuthGuard: AuthBasicGuard,
+            authApiKeyGuard: AuthApiKeyGuard,
             refreshTokenGuard: AuthRefreshTokenGuard,
             graphqlAuthJwtGuard: GraphqlAuthJwtGuard,
             graphqlAuthRefreshTokenGuard: GraphqlAuthRefreshTokenGuard,
@@ -173,6 +182,7 @@ export class AuthModule implements NestModule {
               reflector,
               authJwtGuard,
               basicAuthGuard,
+              authApiKeyGuard,
               refreshTokenGuard,
               graphqlAuthJwtGuard,
               graphqlAuthRefreshTokenGuard,
@@ -183,6 +193,7 @@ export class AuthModule implements NestModule {
             Reflector,
             AuthJwtGuard,
             AuthBasicGuard,
+            AuthApiKeyGuard,
             AuthRefreshTokenGuard,
             GraphqlAuthJwtGuard,
             GraphqlAuthRefreshTokenGuard,
@@ -205,6 +216,7 @@ export class AuthModule implements NestModule {
         TokenService,
 
         GetUserByJwtTokenAction,
+        GetUserByApiKeyAction,
         GetUserByRefreshTokenAction,
         LocalLoginAction,
         ParseJwtTokenAction,

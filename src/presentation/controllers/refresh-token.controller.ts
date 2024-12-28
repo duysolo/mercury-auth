@@ -2,12 +2,12 @@ import { Controller, Post, UseInterceptors } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { Observable, of } from 'rxjs'
 import { IAuthWithTokenResponse, IRefreshTokenAuthResponse } from '../../domain'
-import { CurrentUserWithToken, ShouldUseRefreshToken } from '../decorators'
+import { CurrentUserWithToken, AuthRefreshToken } from '../decorators'
 import { CookieAuthInterceptor } from '../interceptors'
 
 @ApiTags('Authentication')
 @Controller({ path: 'auth' })
-@ShouldUseRefreshToken()
+@AuthRefreshToken()
 @UseInterceptors(CookieAuthInterceptor)
 export class RefreshTokenController {
   @ApiOperation({

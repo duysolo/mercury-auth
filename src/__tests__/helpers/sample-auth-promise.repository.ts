@@ -17,8 +17,8 @@ export class SampleAuthPromiseRepository
     protected readonly hasher: PasswordHasherService
   ) {}
 
-  public async getAuthUserByUsername(
-    username: string
+  protected async getAuthUserByUsername(
+    username?: string
   ): Promise<IAuthUserEntity | undefined> {
     return {
       id: (Math.floor(Math.random() * 1999) + 1).toString(),
@@ -66,5 +66,15 @@ export class SampleAuthPromiseRepository
      */
 
     return this.getAuthUserByUsername(jwtPayload.username!)
+  }
+
+  public async getAuthUserByApiKey(
+    apiKey: string,
+  ): Promise<IAuthUserEntity | undefined> {
+    /**
+     * You can check the apiKey if it's stored in database.
+     */
+
+    return this.getAuthUserByUsername()
   }
 }

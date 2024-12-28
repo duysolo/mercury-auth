@@ -26,7 +26,7 @@ export function generateExecutionContextForRefreshTokenStrategy(
   const getRequest = () => {
     return {
       headers: {
-        'refresh-token': `${refreshToken}`,
+        'RefreshToken': `${refreshToken}`,
       },
     }
   }

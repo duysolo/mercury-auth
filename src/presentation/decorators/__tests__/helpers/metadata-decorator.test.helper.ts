@@ -19,6 +19,7 @@ export function metadataDecoratorTestHelper(
     })
 
     it('should able to get method metadata', function () {
+      // eslint-disable-next-line dot-notation
       const metadata = Reflect.getMetadata(metadataKey, testMethod['handle'])
 
       expect(metadata).toEqual(expectedValue)

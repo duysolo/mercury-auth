@@ -5,6 +5,7 @@ import { GqlContextType } from '@nestjs/graphql'
 import { catchError, forkJoin, map, Observable, of, throwError } from 'rxjs'
 import { InjectAuthDefinitions } from '../decorators'
 import {
+  AuthApiKeyGuard,
   GraphqlAuthJwtGuard,
   GraphqlAuthRefreshTokenGuard,
   IAuthDefinitions,
@@ -20,6 +21,8 @@ export const IS_PUBLIC_KEY: string = 'isPublic'
 export const IS_PUBLIC_WITH_OPTIONAL_USER_KEY: string =
   'isPublicWithOptionalUser'
 
+export const IS_API_KEY: string = 'isApiKey'
+
 export const IS_REFRESH_TOKEN_KEY: string = 'isRefreshToken'
 
 @Injectable()
@@ -28,6 +31,7 @@ export class AuthGlobalGuard {
     private readonly _reflector: Reflector,
     private readonly _authJwtGuard: AuthJwtGuard,
     private readonly _basicAuthGuard: AuthBasicGuard,
+    private readonly _authApiKeyGuard: AuthApiKeyGuard,
     private readonly _refreshTokenGuard: AuthRefreshTokenGuard,
     private readonly _graphqlAuthJwtGuard: GraphqlAuthJwtGuard,
     private readonly _graphqlAuthRefreshTokenGuard: GraphqlAuthRefreshTokenGuard,
@@ -38,6 +42,7 @@ export class AuthGlobalGuard {
   public canActivate(
     context: ExecutionContext
   ): boolean | Promise<boolean> | Observable<boolean> {
+    // ----------------- Public -----------------
     const isPublic = this._reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -54,6 +59,7 @@ export class AuthGlobalGuard {
 
     const contextType: GqlContextType = context.getType<GqlContextType>()
 
+    // ----------------- Internal Only -----------------
     const isInternalOnly = this._reflector.getAllAndOverride<boolean>(
       IS_INTERNAL_ONLY,
       [context.getHandler(), context.getClass()]
@@ -63,10 +69,22 @@ export class AuthGlobalGuard {
       return this._basicAuthGuard.canActivate(context)
     }
 
+    // ----------------- API Key -----------------
+    const isApiKey = this._reflector.getAllAndOverride<boolean>(
+      IS_API_KEY,
+      [context.getHandler(), context.getClass()]
+    )
+
+    if (isApiKey) {
+      return this._authApiKeyGuard.canActivate(context)
+    }
+
+    // Below this line, we are dealing with JWT
     if (!this._options?.jwt) {
       return true
     }
 
+    // ----------------- Refresh Token -----------------
     const isRefreshToken = this._reflector.getAllAndOverride<boolean>(
       IS_REFRESH_TOKEN_KEY,
       [context.getHandler(), context.getClass()]
@@ -80,6 +98,7 @@ export class AuthGlobalGuard {
       return this._refreshTokenGuard.canActivate(context)
     }
 
+    // ----------------- JWT ----------------
     const isPublicWithOptionalUser = this._reflector.getAllAndOverride<boolean>(
       IS_PUBLIC_WITH_OPTIONAL_USER_KEY,
       [context.getHandler(), context.getClass()]

@@ -42,7 +42,7 @@ describe('AuthModule (e2e) - Fastify Adaptor', () => {
           method: 'POST',
           path: '/auth/refresh-token',
           headers: {
-            'Refresh-Token': `${refreshToken}`,
+            'RefreshToken': `${refreshToken}`,
           },
         }).then((response) => {
           const parsedResponseBody: IRefreshTokenAuthResponse =
@@ -125,7 +125,7 @@ describe('AuthModule (e2e) - Fastify Adaptor - Without hashing token', () => {
           method: 'POST',
           path: '/auth/refresh-token',
           headers: {
-            'Refresh-Token': `${refreshToken}`,
+            'RefreshToken': `${refreshToken}`,
           },
         }).then((response) => {
           const parsedResponseBody: IRefreshTokenAuthResponse =

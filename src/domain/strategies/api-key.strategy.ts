@@ -3,20 +3,22 @@ import { QueryBus } from '@nestjs/cqrs'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
 import { Strategy } from 'passport-strategy'
-import { GetCurrentUserByRefreshTokenQuery } from '../../application/queries'
+import {
+  GetCurrentUserByApiKeyQuery
+} from '../../application/queries'
 import { InjectAuthDefinitions } from '../decorators'
 import { IAuthDefinitions } from '../definitions'
 import {
-  cookieExtractorForRefreshToken,
-  headerExtractorForRefreshToken
+  cookieExtractorForApiKey,
+  headerExtractorForApiKey
 } from '../helpers'
 
-export const REFRESH_TOKEN_STRATEGY_NAME: string = 'mercury-refresh-token'
+export const API_KEY_STRATEGY_NAME: string = 'mercury-api-key'
 
 @Injectable()
-export class RefreshTokenStrategy extends PassportStrategy(
+export class ApiKeyStrategy extends PassportStrategy(
   Strategy,
-  REFRESH_TOKEN_STRATEGY_NAME
+  API_KEY_STRATEGY_NAME
 ) {
   protected jwtFromRequest: JwtFromRequestFunction
 
@@ -28,8 +30,8 @@ export class RefreshTokenStrategy extends PassportStrategy(
     super()
 
     this.jwtFromRequest = ExtractJwt.fromExtractors([
-      cookieExtractorForRefreshToken(authDefinitions.transferTokenMethod),
-      headerExtractorForRefreshToken(authDefinitions.transferTokenMethod),
+      cookieExtractorForApiKey(authDefinitions.transferTokenMethod),
+      headerExtractorForApiKey(authDefinitions.transferTokenMethod),
     ]) as any
   }
 
@@ -37,9 +39,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     const token: string | any = this.jwtFromRequest(req)
 
     const user = token
-      ? await this.queryBus.execute(
-          new GetCurrentUserByRefreshTokenQuery(token)
-        )
+      ? await this.queryBus.execute(new GetCurrentUserByApiKeyQuery(token))
       : undefined
 
     if (!user) {

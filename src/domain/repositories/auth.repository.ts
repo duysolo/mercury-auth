@@ -6,14 +6,8 @@ import { IJwtPayload } from '../entities'
 @Injectable()
 export abstract class AuthRepository<
   T = string,
-  TRequest = Record<string, any>
+  TRequest = Record<string, any>,
 > {
-  public abstract getAuthUserByUsername(
-    username: string
-  ):
-    | Observable<IAuthUserEntity<T> | undefined>
-    | Promise<IAuthUserEntity<T> | undefined>
-
   public abstract authenticate(
     username: string,
     request: TRequest,
@@ -32,6 +26,12 @@ export abstract class AuthRepository<
   public abstract getAuthUserByRefreshToken(
     refreshToken: string,
     jwtPayload: IJwtPayload
+  ):
+    | Observable<IAuthUserEntity<T> | undefined>
+    | Promise<IAuthUserEntity<T> | undefined>
+
+  public abstract getAuthUserByApiKey(
+    apiKey: string
   ):
     | Observable<IAuthUserEntity<T> | undefined>
     | Promise<IAuthUserEntity<T> | undefined>

@@ -5,50 +5,13 @@ import { ExtractJwt, JwtFromRequestFunction } from 'passport-jwt'
 import { Strategy } from 'passport-strategy'
 import { GetCurrentUserByAccessTokenQuery } from '../../application/queries'
 import { InjectAuthDefinitions } from '../decorators'
-import { AuthTransferTokenMethod } from '../definitions'
 import {
-  getRequestCookie,
-  getRequestHeader,
-  IHttpRequest,
-  removeBearerFromToken,
+  cookieExtractorForAuthorization,
+  headerExtractorForAuthorization,
 } from '../helpers'
 import { IAuthDefinitions } from '../index'
 
 export const JWT_STRATEGY_NAME: string = 'jwt'
-
-export const cookieExtractor: (
-  transferTokenMethod: AuthTransferTokenMethod | undefined
-) => JwtFromRequestFunction =
-  (transferTokenMethod) =>
-  (request: IHttpRequest): string | any => {
-    if (transferTokenMethod === AuthTransferTokenMethod.BEARER_ONLY) {
-      return null
-    }
-
-    return (
-      removeBearerFromToken(
-        getRequestCookie(request, 'AccessToken') as unknown as string
-      ) || null
-    )
-  }
-
-export const accessTokenHeaderExtractor: (
-  transferTokenMethod: AuthTransferTokenMethod | undefined
-) => JwtFromRequestFunction =
-  (transferTokenMethod) =>
-  (request: IHttpRequest): string | any => {
-    if (transferTokenMethod === AuthTransferTokenMethod.COOKIE_ONLY) {
-      return null
-    }
-
-    const authHeader = getRequestHeader(request, 'authorization')
-
-    if (!authHeader || typeof authHeader !== 'string') {
-      return null
-    }
-
-    return removeBearerFromToken(authHeader)
-  }
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
@@ -62,8 +25,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY_NAME) {
     super()
 
     this._extractor = ExtractJwt.fromExtractors([
-      cookieExtractor(authDefinitions.transferTokenMethod),
-      accessTokenHeaderExtractor(authDefinitions.transferTokenMethod),
+      cookieExtractorForAuthorization(authDefinitions.transferTokenMethod),
+      headerExtractorForAuthorization(authDefinitions.transferTokenMethod),
     ])
   }
 
