@@ -7,6 +7,7 @@ import {
   InjectPasswordHasher,
   PasswordHasherService,
 } from '../../domain'
+import { generateCorrectApiKey } from './user-fixture'
 
 @Injectable()
 export class SampleAuthPromiseRepository
@@ -69,11 +70,15 @@ export class SampleAuthPromiseRepository
   }
 
   public async getAuthUserByApiKey(
-    apiKey: string,
+    apiKey: string
   ): Promise<IAuthUserEntity | undefined> {
     /**
      * You can check the apiKey if it's stored in database.
      */
+
+    if (apiKey !== generateCorrectApiKey()) {
+      return undefined
+    }
 
     return this.getAuthUserByUsername()
   }

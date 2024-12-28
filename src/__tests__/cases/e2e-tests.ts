@@ -10,7 +10,9 @@ import {
   generateCorrectUserPayloadImpersonate,
   generateInvalidUserPayload,
   generateInvalidUserPayloadImpersonate,
+  generateCorrectApiKey,
   UserLoggedInEventHandler,
+  generateInvalidApiKey,
 } from '../helpers'
 
 interface ITokenResponse<T = IAuthWithTokenResponse> {
@@ -202,10 +204,10 @@ export function e2eTestsSetup<T extends INestApplication>(
 
   describe('ApiKey Strategy', () => {
     describe('ApiKeyController', () => {
-      it('should show user profile', async () => {
+      it('should show user profile if provided ApiKey is correct', async () => {
         const res = await options.getProfileByApiKeyRequest()(
           app,
-          '01940cb7-c669-709e-9ac1-b9f407257091'
+          generateCorrectApiKey()
         )
 
         expect(res.statusCode).toEqual(HttpStatus.OK)
@@ -213,6 +215,15 @@ export function e2eTestsSetup<T extends INestApplication>(
         expect(res.userData.id).toBeDefined()
         expect(res.userData.username).toBeDefined()
         expect(res.userData.uuid).toBeDefined()
+      })
+
+      it('should throw error if provided ApiKey is invalid', async () => {
+        const res = await options.getProfileByApiKeyRequest()(
+          app,
+          generateInvalidApiKey()
+        )
+
+        loginFailedCheck(res)
       })
     })
   })

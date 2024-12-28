@@ -40,3 +40,11 @@ export function generateInvalidUserPayloadImpersonate(impersonate?: {
     password: impersonate?.password || '',
   }
 }
+
+export function generateCorrectApiKey() {
+  return '01940cbd-0735-709f-b3f2-0bc6dbaac15f'
+}
+
+export function generateInvalidApiKey() {
+  return '01940cb7-c669-709e-9ac1-b9f407257091'
+}

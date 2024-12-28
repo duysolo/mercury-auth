@@ -36,7 +36,13 @@ export class GetUserByApiKeyAction {
     return forkJoin([this.authRepository.getAuthUserByApiKey(apiKey)]).pipe(
       map(([res]) => res),
       map(hideRedactedFields(this.authDefinitions.redactedFields)),
-      map((user) => ({ userData: user }) as IAuthResponse<T>)
+      map((userData) => {
+        if (!userData) {
+          return undefined
+        }
+
+        return { userData } as IAuthResponse<T>
+      })
     )
   }
 }

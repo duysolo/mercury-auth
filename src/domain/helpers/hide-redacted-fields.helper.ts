@@ -4,6 +4,10 @@ export function hideRedactedFields(
   redactedFields?: string[]
 ): (user: IAuthUserEntity) => IAuthUserEntityForResponse {
   return (user) => {
+    if (!user) {
+      return user
+    }
+
     const omittedFields = redactedFields || ['password']
 
     return Object.fromEntries(

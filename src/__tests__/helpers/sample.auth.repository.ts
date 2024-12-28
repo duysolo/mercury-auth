@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { asyncScheduler, map, Observable, scheduled } from 'rxjs'
+import { asyncScheduler, map, Observable, of, scheduled } from 'rxjs'
 import {
   AuthDto,
   AuthRepository,
@@ -8,6 +8,7 @@ import {
   InjectPasswordHasher,
   PasswordHasherService,
 } from '../../domain'
+import { generateCorrectApiKey } from './user-fixture'
 
 @Injectable()
 export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
@@ -78,6 +79,9 @@ export class SampleAuthRepository implements AuthRepository<string, AuthDto> {
     /**
      * You can check the apiKey if it's stored in database.
      */
+    if (apiKey !== generateCorrectApiKey()) {
+      return of(undefined)
+    }
 
     return this.getAuthUserByUsername()
   }
