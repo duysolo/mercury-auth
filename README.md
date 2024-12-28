@@ -569,13 +569,29 @@ export class AppController {
 }
 ```
 
+`@AuthApiKey()` You need an `ApiKey` header while accessing your controller.
+
+```typescript
+import { AuthApiKey } from '@mercury-labs/nest-auth'
+import { Controller, Get } from '@nestjs/common'
+
+@Controller()
+@AuthApiKey()
+export class AppController {
+  @Get()
+  public getHello(): string {
+    return 'Hello World!'
+  }
+}
+```
+
 **JWT**
 By default, all another routes will be checked using JWT strategy guard.
 
 It means, you need to pass your access token into the request header.
 
 If you set the transfer method to `both` or `cookie`, you don't need to do
-anything. The `AccessToken` and `RefreshToken` already be sent via cookie.
+anything. The `Authorization` and `RefreshToken` already be sent via cookie.
 
 If you set the transfer method to `bearer`, you need to pass your access token
 to the `Authorization` header.
