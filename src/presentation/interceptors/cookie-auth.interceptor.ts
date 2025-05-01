@@ -60,7 +60,7 @@ export class CookieAuthInterceptor implements NestInterceptor {
 
     return transferFunction(tokenResponse, {
       accessToken: 'Authorization',
-      refreshToken: 'RefreshToken',
+      refreshToken: 'Refresh-Token',
     })
   }
 }

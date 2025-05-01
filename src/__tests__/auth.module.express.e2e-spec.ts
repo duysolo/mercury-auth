@@ -42,7 +42,7 @@ describe('AuthModule (e2e) - Express Adaptor', () => {
           method: 'POST',
           path: '/auth/refresh-token',
           headers: {
-            'RefreshToken': `${refreshToken}`,
+            'Refresh-Token': `${refreshToken}`,
           },
         }).then((response) => {
           const parsedResponseBody: IRefreshTokenAuthResponse = JSON.parse(
