@@ -79,7 +79,7 @@ describe('AuthModule (e2e) - Express Adaptor', () => {
           method: 'GET',
           path: '/auth/profile/api-key',
           headers: {
-            ApiKey: `${apiKey}`,
+            'Api-Key': `${apiKey}`,
           },
         }).then((response) => {
           return {

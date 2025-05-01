@@ -65,5 +65,5 @@ export const headerExtractorForAuthorization = headerExtractor('Authorization')
 export const cookieExtractorForRefreshToken = cookieExtractor('Refresh-Token')
 export const headerExtractorForRefreshToken = headerExtractor('Refresh-Token')
 
-export const cookieExtractorForApiKey = cookieExtractor('ApiKey')
-export const headerExtractorForApiKey = headerExtractor('ApiKey')
+export const cookieExtractorForApiKey = cookieExtractor('Api-Key')
+export const headerExtractorForApiKey = headerExtractor('Api-Key')

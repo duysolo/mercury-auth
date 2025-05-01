@@ -78,7 +78,7 @@ describe('AuthModule (e2e) - Fastify Adaptor', () => {
           method: 'GET',
           path: '/auth/profile/api-key',
           headers: {
-            ApiKey: `${apiKey}`,
+            'Api-Key': `${apiKey}`,
           },
         }).then((response) => {
           return {
@@ -177,7 +177,7 @@ describe('AuthModule (e2e) - Fastify Adaptor - Without hashing token', () => {
           method: 'GET',
           path: '/auth/profile/api-key',
           headers: {
-            ApiKey: `${apiKey}`,
+            'Api-Key': `${apiKey}`,
           },
         }).then((response) => {
           return {
