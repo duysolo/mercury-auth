@@ -63,7 +63,7 @@ export class LogoutAction {
 
   public clearAuthCookies(res: IHttpResponse): void {
     if (
-      (res.httpAdaptorType === 'fastify' && !res.setCookie) ||
+      (res.httpAdaptorType === 'fastify' && !res.cookie) ||
       (res.httpAdaptorType === 'express' && !res.cookie)
     ) {
       return
@@ -80,14 +80,14 @@ export class LogoutAction {
       expires: new Date(),
     }
 
-    if (res.httpAdaptorType === 'fastify' && res.setCookie) {
-      res.setCookie('Authorization', '', cookieOptions)
-      res.setCookie('RefreshToken', '', cookieOptions)
+    if (res.httpAdaptorType === 'fastify' && res.cookie) {
+      res.cookie('Authorization', '', cookieOptions)
+      res.cookie('Refresh-Token', '', cookieOptions)
     }
 
     if (res.httpAdaptorType === 'express' && res.cookie) {
       res.cookie('Authorization', '', cookieOptions)
-      res.cookie('RefreshToken', '', cookieOptions)
+      res.cookie('Refresh-Token', '', cookieOptions)
     }
   }
 }

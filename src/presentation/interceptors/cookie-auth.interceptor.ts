@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common'
 import { map, Observable } from 'rxjs'
 import {
-  AuthTransferTokenMethod,
   getResponseFromContext,
   IAuthDefinitions,
   IAuthWithTokenResponse,
@@ -43,16 +42,6 @@ export class CookieAuthInterceptor implements NestInterceptor {
     res: IHttpResponse,
     tokenResponse: IAuthWithTokenResponse
   ): any {
-    if (
-      (res.httpAdaptorType === 'fastify' && !res.setCookie) ||
-      (res.httpAdaptorType === 'express' && !res.cookie) ||
-      this.definitions.transferTokenMethod ===
-        AuthTransferTokenMethod.BEARER_ONLY ||
-      !tokenResponse.token.accessToken
-    ) {
-      return tokenResponse
-    }
-
     const transferFunction = transferTokenFromResponseToCookie(
       res,
       this.definitions

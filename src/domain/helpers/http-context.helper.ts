@@ -22,7 +22,7 @@ export interface IHttpRequest {
 export type IHttpResponse =
   | {
       httpAdaptorType: 'fastify'
-      setCookie?: (
+      cookie?: (
         key: string,
         value: string,
         options: ICookieSerializeOptions

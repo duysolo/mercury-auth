@@ -20,7 +20,7 @@ export const transferTokenFromResponseToCookie: (
 ) => Record<string, any> =
   (response, definitions) => (authResponse, mapKeys) => {
     if (
-      (response.httpAdaptorType === 'fastify' && !response.setCookie) ||
+      (response.httpAdaptorType === 'fastify' && !response.cookie) ||
       (response.httpAdaptorType === 'express' && !response.cookie) ||
       !definitions.transferTokenMethod ||
       ![
@@ -52,8 +52,8 @@ export const transferTokenFromResponseToCookie: (
               : token.expiryDate,
         }
 
-        if (response.httpAdaptorType === 'fastify' && response.setCookie) {
-          response.setCookie(currentKey, currentToken, cookieOptions)
+        if (response.httpAdaptorType === 'fastify' && response.cookie) {
+          response.cookie(currentKey, currentToken, cookieOptions)
         }
 
         if (response.httpAdaptorType === 'express' && response.cookie) {

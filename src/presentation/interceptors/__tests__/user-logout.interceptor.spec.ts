@@ -61,7 +61,7 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
             getResponse: () => {
               if (httpAdaptorType === 'fastify') {
                 return {
-                  setCookie: () => undefined,
+                  cookie: () => undefined,
                 }
               }
 
@@ -140,7 +140,7 @@ function applyTests(httpAdaptorType: 'fastify' | 'express') {
               if (httpAdaptorType === 'fastify') {
                 expect(spy).toHaveBeenCalledWith(
                   expect.not.objectContaining({
-                    setCookie: expect.anything(),
+                    cookie: expect.anything(),
                   })
                 )
               } else {
